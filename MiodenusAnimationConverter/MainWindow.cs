@@ -250,7 +250,7 @@ namespace MiodenusAnimationConverter
             
             _screenshotId++;
             var tempScreenshot = new Screenshot((ushort)Size.X, (ushort)Size.Y);
-            tempScreenshot.SaveToFile($"screenshot_{_screenshotId}.png");
+            tempScreenshot.SaveToPng($"screenshot_{_screenshotId}");
         }
         
         private static void SaveScreenshot(string filename, int windowWidth, int windowHeight)

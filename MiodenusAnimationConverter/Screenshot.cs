@@ -1,5 +1,6 @@
 using System;
-using System.IO;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 
 namespace MiodenusAnimationConverter
@@ -27,18 +28,15 @@ namespace MiodenusAnimationConverter
             GL.ReadPixels(0, 0, Width, Height, PixelFormat.Rgb, PixelType.Byte, PixelsData);
         }
 
-        public void SaveToFile(in string filename)
+        public void SaveToPng(in string filename)
         {
-            var width = BitConverter.GetBytes(Width);
-            var height = BitConverter.GetBytes(Height);
+            Bitmap bmp = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), 
+                    System.Drawing.Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat);
             
-            byte[] header = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, width[0], width[1], height[0], height[1], 24, 0b00001000};
-
-            using (var fileStream = File.OpenWrite(filename))
-            {
-                fileStream.Write(header, 0, header.Length);
-                fileStream.Write(PixelsData, 0, PixelsData.Length);
-            }
+            Marshal.Copy(PixelsData, 0, bitmapData.Scan0, PixelsData.Length);
+            bmp.UnlockBits(bitmapData);
+            bmp.Save($"{filename}.png");
         }
     }
 }
