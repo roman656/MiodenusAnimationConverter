@@ -25,7 +25,7 @@ namespace MiodenusAnimationConverter
             
             GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
             GL.ReadBuffer(ReadBufferMode.Front);
-            GL.ReadPixels(0, 0, Width, Height, PixelFormat.Rgb, PixelType.Byte, PixelsData);
+            GL.ReadPixels(0, 0, Width, Height, PixelFormat.Bgr, PixelType.Byte, PixelsData);
         }
 
         public void SaveToPng(in string filename)
