@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiodenusAnimationConverter", "MiodenusAnimationConverter\MiodenusAnimationConverter.csproj", "{FA16A6D6-DD6D-4FBC-A9B8-9EF14A10DE85}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA16A6D6-DD6D-4FBC-A9B8-9EF14A10DE85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA16A6D6-DD6D-4FBC-A9B8-9EF14A10DE85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA16A6D6-DD6D-4FBC-A9B8-9EF14A10DE85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA16A6D6-DD6D-4FBC-A9B8-9EF14A10DE85}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
