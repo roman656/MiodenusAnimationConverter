@@ -14,25 +14,23 @@ namespace MiodenusAnimationConverter
 
         public Video(string videoType, uint videoTime, uint videoBitrate, string nameOfVideoFile, byte videoFps)
         {
-            if (videoFps > 0)
-            {
-                Fps = videoFps;
-            }
-            else
+            if (!(videoFps > 0))
             {
                 throw new ArgumentException("Invalid Fps value was used in constructor of video");
             }
-            
             Type = videoType;
             Time = videoTime;
             Bitrate = videoBitrate;
-            Filename = nameOfVideoFile + "." + Type;
+            Filename = $"{nameOfVideoFile}.{Type}";
+            Fps = videoFps;
         }
 
         public override string ToString()
         {
             return
-                string.Format(CultureInfo.InvariantCulture, "Video: \n{{\n    Type: {0}\n    Time: {1}\n    Bitrate: {2}\n    Filename: {3}\n    FPS: {4}\n}}", Type, Time, Bitrate, Filename, Fps);
+                string.Format(CultureInfo.InvariantCulture, 
+                    "Video: \n{{\n    Type: {0}\n    Time: {1}\n    Bitrate: {2}\n    Filename: {3}\n    FPS: {4}\n}}",
+                        Type, Time, Bitrate, Filename, Fps);
         }
     }
 }
