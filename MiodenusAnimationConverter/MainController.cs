@@ -1,3 +1,4 @@
+using System;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -6,17 +7,27 @@ namespace MiodenusAnimationConverter
 {
     public class MainController
     {
-        private MainWindow _mainWindow;
+        private readonly MainWindow _mainWindow;
         private readonly string _mainWindowTitle = "Miodenus Animation Converter";
-        private int _mainWindowWidth = 600;
-        private int _mainWindowHeight = 600;
-        private bool _isMainWindowVisible = true;
-        private int _mainWindowFrequency = 60;
+        private readonly ushort _mainWindowWidth = 600;
+        private readonly ushort _mainWindowHeight = 600;
+        private readonly bool _isMainWindowVisible = true;
+        private readonly byte _mainWindowFrequency = 60;
+        private readonly string _animationFilename = "";
+        private readonly string[] _modelFilenames = {"/home/roman/STL/IS-6.stl"};    // Временное решение.
+        private Model[] _models;
         
-        public MainController()
+        public MainController(string[] args)
         {
+            Console.WriteLine($"Start time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            
+            /* TODO: обработка консольных аргументов. */
+            
+            LoadModels();
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
+            
+            Console.WriteLine($"End time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
         }
 
         private MainWindow CreateMainWindow()
@@ -37,7 +48,19 @@ namespace MiodenusAnimationConverter
                 StartVisible = _isMainWindowVisible
             };
 
-            return new MainWindow(mainWindowSettings, nativeWindowSettings);
+            return new MainWindow(_models, mainWindowSettings, nativeWindowSettings);
+        }
+
+        private void LoadModels()
+        {
+            uint i = 0;
+            _models = new Model[_modelFilenames.Length];
+            
+            foreach (var filename in _modelFilenames)
+            {
+                _models[i] = ModelLoader.Load(filename);
+                i++;
+            }
         }
     }
 }

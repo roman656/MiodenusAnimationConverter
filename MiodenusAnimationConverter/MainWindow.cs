@@ -27,14 +27,20 @@ namespace MiodenusAnimationConverter
         private float _freq = Stopwatch.Frequency;
 
         private float _angle;
+        private Model[] _models;
 
-        public MainWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
-                : base(gameWindowSettings, nativeWindowSettings) {}
+        public MainWindow(Model[] models, GameWindowSettings gameWindowSettings,
+            NativeWindowSettings nativeWindowSettings)
+            : base(gameWindowSettings, nativeWindowSettings)
+        {
+            _models = models;
+        }
 
         protected override void OnLoad()
         {
             _model = Matrix4.Identity;
-            Vertex[] vertexes =
+            Vertex[] vertexes = _models[0].Vertexes;
+                /*
             {
                 new Vertex(new Vector4(-0.5f, -0.5f, -0.5f,  1.0f), Color4.Blue),
                 new Vertex(new Vector4( 0.5f, -0.5f, -0.5f,  1.0f), Color4.Blue),
@@ -77,7 +83,7 @@ namespace MiodenusAnimationConverter
                 new Vertex(new Vector4( 0.5f,  0.5f,  0.5f,  1.0f), Color4.Green),
                 new Vertex(new Vector4(-0.5f,  0.5f,  0.5f,  1.0f), Color4.Green),
                 new Vertex(new Vector4(-0.5f,  0.5f, -0.5f,  1.0f), Color4.Green),
-            };
+            };*/
 
             _verticeCount = vertexes.Length;
             _vertexArray = GL.GenVertexArray();
