@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace MiodenusAnimationConverter
 {
-    public struct Video
+    public class Video
     {
         public readonly string Type;
         public readonly int Length;
