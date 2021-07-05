@@ -39,7 +39,28 @@ namespace MiodenusAnimationConverter
         protected override void OnLoad()
         {
             _model = Matrix4.Identity;
-            Vertex[] vertexes = _models[0].Vertexes;
+            int vertexesAmount = 0;
+            
+            foreach (var model in _models)
+            {
+                vertexesAmount += model.Triangles.Length * Triangle.VertexesAmount;
+            }
+
+            Vertex[] vertexes = new Vertex[vertexesAmount];
+
+            int i = 0;
+            
+            foreach (var model in _models)
+            {
+                foreach (var triangle in model.Triangles)
+                {
+                    vertexes[i] = triangle.Vertexes[0];
+                    vertexes[i + 1] = triangle.Vertexes[1];
+                    vertexes[i + 2] = triangle.Vertexes[2];
+                    i += Triangle.VertexesAmount;
+                }
+            }
+
                 /*
             {
                 new Vertex(new Vector4(-0.5f, -0.5f, -0.5f,  1.0f), Color4.Blue),
