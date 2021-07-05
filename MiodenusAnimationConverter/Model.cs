@@ -2,11 +2,11 @@ namespace MiodenusAnimationConverter
 {
     public class Model
     {
-        public readonly Vertex[] Vertexes;
+        public readonly Triangle[] Triangles;
         
-        public Model(Vertex[] vertexes)
+        public Model(Triangle[] triangles)
         {
-            Vertexes = vertexes;
+            Triangles = triangles;
         }
     }
 }
