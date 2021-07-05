@@ -4,63 +4,30 @@ namespace MiodenusAnimationConverter
 {
     public struct Video
     {
-        public readonly string type;
-        public readonly int length;
-        public readonly int bitrate;
-        public readonly string filename;
-        public static Screenshot[] screenshots;
-        public readonly int amountOfScreenshots;
-        public readonly int fps;
+        public readonly string Type;
+        public readonly int Length;
+        public readonly int Bitrate;
+        public readonly string Filename;
+        public readonly int FPS;
 
         public Video(string videoType, int videoLength, int videoBitrate, string nameOfVideoFile)
         {
-            this.type = videoType;
-            this.length = videoLength;
-            this.bitrate = videoBitrate;
-            this.filename = nameOfVideoFile + "." + type;
-            this.amountOfScreenshots = 240;
-            this.fps = 60;
-            this.initializeArray();
+            this.Type = videoType;
+            this.Length = videoLength;
+            this.Bitrate = videoBitrate;
+            this.Filename = nameOfVideoFile + "." + Type;
+            this.FPS = 60;
         }
 
-        public void createVideo()
+        public void CreateVideo()
         {
             
         }
 
-        public string toString()
+        public override string ToString()
         {
             return
-                $"Type = {this.type}, length = {this.length}, bitrate = {this.bitrate}, filename = {this.filename}\n";
-        }
-
-        private void initializeArray()
-        {
-            screenshots = new Screenshot[amountOfScreenshots];
-            
-            for (int i = 0; i < length; ++i)
-            {
-                screenshots[i] = new Screenshot();
-            }
-        }
-        
-        private void initializeArray(Screenshot[] fillingScreenshots)
-        {
-            
-            if (fillingScreenshots.GetLength(0) == this.amountOfScreenshots)
-            {
-                screenshots = new Screenshot[amountOfScreenshots];
-                for (int i = 0; i < this.amountOfScreenshots; ++i)
-                {
-                    screenshots[i] = new Screenshot();
-                    screenshots[i] = fillingScreenshots[i];
-                }
-            }
-            else
-            {
-                System.Console.Out.WriteLine("Wrong length of array in function initializeArray in Video struct.");
-            }
-            
+                $"Type = {this.Type}, length = {this.Length}, bitrate = {this.Bitrate}, filename = {this.Filename}\n";
         }
     }
 }
