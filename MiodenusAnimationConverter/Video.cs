@@ -1,5 +1,8 @@
 using System;
 using System.Globalization;
+using System.Drawing; //может, работает
+using System.Runtime.CompilerServices;
+using AForge.Video.FFMPEG; //не работает
 
 namespace MiodenusAnimationConverter
 {
@@ -23,6 +26,28 @@ namespace MiodenusAnimationConverter
             Bitrate = videoBitrate;
             Filename = $"{nameOfVideoFile}.{Type}";
             Fps = videoFps;
+        }
+
+        public void CreateVideo(int imagesAmount/*, string path*/) //не работает
+        {
+            System.Console.Out.WriteLine("Video creation started");
+            
+            string path = "C:\\Users\\PoorMercymain\\RiderProjects\\Miodenus1\\MiodenusAnimationConverter\\Photo\\";
+            
+            using (var videoWriter = new VideoFileWriter())
+            {
+                videoWriter.Open($"{path}video.avi", 600, 600, 15, VideoCodec.MPEG4, 10000);
+
+                for (int imageFrame = 0; imageFrame < imagesAmount; imageFrame++)
+                {
+                    var imgPath = string.Format("{0}screenshot_{1}.png", path, imageFrame);
+                    using (Bitmap image = Bitmap.FromFile(imgPath) as Bitmap)
+                    {
+                        videoWriter.WriteVideoFrame(image);
+                    }
+                }
+                videoWriter.Close();
+            }
         }
 
         public override string ToString()
