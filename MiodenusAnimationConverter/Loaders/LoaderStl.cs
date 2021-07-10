@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Mathematics;
@@ -13,14 +15,14 @@ namespace MiodenusAnimationConverter.Loaders
             Binary
         }
 
-        private const string FileExtension = "stl";
+        private const string FileExtension = ".stl";
         private const byte HeaderSizeInBytes = 80;
         private const byte TriangleRecordSizeInBytes = 50;
         private const byte TriangleRecordsStartPositionInBytes = 84;
         private static readonly string[] StlAsciiKeywords = { "solid ",
-                                                              "facet normal",
+                                                              "facet normal ",
                                                               "outer loop",
-                                                              "vertex",
+                                                              "vertex ",
                                                               "endloop",
                                                               "endfacet",
                                                               "endsolid " };
@@ -59,7 +61,7 @@ namespace MiodenusAnimationConverter.Loaders
                 throw new EmptyFileException($"File {filename} is empty.");
             }
             
-            if (modelFileInfo.Extension.Equals(FileExtension))
+            if (!modelFileInfo.Extension.ToLower().Equals(FileExtension))
             {
                 throw new InvalidExtensionException($"Extension of {filename} file must be {FileExtension}.");
             }
@@ -68,8 +70,8 @@ namespace MiodenusAnimationConverter.Loaders
         private static StlFormat RecogniseStlFormat(in byte[] fileData)
         {
             StlFormat result;
-            
-            if (fileData.ToString().StartsWith(StlAsciiKeywords[0]))
+
+            if (System.Text.Encoding.UTF8.GetString(fileData).StartsWith(StlAsciiKeywords[0]))
             {
                 result = StlFormat.Ascii;
             }
@@ -83,24 +85,57 @@ namespace MiodenusAnimationConverter.Loaders
         
         private static Model LoadAsciiStl(in byte[] fileData)
         {
-            // TODO
-            return new Model(null);
+            var triangles = new List<Triangle>();
+            var lines = System.Text.Encoding.UTF8.GetString(fileData).Split('\n');
+            bool isTriangleReady = false;
+            Vector4 normal = default;
+            var vertexes = new Vertex[Triangle.VertexesAmount];
+            int currentVertex = 0;
+            for (var i = 0; i < lines.Length; i++)
+            {
+                lines[i] = lines[i].Trim();
+                
+                if (lines[i].StartsWith(StlAsciiKeywords[1]))
+                {
+                    var values = lines[i].Split(' ');
+                    normal = new Vector4(float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat), float.Parse(values[4], CultureInfo.InvariantCulture.NumberFormat),1.0f);
+                }
+                else if (lines[i].StartsWith(StlAsciiKeywords[4]))
+                {
+                    isTriangleReady = true;
+                }
+                else if (lines[i].StartsWith(StlAsciiKeywords[3]))
+                {
+                    var values = lines[i].Split(' ');
+                    vertexes[currentVertex] = new Vertex(
+                        new Vector4(0.05f * float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat), 0.05f * float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat), 0.05f * float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat), 1.0f),
+                            Color4.Green);
+                    currentVertex++;
+                }
+
+                if (isTriangleReady)
+                {
+                    triangles.Add(new Triangle(vertexes));
+                    isTriangleReady = false;
+                    currentVertex = 0;
+                }
+            }
+            
+            return new Model(triangles.ToArray());
         }
         
-        private static Model LoadBinaryStl(in byte[] fileData)
+        private static Model LoadBinaryStl(in byte[] fileData, float scale = 0.03f)
         {
-            int trianglesAmount = BitConverter.ToInt32(fileData, HeaderSizeInBytes);
+            var trianglesAmount = BitConverter.ToUInt32(fileData, HeaderSizeInBytes);
             var triangles = new Triangle[trianglesAmount];
 
-            float scale = 0.05f;    // Временно.
-
-            for (int i = 0; i < trianglesAmount; i++)
+            for (uint i = 0; i < trianglesAmount; i++)
             {
-                int currentRecordPosition = TriangleRecordsStartPositionInBytes + (i * TriangleRecordSizeInBytes);
+                var currentRecordPosition = (int)(TriangleRecordsStartPositionInBytes + (i * TriangleRecordSizeInBytes));
                 
-                var normal = new Vector3(BitConverter.ToSingle(fileData, currentRecordPosition), 
+                var normal = new Vector4(BitConverter.ToSingle(fileData, currentRecordPosition), 
                         BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float)),
-                        BitConverter.ToSingle(fileData, currentRecordPosition + 2 * sizeof(float)));
+                        BitConverter.ToSingle(fileData, currentRecordPosition + 2 * sizeof(float)), 1.0f);
 
                 var vertexes = new Vertex[Triangle.VertexesAmount];
                 
@@ -128,7 +163,7 @@ namespace MiodenusAnimationConverter.Loaders
                                 1.0f),
                         Color4.Green);
                 
-                triangles[i] = new Triangle(normal, vertexes);
+                triangles[i] = new Triangle(vertexes);
             }
 
             return new Model(triangles);
