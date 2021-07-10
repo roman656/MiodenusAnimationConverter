@@ -25,6 +25,12 @@ namespace MiodenusAnimationConverter
             /* TODO: обработка консольных аргументов. */
             
             LoadModels();
+
+            foreach (var model in _models)
+            {
+                model.Scale(0.01f);
+            }
+            
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
             

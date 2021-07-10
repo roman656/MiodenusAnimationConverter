@@ -88,19 +88,13 @@ namespace MiodenusAnimationConverter.Loaders
             var triangles = new List<Triangle>();
             var lines = System.Text.Encoding.UTF8.GetString(fileData).Split('\n');
             bool isTriangleReady = false;
-            Vector4 normal = default;
             var vertexes = new Vertex[Triangle.VertexesAmount];
             int currentVertex = 0;
             for (var i = 0; i < lines.Length; i++)
             {
                 lines[i] = lines[i].Trim();
                 
-                if (lines[i].StartsWith(StlAsciiKeywords[1]))
-                {
-                    var values = lines[i].Split(' ');
-                    normal = new Vector4(float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat), float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat), float.Parse(values[4], CultureInfo.InvariantCulture.NumberFormat),1.0f);
-                }
-                else if (lines[i].StartsWith(StlAsciiKeywords[4]))
+                if (lines[i].StartsWith(StlAsciiKeywords[4]))
                 {
                     isTriangleReady = true;
                 }
@@ -124,7 +118,7 @@ namespace MiodenusAnimationConverter.Loaders
             return new Model(triangles.ToArray());
         }
         
-        private static Model LoadBinaryStl(in byte[] fileData, float scale = 0.03f)
+        private static Model LoadBinaryStl(in byte[] fileData)
         {
             var trianglesAmount = BitConverter.ToUInt32(fileData, HeaderSizeInBytes);
             var triangles = new Triangle[trianglesAmount];
@@ -132,34 +126,30 @@ namespace MiodenusAnimationConverter.Loaders
             for (uint i = 0; i < trianglesAmount; i++)
             {
                 var currentRecordPosition = (int)(TriangleRecordsStartPositionInBytes + (i * TriangleRecordSizeInBytes));
-                
-                var normal = new Vector4(BitConverter.ToSingle(fileData, currentRecordPosition), 
-                        BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float)),
-                        BitConverter.ToSingle(fileData, currentRecordPosition + 2 * sizeof(float)), 1.0f);
 
                 var vertexes = new Vertex[Triangle.VertexesAmount];
                 
                 vertexes[0] = new Vertex(
                         new Vector4(
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 3 * sizeof(float)) * scale,
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 4 * sizeof(float)) * scale,
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 5 * sizeof(float)) * scale,
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 3 * sizeof(float)),
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 4 * sizeof(float)),
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 5 * sizeof(float)),
                                 1.0f),
                         Color4.Green);
                 
                 vertexes[1] = new Vertex(
                         new Vector4(
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 6 * sizeof(float)) * scale,
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 7 * sizeof(float)) * scale,
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 8 * sizeof(float)) * scale,
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 6 * sizeof(float)),
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 7 * sizeof(float)),
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 8 * sizeof(float)),
                                 1.0f),
                         Color4.Green);
                 
                 vertexes[2] = new Vertex(
                         new Vector4(
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 9 * sizeof(float)) * scale,
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 10 * sizeof(float)) * scale,
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 11 * sizeof(float)) * scale,
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 9 * sizeof(float)),
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 10 * sizeof(float)),
+                                BitConverter.ToSingle(fileData, currentRecordPosition + 11 * sizeof(float)),
                                 1.0f),
                         Color4.Green);
                 
