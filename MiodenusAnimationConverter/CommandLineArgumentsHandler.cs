@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Graphics.OpenGL;
 
@@ -6,103 +7,99 @@ namespace MiodenusAnimationConverter
 {
     public class CommandLineArgumentsHandler
     {
-        public string[] InputKeys = {"fps",
-                                     "bitrate",
-                                     "extension"
+        public string[] InputKeys = {"-fps",
+                                     "-bitrate",
+                                     "-extension"
         };
 
-        public string AnimationFile = "";
+        public List<string> AnimationFile = new List<string>();
         public string VideoFile = "";
         public string Extension = "avi";
         public int Bitrate = 10000;
         public int Fps = 60;
 
-        private void InitializeInOut(string[] arguments)
+        public CommandLineArgumentsHandler(string[] arguments)
         {
-            if (arguments.Length < 2)
+            
+            var argumentsList = new List<string>(arguments);
+
+            if (argumentsList.Count < 2)
             {
                 throw new WrongCommandLineArgumentsException("At least 2 command line arguments should be used");
             }
             else
             {
-                AnimationFile = arguments[0];
-                VideoFile = arguments[1];
-            }
-        }
-
-        private void InitializeExtension(string[] arguments)
-        {
-            if (arguments[2] != InputKeys[2])
-            {
-                throw new WrongCommandLineArgumentsException("The third argument should be extension");
-            }
+                System.Console.Out.WriteLine(argumentsList[0]);
                 
-            if(arguments.Length < 4)
-            {
-                throw new WrongCommandLineArgumentsException("Extension of video can not be empty");
-            }
-            else
-            {
-                Extension = arguments[3];
-            }
-        }
-        
-        private void InitializeBitrate(string[] arguments)
-        {
-            if (arguments[4] != InputKeys[1])
-            {
-                throw new WrongCommandLineArgumentsException("The fourth argument should be bitrate");
-            }
-
-            if (arguments.Length < 6)
-            {
-                throw new WrongCommandLineArgumentsException("Bitrate can not be empty");
-            }
-            else
-            {
-                if (!Int32.TryParse(arguments[5], out Bitrate))
+                for (int i = 0; argumentsList.Count!=0; )
                 {
-                    throw new WrongCommandLineArgumentsException("Bitrate should be a number");
-                }
-            }
-        }
-        
-        private void InitializeFps(string[] arguments)
-        {
-            if (arguments[6] != InputKeys[0])
-            {
-                throw new WrongCommandLineArgumentsException("The fifth argument should be fps");
-            }
-
-            if (arguments.Length < 8)
-            {
-                throw new WrongCommandLineArgumentsException("Fps can not be empty");
-            }
-            else
-            {
-                if (!Int32.TryParse(arguments[7], out Fps))
-                {
-                    throw new WrongCommandLineArgumentsException("Fps should be a number");
-                }
-            }
-        }
-        
-        public CommandLineArgumentsHandler(string[] arguments)
-        {
-            InitializeInOut(arguments);
-            
-            if (arguments.Length > 2)
-            {
-                InitializeExtension(arguments);
-
-                if (arguments.Length > 4)
-                {
-                    InitializeBitrate(arguments);
-
-                    if (arguments.Length > 6)
+                    foreach (string key in InputKeys)
                     {
-                        InitializeFps(arguments);
+                        if (argumentsList[i] != InputKeys[0] && argumentsList[i] != InputKeys[1] && argumentsList[i] != InputKeys[2])
+                        {
+                            AnimationFile.Add(argumentsList[i]);
+                            argumentsList.Remove(argumentsList[i]);
+                            break;
+                        }
+                        else
+                        {
+                            if (argumentsList.Count < 2)
+                            {
+                                throw new WrongCommandLineArgumentsException($"Argument {argumentsList[0]} should not be empty"); 
+                            }
+                            else
+                            {
+                                if (argumentsList[0] == "-fps")
+                                {
+                                    if (!Int32.TryParse(argumentsList[1], out Fps))
+                                    {
+                                        throw new WrongCommandLineArgumentsException("Fps should be a number");
+                                    }
+                                    
+                                    argumentsList.Remove(argumentsList[1]);
+                                    argumentsList.Remove(argumentsList[0]);
+                                    
+                                    System.Console.Out.WriteLine($"Fps = {Fps}");
+                                    
+                                    break;
+                                }
+                                if (argumentsList[0] == "-bitrate")
+                                {
+                                    if(!Int32.TryParse(argumentsList[1], out Bitrate))
+                                    {
+                                        throw new WrongCommandLineArgumentsException("Bitrate should be a number");
+                                    }
+                                    
+                                    argumentsList.Remove(argumentsList[1]);
+                                    argumentsList.Remove(argumentsList[0]);
+                                    
+                                    System.Console.Out.WriteLine($"Bitrate = {Bitrate}");
+                                    
+                                    break;
+                                }
+                                if(argumentsList[0] == "-extension")
+                                {
+                                    Extension = argumentsList[1];
+                                    
+                                    argumentsList.Remove(argumentsList[1]);
+                                    argumentsList.Remove(argumentsList[0]);
+
+                                    System.Console.Out.WriteLine($"Extension = {Extension}");
+                                    
+                                    break;
+                                }
+                            }
+                        }
+
+                        
                     }
+                }
+                VideoFile = AnimationFile[AnimationFile.Count - 1];
+                AnimationFile.Remove(AnimationFile[AnimationFile.Count - 1]);
+                System.Console.Out.WriteLine($"Video file = {VideoFile}");
+                foreach (var animation in AnimationFile)
+                {
+                    System.Console.Out.WriteLine($"Animation file = {animation}");
                 }
             }
         }
