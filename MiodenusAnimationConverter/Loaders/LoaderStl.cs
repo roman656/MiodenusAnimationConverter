@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Mathematics;
 
@@ -60,7 +61,7 @@ namespace MiodenusAnimationConverter.Loaders
             {
                 throw new EmptyFileException($"File {filename} is empty.");
             }
-            
+
             if (!modelFileInfo.Extension.ToLower().Equals(FileExtension))
             {
                 throw new InvalidExtensionException($"Extension of {filename} file must be {FileExtension}.");
@@ -69,24 +70,46 @@ namespace MiodenusAnimationConverter.Loaders
 
         private static StlFormat RecogniseStlFormat(in byte[] fileData)
         {
-            StlFormat result;
+            var result = StlFormat.Binary;
+            var dataLength = fileData.Length;
 
-            if (System.Text.Encoding.UTF8.GetString(fileData).StartsWith(StlAsciiKeywords[0]))
+            for (var i = 0; i < dataLength; i++)
             {
-                result = StlFormat.Ascii;
-            }
-            else
-            {
-                result = StlFormat.Binary;
-            }
+                /* Если встретился первый символ ключевого слова. */
+                if ((fileData[i] == StlAsciiKeywords[0][0]) || (fileData[i] == (StlAsciiKeywords[0].ToUpper())[0]))
+                {
+                    /* Пытаемся считать все слово и сравнить с ключевым. */
+                    try
+                    {
+                        var keywordCandidate = new ArraySegment<byte>(fileData, i, StlAsciiKeywords[0].Length);
 
+                        if (System.Text.Encoding.ASCII.GetString(keywordCandidate).ToLower().Equals(StlAsciiKeywords[0]))
+                        {
+                            result = StlFormat.Ascii;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        /* Если не удалось - значит это не ASCII. */
+                        result = StlFormat.Binary;
+                    }
+                }
+                else if (char.IsWhiteSpace((char) fileData[i]))
+                {
+                    /* Все пробельные символы с начала файла пропускаются. */
+                    continue;
+                }
+                
+                break;
+            }
+            
             return result;
         }
         
         private static Model LoadAsciiStl(in byte[] fileData)
         {
             var triangles = new List<Triangle>();
-            var lines = System.Text.Encoding.UTF8.GetString(fileData).Split('\n');
+            var lines = System.Text.Encoding.ASCII.GetString(fileData).Split('\n');
             bool isTriangleReady = false;
             var vertexes = new Vertex[Triangle.VertexesAmount];
             int currentVertex = 0;
