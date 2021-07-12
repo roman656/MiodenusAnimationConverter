@@ -152,7 +152,7 @@ namespace MiodenusAnimationConverter
 
                 if (AnimationFile.Count < 2)
                 {
-                    throw new WrongCommandLineArgumentsException("At least 2 command line arguments should be used: 1. For input file 2. For output file");
+                    throw new WrongCommandLineArgumentsException("The first 2 command line arguments should be: 1. Path for input file 2. Path for output file");
                 }
                 
                 VideoFile = AnimationFile[AnimationFile.Count - 1];
