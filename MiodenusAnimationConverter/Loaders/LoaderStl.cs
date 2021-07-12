@@ -16,6 +16,7 @@ namespace MiodenusAnimationConverter.Loaders
             Binary
         }
 
+        public bool UseCalculatedNormals;
         private const string FileExtension = ".stl";
         private const byte HeaderSizeInBytes = 80;
         private const byte TriangleRecordSizeInBytes = 50;
@@ -27,6 +28,11 @@ namespace MiodenusAnimationConverter.Loaders
                                                               "endloop",
                                                               "endfacet",
                                                               "endsolid " };
+
+        public LoaderStl(bool useCalculatedNormals = true)
+        {
+            UseCalculatedNormals = useCalculatedNormals;
+        }
         
         public Model Load(in string filename)
         {
@@ -75,7 +81,7 @@ namespace MiodenusAnimationConverter.Loaders
 
             for (var i = 0; i < dataLength; i++)
             {
-                /* Если встретился первый символ ключевого слова. */
+                /* Если встретился первый символ ключевого слова (до него непробельных символов не было). */
                 if ((fileData[i] == StlAsciiKeywords[0][0]) || (fileData[i] == (StlAsciiKeywords[0].ToUpper())[0]))
                 {
                     /* Пытаемся считать все слово и сравнить с ключевым. */
@@ -109,21 +115,22 @@ namespace MiodenusAnimationConverter.Loaders
         private static Model LoadAsciiStl(in byte[] fileData)
         {
             var triangles = new List<Triangle>();
-            var lines = System.Text.Encoding.ASCII.GetString(fileData).Split('\n');
+            var fileLines = System.Text.Encoding.ASCII.GetString(fileData).Split('\n');
             bool isTriangleReady = false;
             var vertexes = new Vertex[Triangle.VertexesAmount];
             int currentVertex = 0;
-            for (var i = 0; i < lines.Length; i++)
+            
+            for (var i = 0; i < fileLines.Length; i++)
             {
-                lines[i] = lines[i].Trim();
+                fileLines[i] = fileLines[i].Trim();
                 
-                if (lines[i].StartsWith(StlAsciiKeywords[4]))
+                if (fileLines[i].StartsWith(StlAsciiKeywords[4]))
                 {
                     isTriangleReady = true;
                 }
-                else if (lines[i].StartsWith(StlAsciiKeywords[3]))
+                else if (fileLines[i].StartsWith(StlAsciiKeywords[3]))
                 {
-                    var values = lines[i].Split(' ');
+                    var values = fileLines[i].Split(' ');
                     vertexes[currentVertex] = new Vertex(
                         new Vector4(0.05f * float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat), 0.05f * float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat), 0.05f * float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat), 1.0f),
                             Color4.Green);
@@ -132,7 +139,7 @@ namespace MiodenusAnimationConverter.Loaders
 
                 if (isTriangleReady)
                 {
-                    triangles.Add(new Triangle(vertexes));
+                    triangles.Add(new Triangle(vertexes, Triangle.CalculateNormal(vertexes)));
                     isTriangleReady = false;
                     currentVertex = 0;
                 }
@@ -176,7 +183,7 @@ namespace MiodenusAnimationConverter.Loaders
                                 1.0f),
                         Color4.Green);
                 
-                triangles[i] = new Triangle(vertexes);
+                triangles[i] = new Triangle(vertexes, Triangle.CalculateNormal(vertexes));
             }
 
             return new Model(triangles);

@@ -9,18 +9,18 @@ namespace MiodenusAnimationConverter
         public readonly Vector4 Normal;
         public readonly Vertex[] Vertexes;
 
-        public Triangle(in Vertex[] vertexes)
+        public Triangle(in Vertex[] vertexes, Vector4 normal)
         {
-            CheckArgument(vertexes);
-            
-            Normal = CalculateNormal(vertexes);
+            CheckVertexesArgument(vertexes);
+
+            Normal = normal;
             Vertexes = new Vertex[3];
             Array.Copy(vertexes, Vertexes, vertexes.Length);
         }
 
         public static Vector4 CalculateNormal(in Vertex[] vertexes)
         {
-            CheckArgument(vertexes);
+            CheckVertexesArgument(vertexes);
 
             var AB = new Vector3(vertexes[1].Position - vertexes[0].Position);
             var AC = new Vector3(vertexes[2].Position - vertexes[0].Position);
@@ -28,7 +28,7 @@ namespace MiodenusAnimationConverter
             return new Vector4(Vector3.Cross(AB, AC).Normalized(), 1.0f);
         }
 
-        private static void CheckArgument(in Vertex[] vertexes)
+        private static void CheckVertexesArgument(in Vertex[] vertexes)
         {
             if (vertexes == null)
             {
