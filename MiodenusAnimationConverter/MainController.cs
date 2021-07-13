@@ -66,7 +66,7 @@ namespace MiodenusAnimationConverter
             
             foreach (var filename in _modelFilenames)
             {
-                _models[i] = loader.Load(filename, Color4.SteelBlue, true);
+                _models[i] = loader.Load(filename, Color4.SteelBlue, false);
                 i++;
             }
         }

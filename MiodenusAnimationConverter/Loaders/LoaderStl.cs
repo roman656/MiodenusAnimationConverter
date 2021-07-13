@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Mathematics;
 
@@ -125,14 +124,17 @@ namespace MiodenusAnimationConverter.Loaders
                 {
                     if (isNormalReady)
                     {
-                        throw new Exception("In model file встреитлось 2 normals подряд.");
+                        throw new WrongModelFileContentException("There is not enough data in the model file." 
+                                + $" {Triangle.VertexesAmount - currentVertexId} more vertexes are needed."
+                                + $" Current facet normal: {normal.X} {normal.Y} {normal.Z}.");
                     }
                     
                     var values = fileLines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                     if (values.Length != 5)
                     {
-                        throw new Exception("In model file у facet normal должно быть 3 параметра.");
+                        throw new WrongModelFileContentException("Normal`s parameters amount is incorrect "
+                                + $"in the model file. facet normal must have 3 parameters. Got {values.Length - 2}.");
                     }
 
                     try
@@ -144,23 +146,26 @@ namespace MiodenusAnimationConverter.Loaders
                     }
                     catch (FormatException)
                     {
-                        throw new Exception("In model file у facet normal не float параметр.");
+                        throw new WrongModelFileContentException("In the model file: one or more parameters"
+                                + " of facet normal are not of the float type.");
                     }
 
                     isNormalReady = true;
                 }
                 else if (fileLines[i].StartsWith(StlAsciiKeywords[3]))    // Считывание текущей вершины.
                 {
-                    if (isVertexesReady)
+                    if (!isNormalReady && !useCalculatedNormals)
                     {
-                        throw new Exception("In model file //.");
+                        throw new WrongModelFileContentException("Incorrect data in the model file."
+                                + " Expected: facet normal. Got: vertex.");
                     }
-                    
+
                     var values = fileLines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                     if (values.Length != 4)
                     {
-                        throw new Exception($"In model file у vertex должно быть 3 параметра.");
+                        throw new WrongModelFileContentException("Vertex`s parameters amount is incorrect " 
+                                + $"in the model file. vertex must have 3 parameters. Got {values.Length - 1}.");
                     }
                     
                     try
@@ -174,7 +179,8 @@ namespace MiodenusAnimationConverter.Loaders
                     }
                     catch (FormatException)
                     {
-                        throw new Exception("In model file у vertex не float параметр.");
+                        throw new WrongModelFileContentException("In the model file: one or more parameters" 
+                                + " of vertex are not of the float type.");
                     }
 
                     currentVertexId++;
@@ -185,7 +191,7 @@ namespace MiodenusAnimationConverter.Loaders
                     }
                 }
 
-                if (isVertexesReady && (useCalculatedNormals || isNormalReady))
+                if (isVertexesReady)
                 {
                     if (useCalculatedNormals)
                     {
