@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Exceptions;
+using OpenTK.Graphics.OpenGL;
 
 namespace MiodenusAnimationConverter
 {
@@ -24,17 +25,27 @@ namespace MiodenusAnimationConverter
                                         false
         };
 
-        public List<string> AnimationFile = new ();
+        public byte MinimumAmountOfArguments = 2;
+        public List<string> AnimationFile = new List<string>();
         public string VideoFile = "";
         public string Extension = "avi";
         public int Bitrate = 10000;
         public int Fps = 60;
 
-        private Video InitializeVideo()
+        public Settings InitializeSettings()
         {
-            Video video = new Video(Extension, 60, (uint)Bitrate, VideoFile, (byte)Fps);
+            Settings settings = new Settings(VideoFile, Extension, Bitrate, Fps, AnimationFile);
+
+            Console.WriteLine($"settings:\n  VideoFile = {settings.VideoFile}\n  Extension = {settings.Extension}\n  Bitrate = {settings.Bitrate}\n  Fps = {settings.Fps}");
+
+            for (int i = 0; i < settings.AnimationFile.Count; i++)
+            {
+                Console.WriteLine($"  AnimationFile[{i}] = {settings.AnimationFile[i]}");
+            }
             
-            return video;
+            Console.WriteLine("end settings");
+            
+            return settings;
         }
         
         public CommandLineArgumentsHandler(string[] arguments)
@@ -43,28 +54,28 @@ namespace MiodenusAnimationConverter
             
             if (argumentsList.Count == 1 && argumentsList[0] == "-i")
             {
-                Console.WriteLine(info);
+                System.Console.Out.WriteLine(info);
                 Environment.Exit(0);
             }
             
-            if (argumentsList.Count < 2)
+            if (argumentsList.Count < MinimumAmountOfArguments)
             {
                 throw new WrongCommandLineArgumentsException("At least 2 command line arguments should be used");
             }
             else
             {
-                Console.WriteLine(argumentsList[0]);
+                System.Console.Out.WriteLine(argumentsList[0]);
                 
                 for ( ; argumentsList.Count!=0; )
                 {
                     if (argumentsList[0] != InputKeys[0] && argumentsList[0] != InputKeys[1] && argumentsList[0] != InputKeys[2])
-                        {
+                    {
                             
-                            AnimationFile.Add(argumentsList[0]);
-                            argumentsList.Remove(argumentsList[0]);
-                        }
-                        else
-                        {
+                        AnimationFile.Add(argumentsList[0]);
+                        argumentsList.Remove(argumentsList[0]);
+                    }
+                    else
+                    {
                             if (argumentsList.Count < 2)
                             {
                                 throw new WrongCommandLineArgumentsException($"Argument {argumentsList[0]} should not be empty"); 
@@ -80,7 +91,7 @@ namespace MiodenusAnimationConverter
                                             throw new WrongCommandLineArgumentsException("Fps should be a number");
                                         }
                                         
-                                        if (Fps < 1 || Fps > 255)
+                                        if (Fps < 1 || Fps > byte.MaxValue)
                                         {
                                             throw new WrongCommandLineArgumentsException("Fps should be greater or equal to 1 and less than 256");
                                         }
@@ -90,7 +101,7 @@ namespace MiodenusAnimationConverter
                                         argumentsList.Remove(argumentsList[1]);
                                         argumentsList.Remove(argumentsList[0]);
                                                                             
-                                        Console.WriteLine($"Fps = {Fps}");
+                                        System.Console.Out.WriteLine($"Fps = {Fps}");
                                     }
                                     else
                                     {
@@ -118,7 +129,7 @@ namespace MiodenusAnimationConverter
                                         argumentsList.Remove(argumentsList[1]);
                                         argumentsList.Remove(argumentsList[0]);
                                                                             
-                                        Console.WriteLine($"Bitrate = {Bitrate}");
+                                        System.Console.Out.WriteLine($"Bitrate = {Bitrate}");
                                     }
                                     else
                                     {
@@ -137,7 +148,7 @@ namespace MiodenusAnimationConverter
                                         argumentsList.Remove(argumentsList[1]);
                                         argumentsList.Remove(argumentsList[0]);
                                         
-                                        Console.WriteLine($"Extension = {Extension}");
+                                        System.Console.Out.WriteLine($"Extension = {Extension}");
                                     }
                                     else
                                     {
@@ -146,26 +157,24 @@ namespace MiodenusAnimationConverter
                                     
                                 }
                             }
-                        }
+                    }
                 }
 
-                if (AnimationFile.Count < 2)
+                if (AnimationFile.Count < MinimumAmountOfArguments)
                 {
-                    throw new WrongCommandLineArgumentsException("The first 2 command line arguments should be: 1. Path for input file 2. Path for output file");
+                    throw new WrongCommandLineArgumentsException("The first command line arguments should be: 1. Path (or paths) for input file (or files) 2. Path for output file");
                 }
                 
                 VideoFile = AnimationFile[AnimationFile.Count - 1];
                 AnimationFile.Remove(AnimationFile[AnimationFile.Count - 1]);
                 
-                Console.WriteLine($"Video file = {VideoFile}");
+                System.Console.Out.WriteLine($"Video file = {VideoFile}");
                 
                 foreach (var animation in AnimationFile)
                 {
-                    Console.WriteLine($"Animation file = {animation}");
+                    System.Console.Out.WriteLine($"Animation file = {animation}");
                 }
             }
-
-            InitializeVideo();
         }
     }
 }
