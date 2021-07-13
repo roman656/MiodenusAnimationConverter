@@ -116,7 +116,7 @@ namespace MiodenusAnimationConverter
             // create first buffer: vertex
             GL.NamedBufferStorage(
                 _buffer,
-                Vertex.Size * vertexes.Length,        // the size needed by this buffer
+                Vertex.SizeInBytes * vertexes.Length,        // the size needed by this buffer
                 vertexes,                           // data to initialize with
                 BufferStorageFlags.MapWriteBit);    // at this point we will only write to the buffer
 
@@ -143,7 +143,7 @@ namespace MiodenusAnimationConverter
                 16);                     // relative offset after a vec4
 
             // link the vertex array and buffer and provide the stride as size of Vertex
-            GL.VertexArrayVertexBuffer(_vertexArray, 0, _buffer, IntPtr.Zero, Vertex.Size);
+            GL.VertexArrayVertexBuffer(_vertexArray, 0, _buffer, IntPtr.Zero, Vertex.SizeInBytes);
             _initialized = true;
 
             CursorVisible = true;
@@ -193,7 +193,7 @@ namespace MiodenusAnimationConverter
                         void main(void)
                         {
                             float lighting = abs(dot(transformed_normal, vec3(0,0,-1)));
-                            color = vs_color * lighting;
+                            color = vs_color * 1; //lighting;
                         }";
                 GL.ShaderSource(shader, src);
                 GL.CompileShader(shader);
@@ -274,10 +274,11 @@ namespace MiodenusAnimationConverter
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
-            
+            /*
             _screenshotId++;
             var tempScreenshot = new Screenshot((ushort)Size.X, (ushort)Size.Y);
             tempScreenshot.SaveToPng($"screenshot_{_screenshotId}");
+            */
         }
 
         protected override void OnClosed()
