@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Mathematics;
 
@@ -15,8 +14,7 @@ namespace MiodenusAnimationConverter.Loaders
             Ascii,
             Binary
         }
-
-        public bool UseCalculatedNormals;
+        
         private const string FileExtension = ".stl";
         private const byte HeaderSizeInBytes = 80;
         private const byte TriangleRecordSizeInBytes = 50;
@@ -29,12 +27,7 @@ namespace MiodenusAnimationConverter.Loaders
                                                               "endfacet",
                                                               "endsolid " };
 
-        public LoaderStl(bool useCalculatedNormals = true)
-        {
-            UseCalculatedNormals = useCalculatedNormals;
-        }
-        
-        public Model Load(in string filename)
+        public Model Load(in string filename, Color4 modelColor, bool useCalculatedNormals)
         {
             Model model;
             
@@ -44,11 +37,11 @@ namespace MiodenusAnimationConverter.Loaders
             
             if (RecogniseStlFormat(fileData) == StlFormat.Ascii)
             {
-                model = LoadAsciiStl(fileData);
+                model = LoadAsciiStl(fileData, useCalculatedNormals, modelColor);
             }
             else
             {
-                model = LoadBinaryStl(fileData);
+                model = LoadBinaryStl(fileData, useCalculatedNormals, modelColor);
             }
 
             return model;
@@ -112,43 +105,113 @@ namespace MiodenusAnimationConverter.Loaders
             return result;
         }
         
-        private static Model LoadAsciiStl(in byte[] fileData)
+        private static Model LoadAsciiStl(in byte[] fileData, bool useCalculatedNormals, Color4 modelColor)
         {
             var triangles = new List<Triangle>();
-            var fileLines = System.Text.Encoding.ASCII.GetString(fileData).Split('\n');
-            bool isTriangleReady = false;
+            var fileLines = System.Text.Encoding.ASCII.GetString(fileData).ToLower().Split('\n');
+            var fileLinesAmount = fileLines.Length;
+            var isNormalReady = false;
+            var isVertexesReady = false;
+            var normal = new Vector4();
             var vertexes = new Vertex[Triangle.VertexesAmount];
-            int currentVertex = 0;
-            
-            for (var i = 0; i < fileLines.Length; i++)
+            byte currentVertexId = 0;
+
+            for (var i = 0; i < fileLinesAmount; i++)
             {
                 fileLines[i] = fileLines[i].Trim();
-                
-                if (fileLines[i].StartsWith(StlAsciiKeywords[4]))
+
+                if (fileLines[i].StartsWith(StlAsciiKeywords[1]) && !useCalculatedNormals)    // Считывание нормали.
                 {
-                    isTriangleReady = true;
+                    if (isNormalReady)
+                    {
+                        throw new WrongModelFileContentException("There is not enough data in the model file." 
+                                + $" {Triangle.VertexesAmount - currentVertexId} more vertexes are needed."
+                                + $" Current facet normal: {normal.X} {normal.Y} {normal.Z}.");
+                    }
+                    
+                    var values = fileLines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    if (values.Length != 5)
+                    {
+                        throw new WrongModelFileContentException("Normal`s parameters amount is incorrect "
+                                + $"in the model file. facet normal must have 3 parameters. Got {values.Length - 2}.");
+                    }
+
+                    try
+                    {
+                        normal = new Vector4(float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
+                                             float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat),
+                                             float.Parse(values[4], CultureInfo.InvariantCulture.NumberFormat),
+                                             1.0f);
+                    }
+                    catch (FormatException)
+                    {
+                        throw new WrongModelFileContentException("In the model file: one or more parameters"
+                                + " of facet normal are not of the float type.");
+                    }
+
+                    isNormalReady = true;
                 }
-                else if (fileLines[i].StartsWith(StlAsciiKeywords[3]))
+                else if (fileLines[i].StartsWith(StlAsciiKeywords[3]))    // Считывание текущей вершины.
                 {
-                    var values = fileLines[i].Split(' ');
-                    vertexes[currentVertex] = new Vertex(
-                        new Vector4(0.05f * float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat), 0.05f * float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat), 0.05f * float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat), 1.0f),
-                            Color4.Green);
-                    currentVertex++;
+                    if (!isNormalReady && !useCalculatedNormals)
+                    {
+                        throw new WrongModelFileContentException("Incorrect data in the model file."
+                                + " Expected: facet normal. Got: vertex.");
+                    }
+
+                    var values = fileLines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    if (values.Length != 4)
+                    {
+                        throw new WrongModelFileContentException("Vertex`s parameters amount is incorrect " 
+                                + $"in the model file. vertex must have 3 parameters. Got {values.Length - 1}.");
+                    }
+                    
+                    try
+                    {
+                        vertexes[currentVertexId] = new Vertex(
+                                new Vector4(float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat),
+                                            float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
+                                            float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat),
+                                            1.0f), 
+                                modelColor);
+                    }
+                    catch (FormatException)
+                    {
+                        throw new WrongModelFileContentException("In the model file: one or more parameters" 
+                                + " of vertex are not of the float type.");
+                    }
+
+                    currentVertexId++;
+
+                    if (currentVertexId >= Triangle.VertexesAmount)
+                    {
+                        isVertexesReady = true;
+                    }
                 }
 
-                if (isTriangleReady)
+                if (isVertexesReady)
                 {
-                    triangles.Add(new Triangle(vertexes, Triangle.CalculateNormal(vertexes)));
-                    isTriangleReady = false;
-                    currentVertex = 0;
+                    if (useCalculatedNormals)
+                    {
+                        triangles.Add(new Triangle(vertexes, Triangle.CalculateNormal(vertexes)));
+                    }
+                    else
+                    {
+                        triangles.Add(new Triangle(vertexes, normal));
+                    }
+                    
+                    isNormalReady = false;
+                    isVertexesReady = false;
+                    currentVertexId = 0;
                 }
             }
             
             return new Model(triangles.ToArray());
         }
         
-        private static Model LoadBinaryStl(in byte[] fileData)
+        private static Model LoadBinaryStl(in byte[] fileData, bool useCalculatedNormals, Color4 modelColor)
         {
             var trianglesAmount = BitConverter.ToUInt32(fileData, HeaderSizeInBytes);
             var triangles = new Triangle[trianglesAmount];
