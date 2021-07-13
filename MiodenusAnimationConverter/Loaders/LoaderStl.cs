@@ -31,6 +31,9 @@ namespace MiodenusAnimationConverter.Loaders
         {
             Model model;
             
+            Console.WriteLine($"Loading model from {filename}");
+            Console.WriteLine($"Loading begin time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            
             CheckModelFile(filename);
 
             var fileData = File.ReadAllBytes(filename);
@@ -43,7 +46,9 @@ namespace MiodenusAnimationConverter.Loaders
             {
                 model = LoadBinaryStl(fileData, useCalculatedNormals, modelColor);
             }
-
+            
+            Console.WriteLine($"Loading end time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            
             return model;
         }
 
@@ -206,6 +211,11 @@ namespace MiodenusAnimationConverter.Loaders
                     isVertexesReady = false;
                     currentVertexId = 0;
                 }
+            }
+
+            if (triangles.Count <= 0)
+            {
+                Console.WriteLine("Warning: there are no triangles in the model file.");
             }
             
             return new Model(triangles.ToArray());

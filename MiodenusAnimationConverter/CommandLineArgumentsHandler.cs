@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Exceptions;
-using OpenTK.Graphics.OpenGL;
 
 namespace MiodenusAnimationConverter
 {
@@ -25,7 +24,7 @@ namespace MiodenusAnimationConverter
                                         false
         };
 
-        public List<string> AnimationFile = new List<string>();
+        public List<string> AnimationFile = new ();
         public string VideoFile = "";
         public string Extension = "avi";
         public int Bitrate = 10000;
@@ -44,7 +43,7 @@ namespace MiodenusAnimationConverter
             
             if (argumentsList.Count == 1 && argumentsList[0] == "-i")
             {
-                System.Console.Out.WriteLine(info);
+                Console.WriteLine(info);
                 Environment.Exit(0);
             }
             
@@ -54,7 +53,7 @@ namespace MiodenusAnimationConverter
             }
             else
             {
-                System.Console.Out.WriteLine(argumentsList[0]);
+                Console.WriteLine(argumentsList[0]);
                 
                 for ( ; argumentsList.Count!=0; )
                 {
@@ -91,7 +90,7 @@ namespace MiodenusAnimationConverter
                                         argumentsList.Remove(argumentsList[1]);
                                         argumentsList.Remove(argumentsList[0]);
                                                                             
-                                        System.Console.Out.WriteLine($"Fps = {Fps}");
+                                        Console.WriteLine($"Fps = {Fps}");
                                     }
                                     else
                                     {
@@ -119,7 +118,7 @@ namespace MiodenusAnimationConverter
                                         argumentsList.Remove(argumentsList[1]);
                                         argumentsList.Remove(argumentsList[0]);
                                                                             
-                                        System.Console.Out.WriteLine($"Bitrate = {Bitrate}");
+                                        Console.WriteLine($"Bitrate = {Bitrate}");
                                     }
                                     else
                                     {
@@ -138,7 +137,7 @@ namespace MiodenusAnimationConverter
                                         argumentsList.Remove(argumentsList[1]);
                                         argumentsList.Remove(argumentsList[0]);
                                         
-                                        System.Console.Out.WriteLine($"Extension = {Extension}");
+                                        Console.WriteLine($"Extension = {Extension}");
                                     }
                                     else
                                     {
@@ -158,11 +157,11 @@ namespace MiodenusAnimationConverter
                 VideoFile = AnimationFile[AnimationFile.Count - 1];
                 AnimationFile.Remove(AnimationFile[AnimationFile.Count - 1]);
                 
-                System.Console.Out.WriteLine($"Video file = {VideoFile}");
+                Console.WriteLine($"Video file = {VideoFile}");
                 
                 foreach (var animation in AnimationFile)
                 {
-                    System.Console.Out.WriteLine($"Animation file = {animation}");
+                    Console.WriteLine($"Animation file = {animation}");
                 }
             }
 

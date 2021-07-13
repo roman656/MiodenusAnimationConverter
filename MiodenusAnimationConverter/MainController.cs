@@ -15,20 +15,20 @@ namespace MiodenusAnimationConverter
         private readonly bool _isMainWindowVisible = true;
         private readonly byte _mainWindowFrequency = 60;
         private readonly string _animationFilename = "";
-        private readonly string[] _modelFilenames = { "/home/roman/STL/teapot.stl" };    // Временное решение.
+        private readonly string[] _modelFilenames = { "/home/roman/STL/test.stl" };    // Временное решение.
         private Model[] _models;
         
         public MainController(string[] args)
         {
-            Console.WriteLine($"Start time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
-            
-            /* TODO: обработка консольных аргументов. */
+            Console.WriteLine($"Begin time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+
+            //new CommandLineArgumentsHandler(args);
             
             LoadModels();
 
             foreach (var model in _models)
             {
-                model.Scale(0.014f);
+                model.Scale(0.024f);
             }
             
             _mainWindow = CreateMainWindow();
@@ -64,11 +64,15 @@ namespace MiodenusAnimationConverter
             _models = new Model[_modelFilenames.Length];
             IModelLoader loader = new LoaderStl();
             
+            Console.WriteLine("Loading models...");
+            
             foreach (var filename in _modelFilenames)
             {
                 _models[i] = loader.Load(filename, Color4.SteelBlue, false);
                 i++;
             }
+            
+            Console.WriteLine("Loading models finished.");
         }
     }
 }
