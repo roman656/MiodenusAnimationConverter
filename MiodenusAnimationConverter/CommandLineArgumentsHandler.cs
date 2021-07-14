@@ -32,9 +32,9 @@ namespace MiodenusAnimationConverter
         public int Bitrate = 10000;
         public int Fps = 60;
 
-        public Settings InitializeSettings()
+        public MainSettings InitializeSettings()
         {
-            Settings settings = new Settings(VideoFile, Extension, Bitrate, Fps, AnimationFile);
+            MainSettings settings = new MainSettings(VideoFile, Extension, Bitrate, Fps, AnimationFile);
 
             Console.WriteLine($"settings:\n  VideoFile = {settings.VideoFile}\n  Extension = {settings.Extension}\n  Bitrate = {settings.Bitrate}\n  Fps = {settings.Fps}");
 

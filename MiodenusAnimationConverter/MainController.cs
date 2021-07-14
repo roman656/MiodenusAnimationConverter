@@ -15,7 +15,7 @@ namespace MiodenusAnimationConverter
         private readonly bool _isMainWindowVisible = true;
         private readonly byte _mainWindowFrequency = 60;
         private readonly string _animationFilename = "";
-        private readonly string[] _modelFilenames = { "/home/roman/STL/IS-6.stl" };    // Временное решение.
+        private readonly string[] _modelFilenames = { "/home/roman/STL/Rhm._Borsig_12.8.stl" };    // Временное решение.
         private Model[] _models;
         
         public MainController(string[] args)
