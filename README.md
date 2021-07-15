@@ -92,6 +92,7 @@
             "name": "rotation of model1",
             "startTime": 10,
             "timeLength": 3000,
+            "useInterpolation": true,
             "values": [
                 {
                     "time": 0,
