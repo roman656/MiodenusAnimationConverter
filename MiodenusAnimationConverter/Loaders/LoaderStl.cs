@@ -15,7 +15,8 @@ namespace MiodenusAnimationConverter.Loaders
             Binary
         }
         
-        private const string FileExtension = ".stl";
+        private const byte NormalParametersAmount = 3;
+        private const byte VertexParametersAmount = 3;
         private const byte HeaderSizeInBytes = 80;
         private const byte TriangleRecordSizeInBytes = 50;
         private const byte TriangleRecordsStartPositionInBytes = 84;
@@ -31,19 +32,24 @@ namespace MiodenusAnimationConverter.Loaders
         {
             Model model;
             
+            Console.WriteLine($"Loading model from {filename}");
+            Console.WriteLine($"Loading begin time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            
             CheckModelFile(filename);
 
             var fileData = File.ReadAllBytes(filename);
             
             if (RecogniseStlFormat(fileData) == StlFormat.Ascii)
             {
-                model = LoadAsciiStl(fileData, useCalculatedNormals, modelColor);
+                model = LoadAsciiStl(fileData, modelColor, useCalculatedNormals);
             }
             else
             {
-                model = LoadBinaryStl(fileData, useCalculatedNormals, modelColor);
+                model = LoadBinaryStl(fileData, modelColor, useCalculatedNormals);
             }
-
+            
+            Console.WriteLine($"Loading end time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            
             return model;
         }
 
@@ -59,11 +65,6 @@ namespace MiodenusAnimationConverter.Loaders
             if (modelFileInfo.Length <= 0)
             {
                 throw new EmptyFileException($"File {filename} is empty.");
-            }
-
-            if (!modelFileInfo.Extension.ToLower().Equals(FileExtension))
-            {
-                throw new InvalidExtensionException($"Extension of {filename} file must be {FileExtension}.");
             }
         }
 
@@ -105,7 +106,7 @@ namespace MiodenusAnimationConverter.Loaders
             return result;
         }
         
-        private static Model LoadAsciiStl(in byte[] fileData, bool useCalculatedNormals, Color4 modelColor)
+        private static Model LoadAsciiStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals)
         {
             var triangles = new List<Triangle>();
             var fileLines = System.Text.Encoding.ASCII.GetString(fileData).ToLower().Split('\n');
@@ -131,10 +132,11 @@ namespace MiodenusAnimationConverter.Loaders
                     
                     var values = fileLines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                    if (values.Length != 5)
+                    if (values.Length != 2 + NormalParametersAmount)
                     {
                         throw new WrongModelFileContentException("Normal`s parameters amount is incorrect "
-                                + $"in the model file. facet normal must have 3 parameters. Got {values.Length - 2}.");
+                                + $"in the model file. facet normal must have {NormalParametersAmount} parameters."
+                                + $" Got {values.Length - 2}.");
                     }
 
                     try
@@ -162,10 +164,11 @@ namespace MiodenusAnimationConverter.Loaders
 
                     var values = fileLines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                    if (values.Length != 4)
+                    if (values.Length != 1 + VertexParametersAmount)
                     {
                         throw new WrongModelFileContentException("Vertex`s parameters amount is incorrect " 
-                                + $"in the model file. vertex must have 3 parameters. Got {values.Length - 1}.");
+                                + $"in the model file. vertex must have {VertexParametersAmount} parameters."
+                                + $" Got {values.Length - 1}.");
                     }
                     
                     try
@@ -207,49 +210,82 @@ namespace MiodenusAnimationConverter.Loaders
                     currentVertexId = 0;
                 }
             }
+
+            if (triangles.Count <= 0)
+            {
+                Console.WriteLine("Warning: there are no triangles in the model file.");
+            }
             
             return new Model(triangles.ToArray());
         }
         
-        private static Model LoadBinaryStl(in byte[] fileData, bool useCalculatedNormals, Color4 modelColor)
+        private static Model LoadBinaryStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals)
         {
-            var trianglesAmount = BitConverter.ToUInt32(fileData, HeaderSizeInBytes);
+            CheckBinaryStlFileContent(fileData);
+            
+            var trianglesAmount = BitConverter.ToInt32(fileData, HeaderSizeInBytes);
             var triangles = new Triangle[trianglesAmount];
 
-            for (uint i = 0; i < trianglesAmount; i++)
+            for (var i = 0; i < trianglesAmount; i++)
             {
-                var currentRecordPosition = (int)(TriangleRecordsStartPositionInBytes + (i * TriangleRecordSizeInBytes));
-
+                var currentRecordPosition = TriangleRecordsStartPositionInBytes + (i * TriangleRecordSizeInBytes);
                 var vertexes = new Vertex[Triangle.VertexesAmount];
+
+                for (var j = 1; j <= Triangle.VertexesAmount; j++)
+                {
+                    var offsetX = (VertexParametersAmount * j) * sizeof(float);
+                    var offsetY = (VertexParametersAmount * j + 1) * sizeof(float);
+                    var offsetZ = (VertexParametersAmount * j + 2) * sizeof(float);
+                    
+                    vertexes[j - 1] = new Vertex(
+                            new Vector4(
+                                    BitConverter.ToSingle(fileData, currentRecordPosition + offsetX),
+                                    BitConverter.ToSingle(fileData, currentRecordPosition + offsetY),
+                                    BitConverter.ToSingle(fileData, currentRecordPosition + offsetZ),
+                                    1.0f),
+                            modelColor);
+                }
                 
-                vertexes[0] = new Vertex(
-                        new Vector4(
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 3 * sizeof(float)),
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 4 * sizeof(float)),
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 5 * sizeof(float)),
-                                1.0f),
-                        Color4.Green);
-                
-                vertexes[1] = new Vertex(
-                        new Vector4(
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 6 * sizeof(float)),
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 7 * sizeof(float)),
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 8 * sizeof(float)),
-                                1.0f),
-                        Color4.Green);
-                
-                vertexes[2] = new Vertex(
-                        new Vector4(
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 9 * sizeof(float)),
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 10 * sizeof(float)),
-                                BitConverter.ToSingle(fileData, currentRecordPosition + 11 * sizeof(float)),
-                                1.0f),
-                        Color4.Green);
-                
-                triangles[i] = new Triangle(vertexes, Triangle.CalculateNormal(vertexes));
+                if (useCalculatedNormals)
+                {
+                    triangles[i] = new Triangle(vertexes, Triangle.CalculateNormal(vertexes));
+                }
+                else
+                {
+                    var normal = new Vector4(
+                            BitConverter.ToSingle(fileData, currentRecordPosition), 
+                            BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float)),
+                            BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float) * 2),
+                            1.0f);
+                    
+                    triangles[i] = new Triangle(vertexes, normal);
+                }
+            }
+            
+            if (triangles.Length <= 0)
+            {
+                Console.WriteLine("Warning: there are no triangles in the model file.");
             }
 
             return new Model(triangles);
+        }
+
+        private static void CheckBinaryStlFileContent(in byte[] fileData)
+        {
+            if (fileData.Length < TriangleRecordsStartPositionInBytes)
+            {
+                throw new WrongModelFileContentException("Incorrect content of the model file.");
+            }
+            
+            var trianglesAmount = BitConverter.ToUInt32(fileData, HeaderSizeInBytes);
+            var realTrianglesAmount =
+                    (fileData.Length - TriangleRecordsStartPositionInBytes) / TriangleRecordSizeInBytes;
+
+            if (trianglesAmount != realTrianglesAmount)
+            {
+                throw new WrongModelFileContentException("Triangles amount specified in the model file does" 
+                        + " not match to the actual contents of the file.");
+            }
         }
     }
 }

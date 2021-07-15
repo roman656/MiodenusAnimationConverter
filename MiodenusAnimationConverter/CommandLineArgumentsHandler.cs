@@ -25,17 +25,27 @@ namespace MiodenusAnimationConverter
                                         false
         };
 
+        public byte MinimumAmountOfArguments = 2;
         public List<string> AnimationFile = new List<string>();
         public string VideoFile = "";
         public string Extension = "avi";
         public int Bitrate = 10000;
         public int Fps = 60;
 
-        private Video InitializeVideo()
+        public MainSettings InitializeSettings()
         {
-            Video video = new Video(Extension, 60, (uint)Bitrate, VideoFile, (byte)Fps);
+            MainSettings settings = new MainSettings(VideoFile, Extension, Bitrate, Fps, AnimationFile);
+
+            Console.WriteLine($"settings:\n  VideoFile = {settings.VideoFile}\n  Extension = {settings.Extension}\n  Bitrate = {settings.Bitrate}\n  Fps = {settings.Fps}");
+
+            for (int i = 0; i < settings.AnimationFile.Count; i++)
+            {
+                Console.WriteLine($"  AnimationFile[{i}] = {settings.AnimationFile[i]}");
+            }
             
-            return video;
+            Console.WriteLine("end settings");
+            
+            return settings;
         }
         
         public CommandLineArgumentsHandler(string[] arguments)
@@ -48,7 +58,7 @@ namespace MiodenusAnimationConverter
                 Environment.Exit(0);
             }
             
-            if (argumentsList.Count < 2)
+            if (argumentsList.Count < MinimumAmountOfArguments)
             {
                 throw new WrongCommandLineArgumentsException("At least 2 command line arguments should be used");
             }
@@ -59,13 +69,13 @@ namespace MiodenusAnimationConverter
                 for ( ; argumentsList.Count!=0; )
                 {
                     if (argumentsList[0] != InputKeys[0] && argumentsList[0] != InputKeys[1] && argumentsList[0] != InputKeys[2])
-                        {
+                    {
                             
-                            AnimationFile.Add(argumentsList[0]);
-                            argumentsList.Remove(argumentsList[0]);
-                        }
-                        else
-                        {
+                        AnimationFile.Add(argumentsList[0]);
+                        argumentsList.Remove(argumentsList[0]);
+                    }
+                    else
+                    {
                             if (argumentsList.Count < 2)
                             {
                                 throw new WrongCommandLineArgumentsException($"Argument {argumentsList[0]} should not be empty"); 
@@ -81,7 +91,7 @@ namespace MiodenusAnimationConverter
                                             throw new WrongCommandLineArgumentsException("Fps should be a number");
                                         }
                                         
-                                        if (Fps < 1 || Fps > 255)
+                                        if (Fps < 1 || Fps > byte.MaxValue)
                                         {
                                             throw new WrongCommandLineArgumentsException("Fps should be greater or equal to 1 and less than 256");
                                         }
@@ -147,12 +157,12 @@ namespace MiodenusAnimationConverter
                                     
                                 }
                             }
-                        }
+                    }
                 }
 
-                if (AnimationFile.Count < 2)
+                if (AnimationFile.Count < MinimumAmountOfArguments)
                 {
-                    throw new WrongCommandLineArgumentsException("The first 2 command line arguments should be: 1. Path for input file 2. Path for output file");
+                    throw new WrongCommandLineArgumentsException("The first command line arguments should be: 1. Path (or paths) for input file (or files) 2. Path for output file");
                 }
                 
                 VideoFile = AnimationFile[AnimationFile.Count - 1];
@@ -165,8 +175,6 @@ namespace MiodenusAnimationConverter
                     System.Console.Out.WriteLine($"Animation file = {animation}");
                 }
             }
-
-            InitializeVideo();
         }
     }
 }
