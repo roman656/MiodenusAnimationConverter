@@ -41,3 +41,99 @@
 Данную команду можно записать и таким способом:
 
 `$ MiodenusAnimationConverter --output "result.avi" --fps 60 --animation "animation.maf" --models "/home/usr/STL/model1.stl" "/home/usr/STL/model2.stl"`
+
+## Анимационный файл
+
+Ниже представлен пример содержимого анимационного файла.
+
+```json
+{
+    "animationInfo": {
+        "type": "maf",
+        "version": 1.0,
+        "animationName": "Anim1",
+        "videoName": "Animation1.avi",
+        "timeLength": 3600,
+        "fps": 30
+    },
+    "models": [
+    {
+        "id": 0,
+        "name": "model1",
+        "filename": "model_1.stl",
+        "md5": "1BC29B36F623BA82AAF6724FD3B16718",
+        "transform": {
+            "translation": [0.0, 0.0, 0.0],
+            "rotation": {
+                "angle": 5.0,
+                "vector": [0.0, 1.0, 2.0]
+            },
+            "scale": 1.0
+        }
+    },
+    {
+        "id": 1,
+        "name": "model2",
+        "filename": "model_2.stl",
+        "md5": "1BC29B36FAAF6724FD3B16718623BA82",
+        "transform": {
+            "translation": [0.0, 20.0, 0.0],
+            "rotation": {
+                "angle": 15.0,
+                "vector": [3.0, 1.0, 0.0]
+            },
+            "scale": 1.02
+        }
+    }
+    ],
+    "actions": [
+        {
+            "id": 0,
+            "name": "rotation of model1",
+            "startTime": 10,
+            "timeLength": 3000,
+            "values": [
+                {
+                    "time": 0,
+                    "rotation": {
+                        "angle": 5.0,
+                        "vector": [0.0, 1.0, 2.0]
+                    }
+                },
+                {
+                    "time": 1500,
+                    "rotation": {
+                        "angle": 35.0,
+                        "vector": [0.0, 1.0, 2.0]
+                    }
+                },
+                {
+                    "time": 3000,
+                    "rotation": {
+                        "angle": 95.0,
+                        "vector": [0.0, 1.0, 2.0]
+                    }
+                }
+            ]
+        }
+    ],
+    "bindings": [
+        {
+            "modelId": 0,
+            "actionId": 0
+        },
+        {
+            "modelId": 1,
+            "actionId": 0
+        }
+    ],
+    "animationInfo": {
+        "type": "maf",
+        "version": 1.0,
+        "animationName": "Anim1",
+        "videoName": "Animation1.avi",
+        "timeLength": 3600,
+        "fps": 30
+    }
+}
+```
