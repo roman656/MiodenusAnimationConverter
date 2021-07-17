@@ -1,5 +1,6 @@
 using System;
-using MiodenusAnimationConverter.Loaders;
+using MiodenusAnimationConverter.Loaders.ModelLoaders;
+using MiodenusAnimationConverter.Scene.Models;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -15,7 +16,8 @@ namespace MiodenusAnimationConverter
         private readonly bool _isMainWindowVisible = true;
         private readonly byte _mainWindowFrequency = 60;
         private readonly string _animationFilename = "";
-        private readonly string[] _modelFilenames = { "/home/roman/STL/Rhm._Borsig_12.8.stl" };    // Временное решение.
+        private readonly string[] _modelFilenames = { "/home/roman/STL/Rhm._Borsig_12.8.stl",
+                                                      "/home/roman/STL/IS-6.stl" };    // Временное решение.
         private Model[] _models;
         
         public MainController(string[] args)
@@ -26,11 +28,6 @@ namespace MiodenusAnimationConverter
             
             LoadModels();
 
-            foreach (var model in _models)
-            {
-                model.Scale(0.024f);
-            }
-            
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
             

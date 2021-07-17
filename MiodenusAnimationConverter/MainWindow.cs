@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using MiodenusAnimationConverter.Scene.Models;
+using MiodenusAnimationConverter.Scene.Models.Meshes;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace MiodenusAnimationConverter
 {
@@ -241,7 +245,7 @@ namespace MiodenusAnimationConverter
             return data;
         }
 
-        protected override void OnRenderFrame(OpenTK.Windowing.Common.FrameEventArgs e)
+        protected override void OnRenderFrame(FrameEventArgs e)
         {
             var timeStamp = Stopwatch.GetTimestamp();
             _angle += (float)((timeStamp - _lastTimestamp) / (double)_freq);
