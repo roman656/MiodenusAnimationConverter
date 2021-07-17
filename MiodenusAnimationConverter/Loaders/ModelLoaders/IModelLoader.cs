@@ -1,6 +1,7 @@
+using MiodenusAnimationConverter.Scene.Models;
 using OpenTK.Mathematics;
 
-namespace MiodenusAnimationConverter.Loaders
+namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 {
     public interface IModelLoader
     {

@@ -1,9 +1,9 @@
 using System;
 using OpenTK.Mathematics;
 
-namespace MiodenusAnimationConverter
+namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
-    public struct Triangle
+    public struct Triangle : IMiodenusObject
     {
         public const byte VertexesAmount = 3;
         public readonly Vector4 Normal;

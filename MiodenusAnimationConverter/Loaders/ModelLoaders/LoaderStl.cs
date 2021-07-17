@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using MiodenusAnimationConverter.Exceptions;
+using MiodenusAnimationConverter.Scene.Models;
+using MiodenusAnimationConverter.Scene.Models.Meshes;
 using OpenTK.Mathematics;
 
-namespace MiodenusAnimationConverter.Loaders
+namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 {
     public class LoaderStl : IModelLoader
     {
