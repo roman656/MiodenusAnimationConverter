@@ -1,4 +1,4 @@
-namespace MiodenusAnimationConverter.Loaders
+namespace MiodenusAnimationConverter.Loaders.AnimationLoaders
 {
     public interface IAnimationLoader
     {

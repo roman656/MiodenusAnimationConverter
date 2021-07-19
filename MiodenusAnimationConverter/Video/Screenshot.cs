@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 
-namespace MiodenusAnimationConverter
+namespace MiodenusAnimationConverter.Video
 {
     public struct Screenshot
     {
@@ -30,7 +30,7 @@ namespace MiodenusAnimationConverter
 
         public void SaveToPng(in string filename)
         {
-            Bitmap bmp = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            var bmp = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), 
                     System.Drawing.Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat);
             
