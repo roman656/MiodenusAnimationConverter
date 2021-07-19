@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
+using FFMpegCore;
+using FFMpegCore.Extend;
+using FFMpegCore.Pipes;
 
 namespace MiodenusAnimationConverter.Video
 {
@@ -20,40 +25,62 @@ namespace MiodenusAnimationConverter.Video
             Fps = videoFps;
         }
 
-        public void CreateVideo(int imagesAmount, string path) //не работает
+        public void CreateVideo(int imagesAmount, string path)
         {
             Console.WriteLine("Video creation started");
 
-            using (var videoWriter = new VideoFileWriter())
+            string filename = Filename;
+            
+            var videoFramesSource = new RawVideoPipeSource(GetBitmaps())
             {
-                var img = Bitmap.FromFile($"{path}screenshot_0.png");
-                
-                var width = img.Width;
-                var height = img.Height;
-                
-                videoWriter.Open($"{path}{Filename}", width, height, Fps, VideoCodec.MPEG4, (int)Bitrate);
+                FrameRate = Fps
+            };
 
-                for (int imageFrame = 0; imageFrame < imagesAmount; imageFrame++)
-                {
-                    var file = string.Format("{0}screenshot_{1}.png", path, imageFrame);
-                    
-                    if (System.IO.File.Exists(file))
-                    {
-                        using (Bitmap image = Bitmap.FromFile(file) as Bitmap)
-                        {
-                            videoWriter.WriteVideoFrame(image);
-                        }
-                    }
-                    else
-                    {
-                        throw new FileNotFoundException($"File {file} was not found.");
-                    }
-                    
-                }
-                videoWriter.Close();
+            FFMpegArguments
+                .FromPipeInput(videoFramesSource)
+                .OutputToFile(filename, true, 
+                    options => options
+                        .WithVideoCodec("h264")
+                        .ForceFormat(Type))
+                .ProcessSynchronously();
                 
                 System.Console.Out.WriteLine("Video creation finished");
+        }
+        
+        private static ImageInfo[] GetFiles()
+        {
+            var di = new System.IO.DirectoryInfo("screenshots");
+            var files = di.GetFiles();
+
+            ImageInfo[] ret = new ImageInfo[files.Length];
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                ImageInfo iinfo = new ImageInfo(files[i].FullName);
+                ret[i] = iinfo;
             }
+
+            return ret;
+        }
+
+        public static IEnumerable<IVideoFrame> GetBitmaps()
+        {
+            var di = new System.IO.DirectoryInfo("screenshots");
+            var files = di.GetFiles();
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                using (var frame = CreateVideoFrame(files[i].FullName))
+                {
+                    yield return frame;
+                }
+            }
+        }
+
+        public static BitmapVideoFrameWrapper CreateVideoFrame(string filePath)
+        {
+            var bitmap = new Bitmap(filePath);
+            return new BitmapVideoFrameWrapper(bitmap);
         }
 
         public override string ToString()
@@ -82,7 +109,7 @@ namespace MiodenusAnimationConverter.Video
             
             if (nameOfVideoFileArgument == "")
             {
-                throw new ArgumentException("Epty name of video file was used in constructor of video");
+                throw new ArgumentException("Empty name of video file was used in constructor of video");
             }
         }
     }

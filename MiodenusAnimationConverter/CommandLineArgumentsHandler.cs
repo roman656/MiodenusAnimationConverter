@@ -112,6 +112,218 @@ namespace MiodenusAnimationConverter
             argumentsList.Remove(argumentsList[1]);
             argumentsList.Remove(argumentsList[0]);
         }
+
+        private void SetValueOfFps(List<string> argumentsList)
+        {
+            if (!InputKeysCheck["fps"])
+            {
+                CheckIfValueIsKey(argumentsList);
+                                        
+                CheckIfValueIsANumber(argumentsList);
+                                        
+                CheckFpsValue();
+                                        
+                InputKeysCheck["fps"] = true;
+                                                                            
+                RemoveFirstTwoArguments(argumentsList);
+                                                                            
+                System.Console.Out.WriteLine($"Fps = {Fps}");
+            }
+            else
+            {
+                throw new WrongCommandLineArgumentsException("Fps should be set only once");
+            }
+        }
+
+        private void SetValueOfBitrate(List<string> argumentsList)
+        {
+            if (!InputKeysCheck["bitrate"])
+            {
+                CheckIfValueIsKey(argumentsList);
+                                        
+                CheckIfValueIsANumber(argumentsList);
+
+                CheckBitrateValue();
+                                        
+                InputKeysCheck["bitrate"] = true;
+                                        
+                RemoveFirstTwoArguments(argumentsList);
+                                                                            
+                System.Console.Out.WriteLine($"Bitrate = {Bitrate}");
+            }
+            else
+            {
+                throw new WrongCommandLineArgumentsException("Bitrate should be set only once");
+            }
+        }
+
+        private void SetValueOfExtension(List<string> argumentsList)
+        {
+            if (!InputKeysCheck["extension"])
+            {
+                CheckIfValueIsKey(argumentsList);
+                                        
+                Extension = argumentsList[1];
+                                        
+                InputKeysCheck["extension"] = true;
+                                        
+                RemoveFirstTwoArguments(argumentsList);
+                                        
+                System.Console.Out.WriteLine($"Extension = {Extension}");
+            }
+            else
+            {
+                throw new WrongCommandLineArgumentsException("Bitrate should be set only once");
+            }
+        }
+
+        private void SetValueOfPathToAnimationFile(List<string> argumentsList)
+        {
+            if (!InputKeysCheck["animation"])
+            {
+                CheckIfValueIsKey(argumentsList);
+                                        
+                AnimationFile = argumentsList[1];
+
+                InputKeysCheck["animation"] = true;
+
+                RemoveFirstTwoArguments(argumentsList);
+                                        
+                Console.WriteLine($"Path to animation file = {AnimationFile}");
+            }
+            else
+            {
+                throw new WrongCommandLineArgumentsException("Path to animation file should be set only once");
+            }
+        }
+
+        private void SetValueOfPathToOutputFile(List<string> argumentsList)
+        {
+            if (!InputKeysCheck["output"])
+            {
+                CheckIfValueIsKey(argumentsList);
+                                        
+                VideoFile = argumentsList[1];
+
+                InputKeysCheck["output"] = true;
+
+                RemoveFirstTwoArguments(argumentsList);
+                                        
+                Console.WriteLine($"Path to output file = {VideoFile}");
+            }
+            else
+            {
+                throw new WrongCommandLineArgumentsException("Path to output file should be set only once");
+            }
+        }
+
+        private void SetValueOfPathsToModelFiles(List<string> argumentsList)
+        {
+            if (!InputKeysCheck["models"])
+            {
+                CheckIfValueIsKey(argumentsList);
+                                        
+                bool exit = false;
+                                        
+                int i = 0;
+                foreach (string model in argumentsList)
+                {
+                    for (int j = 0; j < InputKeys.Length;j++)
+                    {
+                        if (i != 0 && model == InputKeys[j])
+                        {
+                            exit = true;
+                            break;
+                        }
+                    }
+
+                    if (exit)
+                    {
+                        break;
+                    }
+
+                    if (i != 0)
+                    {
+                        ModelFiles.Add(model);
+                        Console.WriteLine($"Model = {ModelFiles[ModelFiles.Count-1]}");
+                        InputKeysCheck["models"] = true;
+                    }
+
+                    i++;
+                }
+
+                for (int k = i - 1; k >= 0; k--)
+                {
+                    argumentsList.Remove(argumentsList[k]);
+                }
+            }
+            else
+            {
+                throw new WrongCommandLineArgumentsException("Path (or paths) to model (or models) should be set only once");
+            }
+        }
+
+        private void SetAllValues(List<string> argumentsList)
+        {
+            if (argumentsList[0] == InputKeys[0]||argumentsList[0]==InputKeys[1])
+            {
+                SetValueOfFps(argumentsList);
+            }
+            else if (argumentsList[0] == InputKeys[2]||argumentsList[0]==InputKeys[3])
+            {
+                SetValueOfBitrate(argumentsList);
+            }
+            else if(argumentsList[0] == InputKeys[4]||argumentsList[0]==InputKeys[5])
+            {
+                SetValueOfExtension(argumentsList);
+            }
+            else if (argumentsList[0] == InputKeys[9] || argumentsList[0] == InputKeys[10])
+            {
+                SetValueOfPathToAnimationFile(argumentsList);
+            }
+            else if (argumentsList[0] == InputKeys[13] || argumentsList[0] == InputKeys[14])
+            {
+                SetValueOfPathToOutputFile(argumentsList);
+            }
+            else if (argumentsList[0] == InputKeys[11] || argumentsList[0] == InputKeys[12])
+            {
+                SetValueOfPathsToModelFiles(argumentsList);
+            }
+        }
+
+        private void CheckObligatedArguments()
+        {
+            if (ModelFiles.Count < 1 || AnimationFile == "" || VideoFile == "")
+            {
+                throw new WrongCommandLineArgumentsException($"All {MinimumAmountOfArguments} obligated arguments should be used: path to animation file (-a), path to model (or models) (-m) and path to output video (-o)");
+            }
+        }
+
+        private void SetAll(List<string> argumentsList)
+        {
+            if (argumentsList.Count < MinimumAmountOfArguments)
+            {
+                throw new WrongCommandLineArgumentsException($"At least {MinimumAmountOfArguments} command line arguments should be used");
+            }
+            else
+            {
+
+                for ( ; argumentsList.Count!=0; )
+                {
+                    CheckIfInfoRequired(argumentsList);
+
+                    if (argumentsList.Count < 2)
+                    {
+                        throw new WrongCommandLineArgumentsException($"Argument {argumentsList[0]} should not be empty"); 
+                    }
+                    else
+                    {
+                        SetAllValues(argumentsList);
+                    }
+                }
+                CheckObligatedArguments();
+            }
+        }
         
         public MainSettings InitializeSettings()
         {
@@ -133,182 +345,7 @@ namespace MiodenusAnimationConverter
         {
             var argumentsList = new List<string>(arguments);
 
-            if (argumentsList.Count < MinimumAmountOfArguments)
-            {
-                throw new WrongCommandLineArgumentsException($"At least {MinimumAmountOfArguments} command line arguments should be used");
-            }
-            else
-            {
-
-                for ( ; argumentsList.Count!=0; )
-                {
-                    CheckIfInfoRequired(argumentsList);
-
-                        if (argumentsList.Count < 2)
-                        {
-                            throw new WrongCommandLineArgumentsException($"Argument {argumentsList[0]} should not be empty"); 
-                        }
-                        else
-                        {
-                                if (argumentsList[0] == InputKeys[0]||argumentsList[0]==InputKeys[1])
-                                {
-                                    if (!InputKeysCheck["fps"])
-                                    {
-                                        CheckIfValueIsKey(argumentsList);
-                                        
-                                        CheckIfValueIsANumber(argumentsList);
-                                        
-                                        CheckFpsValue();
-                                        
-                                        InputKeysCheck["fps"] = true;
-                                                                            
-                                        RemoveFirstTwoArguments(argumentsList);
-                                                                            
-                                        System.Console.Out.WriteLine($"Fps = {Fps}");
-                                    }
-                                    else
-                                    {
-                                        throw new WrongCommandLineArgumentsException("Fps should be set only once");
-                                    }
-                                    
-                                    
-                                }
-                                else if (argumentsList[0] == InputKeys[2]||argumentsList[1]==InputKeys[3])
-                                {
-                                    if (!InputKeysCheck["bitrate"])
-                                    {
-                                        CheckIfValueIsKey(argumentsList);
-                                        
-                                        CheckIfValueIsANumber(argumentsList);
-
-                                        CheckBitrateValue();
-                                        
-                                        InputKeysCheck["bitrate"] = true;
-                                        
-                                        RemoveFirstTwoArguments(argumentsList);
-                                                                            
-                                        System.Console.Out.WriteLine($"Bitrate = {Bitrate}");
-                                    }
-                                    else
-                                    {
-                                        throw new WrongCommandLineArgumentsException("Bitrate should be set only once");
-                                    }
-                                    
-                                }
-                                else if(argumentsList[0] == InputKeys[4]||argumentsList[0]==InputKeys[5])
-                                {
-                                    if (!InputKeysCheck["extension"])
-                                    {
-                                        CheckIfValueIsKey(argumentsList);
-                                        
-                                        Extension = argumentsList[1];
-                                        
-                                        InputKeysCheck["extension"] = true;
-                                        
-                                        RemoveFirstTwoArguments(argumentsList);
-                                        
-                                        System.Console.Out.WriteLine($"Extension = {Extension}");
-                                    }
-                                    else
-                                    {
-                                        throw new WrongCommandLineArgumentsException("Bitrate should be set only once");
-                                    }
-                                    
-                                }
-                                else if (argumentsList[0] == InputKeys[9] || argumentsList[0] == InputKeys[10])
-                                {
-                                    if (!InputKeysCheck["animation"])
-                                    {
-                                        CheckIfValueIsKey(argumentsList);
-                                        
-                                        AnimationFile = argumentsList[1];
-
-                                        InputKeysCheck["animation"] = true;
-
-                                        RemoveFirstTwoArguments(argumentsList);
-                                        
-                                        Console.WriteLine($"Path to animation file = {AnimationFile}");
-                                    }
-                                    else
-                                    {
-                                        throw new WrongCommandLineArgumentsException("Path to animation file should be set only once");
-                                    }
-                                }
-                                else if (argumentsList[0] == InputKeys[13] || argumentsList[0] == InputKeys[14])
-                                {
-                                    if (!InputKeysCheck["output"])
-                                    {
-                                        CheckIfValueIsKey(argumentsList);
-                                        
-                                        VideoFile = argumentsList[1];
-
-                                        InputKeysCheck["output"] = true;
-
-                                        RemoveFirstTwoArguments(argumentsList);
-                                        
-                                        Console.WriteLine($"Path to output file = {VideoFile}");
-                                    }
-                                    else
-                                    {
-                                        throw new WrongCommandLineArgumentsException("Path to output file should be set only once");
-                                    }
-                                }
-                                else if (argumentsList[0] == InputKeys[11] || argumentsList[0] == InputKeys[12])
-                                {
-                                    if (!InputKeysCheck["models"])
-                                    {
-                                        CheckIfValueIsKey(argumentsList);
-                                        
-                                        bool exit = false;
-                                        
-                                        int i = 0;
-                                        foreach (string model in argumentsList)
-                                        {
-                                            for (int j = 0; j < InputKeys.Length;j++)
-                                            {
-                                                if (i != 0 && model == InputKeys[j])
-                                                {
-                                                    exit = true;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (exit)
-                                            {
-                                                break;
-                                            }
-
-                                            if (i != 0)
-                                            {
-                                                ModelFiles.Add(model);
-                                                Console.WriteLine($"Model = {ModelFiles[ModelFiles.Count-1]}");
-                                                InputKeysCheck["models"] = true;
-                                            }
-
-                                            i++;
-                                        }
-
-                                        for (int k = i - 1; k >= 0; k--)
-                                        {
-                                            argumentsList.Remove(argumentsList[k]);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        throw new WrongCommandLineArgumentsException("Path (or paths) to model (or models) should be set only once");
-                                    }
-                                }
-                        }
-                }
-
-                if (ModelFiles.Count < 1 || AnimationFile == "" || VideoFile == "")
-                {
-                    throw new WrongCommandLineArgumentsException($"All {MinimumAmountOfArguments} required arguments should be used: path to animation file (-a), path to model (or models) (-m) and path to output video (-o)");
-                }
-                
-                VideoFile = ModelFiles[ModelFiles.Count - 1];
-                ModelFiles.Remove(ModelFiles[ModelFiles.Count - 1]);
-            }
+            SetAll(argumentsList);
         }
     }
 }

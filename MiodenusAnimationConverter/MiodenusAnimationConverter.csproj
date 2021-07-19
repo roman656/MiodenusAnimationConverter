@@ -6,6 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AForge.Video.FFMPEG" Version="2.2.5.1-rc" />
+      <PackageReference Include="FFMpegCore" Version="4.4.0" />
       <PackageReference Include="OpenTK" Version="4.6.4" />
       <PackageReference Include="OpenTK.Graphics" Version="4.6.4" />
       <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
