@@ -6,19 +6,6 @@ using FFMpegCore;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 
-/*
-using System;
-using System.Drawing;
-using System.Collections.Generic;
-using System.IO;
-using FFMpegCore;
-using FFMpegCore.Enums;
-using FFMpegCore.Pipes;
-using FFMpegCore.Extend;
-using System.Threading.Tasks;
-using System.Threading;
- */
-
 namespace MiodenusAnimationConverter.Video
 {
     public class Video
