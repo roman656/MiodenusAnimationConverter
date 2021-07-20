@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AForge.Video.FFMPEG" Version="2.2.5.1-rc" />
       <PackageReference Include="FFMpegCore" Version="4.4.0" />
       <PackageReference Include="NLog" Version="4.7.10" />
       <PackageReference Include="OpenTK" Version="4.6.4" />
@@ -16,6 +15,12 @@
 
     <ItemGroup>
       <Folder Include="Animation" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="NLog.config">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

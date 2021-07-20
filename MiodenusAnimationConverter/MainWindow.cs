@@ -37,7 +37,7 @@ namespace MiodenusAnimationConverter
         private float _lastTimestamp = Stopwatch.GetTimestamp();
         private float _freq = Stopwatch.Frequency;
 
-       // private List<BitmapVideoFrameWrapper> frames = new ();
+        private List<BitmapVideoFrameWrapper> frames = new ();
 
         private float _angle;
         private Model[] _models;
@@ -194,14 +194,14 @@ namespace MiodenusAnimationConverter
             tempScreenshot.Save($"screenshot_{_screenshotId}", ImageFormat.Png);
             */
         }
-        /*
+        
         public IEnumerable<IVideoFrame> GetBitmaps()
         {
             for (int i = 0; i < frames.Count; i++)
             {
                 yield return frames[i];
             }
-        }*/
+        }
 
         protected override void OnClosed()
         {
@@ -211,8 +211,8 @@ namespace MiodenusAnimationConverter
                 FrameRate = 60
             };
             
-            video.CreateVideo(videoFramesSource);*/
-            
+            video.CreateVideo(videoFramesSource);
+*/          
             GL.DeleteVertexArray(_vertexArray);
             GL.DeleteBuffer(_buffer);
             
