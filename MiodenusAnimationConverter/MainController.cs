@@ -1,6 +1,7 @@
 using System;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene.Models;
+using NLog;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -9,6 +10,7 @@ namespace MiodenusAnimationConverter
 {
     public class MainController
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly MainWindow _mainWindow;
         private readonly string _mainWindowTitle = "Miodenus Animation Converter";
         private readonly ushort _mainWindowWidth = 600;
@@ -22,16 +24,17 @@ namespace MiodenusAnimationConverter
         
         public MainController(string[] args)
         {
-            Console.WriteLine($"Begin time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            _logger.Trace("<=====Start=====>");
 
             //new CommandLineArgumentsHandler(args);
             
             LoadModels();
-
+           
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
             
-            Console.WriteLine($"End time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            _logger.Trace("<======End======>");
+            LogManager.Shutdown();
         }
 
         private MainWindow CreateMainWindow()
@@ -57,19 +60,19 @@ namespace MiodenusAnimationConverter
 
         private void LoadModels()
         {
+            _logger.Trace("Loading models started.");
+            
             uint i = 0;
             _models = new Model[_modelFilenames.Length];
             IModelLoader loader = new LoaderStl();
-            
-            Console.WriteLine("Loading models...");
-            
+
             foreach (var filename in _modelFilenames)
             {
                 _models[i] = loader.Load(filename, Color4.SteelBlue, false);
                 i++;
             }
             
-            Console.WriteLine("Loading models finished.");
+            _logger.Trace("Loading models finished.");
         }
     }
 }

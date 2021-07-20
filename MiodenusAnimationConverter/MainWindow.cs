@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Imaging;
+using FFMpegCore.Extend;
+using FFMpegCore.Pipes;
+using MiodenusAnimationConverter.Media;
 using MiodenusAnimationConverter.Scene.Models;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
@@ -17,6 +21,7 @@ namespace MiodenusAnimationConverter
     {
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
+        
         private double _time;
         private bool _initialized;
         private int _vertexArray;
@@ -32,8 +37,11 @@ namespace MiodenusAnimationConverter
         private float _lastTimestamp = Stopwatch.GetTimestamp();
         private float _freq = Stopwatch.Frequency;
 
+       // private List<BitmapVideoFrameWrapper> frames = new ();
+
         private float _angle;
         private Model[] _models;
+        private VideoRecorder video = new VideoRecorder("testvid", "mp4", 30);
 
         public MainWindow(Model[] models, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -133,15 +141,16 @@ namespace MiodenusAnimationConverter
         
         private float[] Matrix4ToArray(Matrix4 matrix)
         {
-            float[] data = new float[16];
-            for (int i = 0; i < 4; i++)
+            var data = new float[16];
+
+            for (byte i = 0; i < 4; i++)
             {
-                for (int j = 0; j < 4; j++)
+                for (byte j = 0; j < 4; j++)
                 {
                     data[i * 4 + j] = matrix[i, j];
-
                 }
             }
+            
             return data;
         }
 
@@ -177,15 +186,33 @@ namespace MiodenusAnimationConverter
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
+
+            //frames.Add(VideoRecorder.CreateVideoFrame());
             /*
             _screenshotId++;
             var tempScreenshot = new Screenshot((ushort)Size.X, (ushort)Size.Y);
-            tempScreenshot.SaveToPng($"screenshot_{_screenshotId}");
+            tempScreenshot.Save($"screenshot_{_screenshotId}", ImageFormat.Png);
             */
         }
+        /*
+        public IEnumerable<IVideoFrame> GetBitmaps()
+        {
+            for (int i = 0; i < frames.Count; i++)
+            {
+                yield return frames[i];
+            }
+        }*/
 
         protected override void OnClosed()
         {
+/*
+            var videoFramesSource = new RawVideoPipeSource(GetBitmaps())
+            {
+                FrameRate = 60
+            };
+            
+            video.CreateVideo(videoFramesSource);*/
+            
             GL.DeleteVertexArray(_vertexArray);
             GL.DeleteBuffer(_buffer);
             
