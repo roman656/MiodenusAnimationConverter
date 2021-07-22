@@ -1,4 +1,3 @@
-using System;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene.Models;
 using NLog;
@@ -25,8 +24,11 @@ namespace MiodenusAnimationConverter
         public MainController(string[] args)
         {
             _logger.Trace("<=====Start=====>");
-
-            //new CommandLineArgumentsHandler(args);
+            _logger.Trace("Processing of command line arguments is started.");
+            
+            //var argumentsHandler = new CommandLineArgumentsHandler(args);
+            
+            _logger.Trace("Processing of command line arguments is finished.");
             
             LoadModels();
            

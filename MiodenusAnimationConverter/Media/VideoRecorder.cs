@@ -10,11 +10,13 @@ namespace MiodenusAnimationConverter.Media
         public readonly string Type;
         public readonly string Filename;
         public readonly byte Fps;
+        private readonly MainWindow _window;
         
-        public VideoRecorder(in string videoFilename, in string videoType, byte videoFps)
+        public VideoRecorder(in MainWindow window, in string videoFilename, in string videoType, byte videoFps)
         {
             CheckArguments(videoFilename, videoType, videoFps);
-            
+
+            _window = window;
             Type = videoType;
             Filename = videoFilename;
             Fps = videoFps;
@@ -25,7 +27,7 @@ namespace MiodenusAnimationConverter.Media
             FFMpegArguments
                     .FromPipeInput(videoFramesSource)
                     .OutputToFile(
-                            Filename,
+                            $"{Filename}.{Type}",
                             true,
                             options => options
                                     .WithVideoCodec("h264")
@@ -41,7 +43,7 @@ namespace MiodenusAnimationConverter.Media
                 }
         }*/
 
-        public static BitmapVideoFrameWrapper CreateVideoFrame() => new (new Screenshot(600, 600).Bitmap);
+        public BitmapVideoFrameWrapper CreateVideoFrame() => new (new Screenshot(_window).Bitmap);
         
         /*
         public override string ToString()

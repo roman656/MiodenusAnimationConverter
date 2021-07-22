@@ -1,18 +1,18 @@
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Windowing.Desktop;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 namespace MiodenusAnimationConverter.Media
 {
-    public struct Screenshot
+    public readonly struct Screenshot
     {
         public const byte PixelChannelsAmount = 3;
         public readonly byte[] PixelsData;
-        public readonly ushort Width;
-        public readonly ushort Height;
+        public readonly int Width;
+        public readonly int Height;
         
         public Bitmap Bitmap
         {
@@ -29,16 +29,11 @@ namespace MiodenusAnimationConverter.Media
             }
         }
 
-        public Screenshot(ushort width, ushort height)
+        public Screenshot(in MainWindow window)
         {
-            if ((width <= 0) || (height <= 0))
-            {
-                throw new ArgumentException("Screenshot`s width and height must be greater than 0.");
-            }
-
-            Width = width;
-            Height = height;
-            PixelsData = new byte[width * height * PixelChannelsAmount];
+            Width = window.Size.X;
+            Height = window.Size.Y;
+            PixelsData = new byte[Width * Height * PixelChannelsAmount];
             
             GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
             GL.ReadBuffer(ReadBufferMode.Front);

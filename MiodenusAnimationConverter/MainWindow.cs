@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.IO;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Media;
@@ -10,6 +11,7 @@ using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
+using NLog;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -19,9 +21,12 @@ namespace MiodenusAnimationConverter
 {
     public class MainWindow : GameWindow
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly string _screenshotsPath;
+        private readonly string _videoPath;
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
-        
+
         private double _time;
         private bool _initialized;
         private int _vertexArray;
@@ -41,16 +46,31 @@ namespace MiodenusAnimationConverter
 
         private float _angle;
         private Model[] _models;
-        private VideoRecorder video = new VideoRecorder("testvid", "mp4", 30);
+        private VideoRecorder video;
 
         public MainWindow(Model[] models, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
+            _screenshotsPath = "screenshots";
+            _videoPath = "videos";
+            CheckPath(_screenshotsPath);
+            CheckPath(_videoPath);
             _models = models;
+            video = new VideoRecorder(this,$"{_videoPath}/animation", "mp4", 60);
+        }
+
+        private static void CheckPath(in string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
         }
 
         private void InitializeShaderPrograms()
         {
+            Logger.Trace("Shader pograms initialization started.");
+            
             var shaders = new List<Shader>
             {
                 new (TransformShader.Code, TransformShader.Type),
@@ -63,6 +83,8 @@ namespace MiodenusAnimationConverter
             {
                 shader.Delete();
             }
+            
+            Logger.Trace("Shader pograms initialization finished.");
         }
 
         protected override void OnLoad()
@@ -161,7 +183,6 @@ namespace MiodenusAnimationConverter
             _lastTimestamp = timeStamp;
 
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            // Clear the color buffer.
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // Bind the VBO
@@ -187,12 +208,14 @@ namespace MiodenusAnimationConverter
             Context.SwapBuffers();
             base.OnRenderFrame(e);
 
-            //frames.Add(VideoRecorder.CreateVideoFrame());
-            /*
+            //frames.Add(video.CreateVideoFrame());
+            //TakeScreenshot(_screenshotsPath);
+        }
+
+        private void TakeScreenshot(in string path)
+        {
             _screenshotId++;
-            var tempScreenshot = new Screenshot((ushort)Size.X, (ushort)Size.Y);
-            tempScreenshot.Save($"screenshot_{_screenshotId}", ImageFormat.Png);
-            */
+            new Screenshot(this).Save($"{path}/screenshot_{_screenshotId}", ImageFormat.Png);
         }
         
         public IEnumerable<IVideoFrame> GetBitmaps()
@@ -212,7 +235,7 @@ namespace MiodenusAnimationConverter
             };
             
             video.CreateVideo(videoFramesSource);
-*/          
+*/        
             GL.DeleteVertexArray(_vertexArray);
             GL.DeleteBuffer(_buffer);
             

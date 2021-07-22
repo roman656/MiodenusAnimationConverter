@@ -5,6 +5,7 @@ using System.IO;
 using MiodenusAnimationConverter.Exceptions;
 using MiodenusAnimationConverter.Scene.Models;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
+using NLog;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Loaders.ModelLoaders
@@ -17,6 +18,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             Binary
         }
         
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private const byte NormalParametersAmount = 3;
         private const byte VertexParametersAmount = 3;
         private const byte HeaderSizeInBytes = 80;
@@ -34,9 +36,8 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
         {
             Model model;
             
-            Console.WriteLine($"Loading model from {filename}");
-            Console.WriteLine($"Loading begin time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
-            
+            _logger.Trace($"Loading model from {filename} started.");
+
             CheckModelFile(filename);
 
             var fileData = File.ReadAllBytes(filename);
@@ -50,7 +51,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 model = LoadBinaryStl(fileData, modelColor, useCalculatedNormals);
             }
             
-            Console.WriteLine($"Loading end time: {DateTime.Now} {DateTime.Now.Millisecond} ms.");
+            _logger.Trace($"Loading model from {filename} finished.");
             
             return model;
         }
@@ -72,6 +73,8 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 
         private static StlFormat RecogniseStlFormat(in byte[] fileData)
         {
+            _logger.Trace("Recognising STL format...");
+            
             var result = StlFormat.Binary;
             var dataLength = fileData.Length;
 
@@ -104,6 +107,8 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 
                 break;
             }
+            
+            _logger.Trace("Recognised STL format: {0}", result);
             
             return result;
         }
@@ -215,7 +220,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 
             if (triangles.Count <= 0)
             {
-                Console.WriteLine("Warning: there are no triangles in the model file.");
+                _logger.Warn("Warning: there are no triangles in the model file.");
             }
             
             return new Model(triangles.ToArray());
@@ -266,7 +271,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             
             if (triangles.Length <= 0)
             {
-                Console.WriteLine("Warning: there are no triangles in the model file.");
+                _logger.Warn("Warning: there are no triangles in the model file.");
             }
 
             return new Model(triangles);
@@ -274,6 +279,8 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 
         private static void CheckBinaryStlFileContent(in byte[] fileData)
         {
+            _logger.Trace("Checking binary STL model file content started.");
+            
             if (fileData.Length < TriangleRecordsStartPositionInBytes)
             {
                 throw new WrongModelFileContentException("Incorrect content of the model file.");
@@ -288,6 +295,8 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 throw new WrongModelFileContentException("Triangles amount specified in the model file does" 
                         + " not match to the actual contents of the file.");
             }
+            
+            _logger.Trace("Checking binary STL model file content finished.");
         }
     }
 }
