@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
+using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models;
 using NLog;
 using OpenTK.Mathematics;
@@ -9,7 +11,7 @@ namespace MiodenusAnimationConverter
 {
     public class MainController
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly MainWindow _mainWindow;
         private readonly string _mainWindowTitle = "Miodenus Animation Converter";
         private readonly ushort _mainWindowWidth = 600;
@@ -19,23 +21,23 @@ namespace MiodenusAnimationConverter
         private readonly string _animationFilename = "";
         private readonly string[] _modelFilenames = { "/home/roman/STL/Rhm._Borsig_12.8.stl",
                                                       "/home/roman/STL/IS-6.stl" };    // Временное решение.
-        private Model[] _models;
+        private Scene.Scene _scene = new ();
         
         public MainController(string[] args)
         {
-            _logger.Trace("<=====Start=====>");
-            _logger.Trace("Processing of command line arguments is started.");
+            Logger.Trace("<=====Start=====>");
+            Logger.Trace("Processing of command line arguments is started.");
             
             //var argumentsHandler = new CommandLineArgumentsHandler(args);
             
-            _logger.Trace("Processing of command line arguments is finished.");
+            Logger.Trace("Processing of command line arguments is finished.");
             
             LoadModels();
            
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
             
-            _logger.Trace("<======End======>");
+            Logger.Trace("<======End======>");
             LogManager.Shutdown();
         }
 
@@ -57,24 +59,29 @@ namespace MiodenusAnimationConverter
                 StartVisible = _isMainWindowVisible
             };
 
-            return new MainWindow(_models, mainWindowSettings, nativeWindowSettings);
+            return new MainWindow(_scene, mainWindowSettings, nativeWindowSettings);
         }
 
         private void LoadModels()
         {
-            _logger.Trace("Loading models started.");
+            Logger.Trace("Loading models started.");
             
             uint i = 0;
-            _models = new Model[_modelFilenames.Length];
+            var models = new Model[_modelFilenames.Length];
             IModelLoader loader = new LoaderStl();
 
             foreach (var filename in _modelFilenames)
             {
-                _models[i] = loader.Load(filename, Color4.SteelBlue, false);
+                models[i] = loader.Load(filename, Color4.SteelBlue, false);
                 i++;
             }
-            
-            _logger.Trace("Loading models finished.");
+
+            foreach (var model in models)
+            {
+                _scene.ModelGroups.Add(new ModelGroup(model));
+            }
+
+            Logger.Trace("Loading models finished.");
         }
     }
 }

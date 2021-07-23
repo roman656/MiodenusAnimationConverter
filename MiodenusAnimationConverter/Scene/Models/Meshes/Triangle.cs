@@ -3,32 +3,34 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
-    public struct Triangle : IMiodenusObject
+    public struct Triangle : IMovable, IRotatable, IScalable
     {
         public const byte VertexesAmount = 3;
-        public readonly Vector4 Normal;
         public readonly Vertex[] Vertexes;
 
-        public Triangle(in Vertex[] vertexes, Vector4 normal)
+        public Triangle(in Vertex[] vertexes, Vector3 normal)
         {
-            CheckVertexesArgument(vertexes);
+            CheckArgument(vertexes);
 
-            Normal = normal;
-            Vertexes = new Vertex[3];
-            Array.Copy(vertexes, Vertexes, vertexes.Length);
+            Vertexes = new Vertex[VertexesAmount];
+            
+            for (byte i = 0; i < VertexesAmount; i++)
+            {
+                Vertexes[i] = new Vertex(vertexes[i].Position, normal, vertexes[i].Color);
+            }
         }
 
-        public static Vector4 CalculateNormal(in Vertex[] vertexes)
+        public static Vector3 CalculateNormal(in Vertex[] vertexes)
         {
-            CheckVertexesArgument(vertexes);
+            CheckArgument(vertexes);
 
             var AB = new Vector3(vertexes[1].Position - vertexes[0].Position);
             var AC = new Vector3(vertexes[2].Position - vertexes[0].Position);
 
-            return new Vector4(Vector3.Cross(AB, AC).Normalized(), 1.0f);
+            return Vector3.Cross(AB, AC).Normalized();
         }
 
-        private static void CheckVertexesArgument(in Vertex[] vertexes)
+        private static void CheckArgument(in Vertex[] vertexes)
         {
             if (vertexes == null)
             {
@@ -40,5 +42,30 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
                 throw new ArgumentException($"Triangle vertexes amount must be {VertexesAmount}.");
             }
         }
+
+        public void Move(float deltaX, float deltaY, float deltaZ)
+        {
+            foreach (var vertex in Vertexes)
+            {
+                vertex.Move(deltaX, deltaY, deltaZ);
+            }
+        }
+
+        public void Rotate(float angle, Vector3 vector)
+        {
+            foreach (var vertex in Vertexes)
+            {
+                vertex.Rotate(angle, vector);
+            }
+        }
+
+        public void Scale(float scaleX, float scaleY, float scaleZ)
+        {
+            foreach (var vertex in Vertexes)
+            {
+                vertex.Scale(scaleX, scaleY, scaleZ);
+            }
+        }
+
     }
 }

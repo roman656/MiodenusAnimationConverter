@@ -18,7 +18,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             Binary
         }
         
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private const byte NormalParametersAmount = 3;
         private const byte VertexParametersAmount = 3;
         private const byte HeaderSizeInBytes = 80;
@@ -36,7 +36,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
         {
             Model model;
             
-            _logger.Trace($"Loading model from {filename} started.");
+            Logger.Trace($"Loading model from {filename} started.");
 
             CheckModelFile(filename);
 
@@ -51,7 +51,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 model = LoadBinaryStl(fileData, modelColor, useCalculatedNormals);
             }
             
-            _logger.Trace($"Loading model from {filename} finished.");
+            Logger.Trace($"Loading model from {filename} finished.");
             
             return model;
         }
@@ -73,7 +73,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 
         private static StlFormat RecogniseStlFormat(in byte[] fileData)
         {
-            _logger.Trace("Recognising STL format...");
+            Logger.Trace("Recognising STL format...");
             
             var result = StlFormat.Binary;
             var dataLength = fileData.Length;
@@ -108,7 +108,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 break;
             }
             
-            _logger.Trace("Recognised STL format: {0}", result);
+            Logger.Trace("Recognised STL format: {0}", result);
             
             return result;
         }
@@ -120,7 +120,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             var fileLinesAmount = fileLines.Length;
             var isNormalReady = false;
             var isVertexesReady = false;
-            var normal = new Vector4();
+            var normal = new Vector3();
             var vertexes = new Vertex[Triangle.VertexesAmount];
             byte currentVertexId = 0;
 
@@ -148,10 +148,9 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 
                     try
                     {
-                        normal = new Vector4(float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
+                        normal = new Vector3(float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
                                              float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat),
-                                             float.Parse(values[4], CultureInfo.InvariantCulture.NumberFormat),
-                                             1.0f);
+                                             float.Parse(values[4], CultureInfo.InvariantCulture.NumberFormat));
                     }
                     catch (FormatException)
                     {
@@ -181,10 +180,10 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                     try
                     {
                         vertexes[currentVertexId] = new Vertex(
-                                new Vector4(float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat),
+                                new Vector3(float.Parse(values[1], CultureInfo.InvariantCulture.NumberFormat),
                                             float.Parse(values[2], CultureInfo.InvariantCulture.NumberFormat),
-                                            float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat),
-                                            1.0f), 
+                                            float.Parse(values[3], CultureInfo.InvariantCulture.NumberFormat)), 
+                                normal,
                                 modelColor);
                     }
                     catch (FormatException)
@@ -220,10 +219,10 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 
             if (triangles.Count <= 0)
             {
-                _logger.Warn("Warning: there are no triangles in the model file.");
+                Logger.Warn("Warning: there are no triangles in the model file.");
             }
             
-            return new Model(triangles.ToArray());
+            return new Model(new Mesh(triangles.ToArray()));
         }
         
         private static Model LoadBinaryStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals)
@@ -245,11 +244,11 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                     var offsetZ = (VertexParametersAmount * j + 2) * sizeof(float);
                     
                     vertexes[j - 1] = new Vertex(
-                            new Vector4(
+                            new Vector3(
                                     BitConverter.ToSingle(fileData, currentRecordPosition + offsetX),
                                     BitConverter.ToSingle(fileData, currentRecordPosition + offsetY),
-                                    BitConverter.ToSingle(fileData, currentRecordPosition + offsetZ),
-                                    1.0f),
+                                    BitConverter.ToSingle(fileData, currentRecordPosition + offsetZ)),
+                            new Vector3(),
                             modelColor);
                 }
                 
@@ -259,11 +258,10 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 }
                 else
                 {
-                    var normal = new Vector4(
+                    var normal = new Vector3(
                             BitConverter.ToSingle(fileData, currentRecordPosition), 
                             BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float)),
-                            BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float) * 2),
-                            1.0f);
+                            BitConverter.ToSingle(fileData, currentRecordPosition + sizeof(float) * 2));
                     
                     triangles[i] = new Triangle(vertexes, normal);
                 }
@@ -271,15 +269,15 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             
             if (triangles.Length <= 0)
             {
-                _logger.Warn("Warning: there are no triangles in the model file.");
+                Logger.Warn("Warning: there are no triangles in the model file.");
             }
 
-            return new Model(triangles);
+            return new Model(new Mesh(triangles));
         }
 
         private static void CheckBinaryStlFileContent(in byte[] fileData)
         {
-            _logger.Trace("Checking binary STL model file content started.");
+            Logger.Trace("Checking binary STL model file content started.");
             
             if (fileData.Length < TriangleRecordsStartPositionInBytes)
             {
@@ -296,7 +294,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                         + " not match to the actual contents of the file.");
             }
             
-            _logger.Trace("Checking binary STL model file content finished.");
+            Logger.Trace("Checking binary STL model file content finished.");
         }
     }
 }

@@ -1,4 +1,4 @@
-using System.Numerics;
+using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
@@ -8,18 +8,13 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         {
             
         }
-        
+
         public void Move(float deltaX, float deltaY, float deltaZ)
         {
             throw new System.NotImplementedException();
         }
 
-        public void MoveTo(float x, float y, float z)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Rotate(float angle, Vector4 vector)
+        public void Rotate(float angle, Vector3 vector)
         {
             throw new System.NotImplementedException();
         }

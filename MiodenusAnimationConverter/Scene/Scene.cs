@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Scene.Cameras;
-using MiodenusAnimationConverter.Scene.Models;
 
 namespace MiodenusAnimationConverter.Scene
 {
-    public class Scene : IMiodenusObject
+    public class Scene
     {
         public List<ICamera> Cameras;
-        public List<IModel> Models;
+        public List<ModelGroup> ModelGroups = new ();
 
         public Scene()
         {

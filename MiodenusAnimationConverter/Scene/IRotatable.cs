@@ -1,9 +1,9 @@
-using System.Numerics;
+using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
 {
-    public interface IRotatable : IMiodenusObject
+    public interface IRotatable
     {
-        public void Rotate(float angle, Vector4 vector);
+        public void Rotate(float angle, Vector3 vector);
     }
 }

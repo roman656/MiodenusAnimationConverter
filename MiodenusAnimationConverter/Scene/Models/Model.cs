@@ -1,37 +1,30 @@
-using System.Collections.Generic;
-using System.Numerics;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
+using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MiodenusAnimationConverter.Scene.Models
 {
-    public class Model : IModel
+    public class Model : IMovable, IRotatable, IScalable 
     {
-        public readonly Triangle[] Triangles;
-        public List<Mesh> Meshes;
+        public readonly Mesh Mesh;
         
-        public Model(Triangle[] triangles)
+        public Model(in Mesh mesh)
         {
-            Triangles = triangles;
-        }
-
-        public void Scale(float scaleX, float scaleY, float scaleZ)
-        {
-            
+            Mesh = new Mesh(mesh.Triangles);
         }
 
         public void Move(float deltaX, float deltaY, float deltaZ)
         {
-
+            Mesh.Move(deltaX, deltaY, deltaZ);
         }
 
-        public void MoveTo(float x, float y, float z)
+        public void Rotate(float angle, Vector3 vector)
         {
-
+            Mesh.Rotate(angle, vector);
         }
 
-        public void Rotate(float angle, Vector4 vector)
+        public void Scale(float scaleX, float scaleY, float scaleZ)
         {
-
+            Mesh.Scale(scaleX, scaleY, scaleZ);
         }
     }
 }

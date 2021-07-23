@@ -16,6 +16,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace MiodenusAnimationConverter
 {
@@ -28,9 +29,10 @@ namespace MiodenusAnimationConverter
         private int _currentProgramIndex = 0;
 
         private double _time;
-        private bool _initialized;
         private int _vertexArray;
+        private int _vertexArray2;
         private int _buffer;
+        
         private int _verticeCount;
         private long _screenshotId = 0;
 
@@ -45,17 +47,20 @@ namespace MiodenusAnimationConverter
         private List<BitmapVideoFrameWrapper> frames = new ();
 
         private float _angle;
-        private Model[] _models;
+        private Scene.Scene _scene;
         private VideoRecorder video;
+        private Vertex[] _vertexes;
+        private Transformation[] _transformations;
 
-        public MainWindow(Model[] models, GameWindowSettings gameWindowSettings,
+
+        public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
             _screenshotsPath = "screenshots";
             _videoPath = "videos";
             CheckPath(_screenshotsPath);
             CheckPath(_videoPath);
-            _models = models;
+            _scene = scene;
             video = new VideoRecorder(this,$"{_videoPath}/animation", "mp4", 60);
         }
 
@@ -87,32 +92,43 @@ namespace MiodenusAnimationConverter
             Logger.Trace("Shader pograms initialization finished.");
         }
 
-        protected override void OnLoad()
+        private static Vertex[] GetAllVertexes(Scene.Scene scene)
         {
-            _model = Matrix4.Identity;
-            int vertexesAmount = 0;
+            var vertexes = new List<Vertex>();
             
-            foreach (var model in _models)
+            foreach (var modelGroup in scene.ModelGroups)
             {
-                vertexesAmount += model.Triangles.Length * Triangle.VertexesAmount;
-            }
-
-            Vertex[] vertexes = new Vertex[vertexesAmount];
-
-            int i = 0;
-            
-            foreach (var model in _models)
-            {
-                foreach (var triangle in model.Triangles)
+                foreach (var model in modelGroup.Models)
                 {
-                    vertexes[i] = triangle.Vertexes[0];
-                    vertexes[i + 1] = triangle.Vertexes[1];
-                    vertexes[i + 2] = triangle.Vertexes[2];
-                    i += Triangle.VertexesAmount;
+                    foreach (var triangle in model.Mesh.Triangles)
+                    {
+                        foreach (var vertex in triangle.Vertexes)
+                        {
+                            vertexes.Add(vertex);
+                        }
+                    }
                 }
             }
 
-            _verticeCount = vertexes.Length;
+            return vertexes.ToArray();
+        }
+
+        protected override void OnLoad()
+        {
+            _model = Matrix4.Identity;
+
+            _vertexes = GetAllVertexes(_scene);
+
+            _transformations = new Transformation[_vertexes.Length];
+
+            for (var i = 0; i < _vertexes.Length; i++)
+            {
+                _transformations[i] = new Transformation(_vertexes[i].Transformation.Location, _vertexes[i].Transformation.Rotation, _vertexes[i].Transformation.Scale);
+            }
+
+            var vertexesData = new byte[(Vertex.SizeInBytes - Transformation.SizeInBytes) * _vertexes.Length];
+
+            _verticeCount = _vertexes.Length;
             _vertexArray = GL.GenVertexArray();
             _buffer = GL.GenBuffer();
 
@@ -122,8 +138,8 @@ namespace MiodenusAnimationConverter
             // create first buffer: vertex
             GL.NamedBufferStorage(
                 _buffer,
-                Vertex.SizeInBytes * vertexes.Length,        // the size needed by this buffer
-                vertexes,                           // data to initialize with
+                _vertexes.Length * Vertex.SizeInBytes,        // the size needed by this buffer
+                _vertexes,                           // data to initialize with
                 BufferStorageFlags.MapWriteBit);    // at this point we will only write to the buffer
 
 
@@ -132,25 +148,35 @@ namespace MiodenusAnimationConverter
             GL.VertexArrayAttribFormat(
                 _vertexArray,
                 0,                      // attribute index, from the shader location = 0
-                4,                      // size of attribute, vec4
+                3,                      // size of attribute, vec3
                 VertexAttribType.Float, // contains floats
                 false,                  // does not need to be normalized as it is already, floats ignore this flag anyway
                 0);                     // relative offset, first item
-
-
+            
             GL.VertexArrayAttribBinding(_vertexArray, 1, 0);
             GL.EnableVertexArrayAttrib(_vertexArray, 1);
             GL.VertexArrayAttribFormat(
                 _vertexArray,
-                1,                      // attribute index, from the shader location = 1
+                1,
+                3,
+                VertexAttribType.Float,
+                false,
+                12);
+
+            GL.VertexArrayAttribBinding(_vertexArray, 2, 0);
+            GL.EnableVertexArrayAttrib(_vertexArray, 2);
+            GL.VertexArrayAttribFormat(
+                _vertexArray,
+                2,                      // attribute index, from the shader location = 2
                 4,                      // size of attribute, vec4
                 VertexAttribType.Float, // contains floats
                 false,                  // does not need to be normalized as it is already, floats ignore this flag anyway
-                16);                     // relative offset after a vec4
+                24);                     // relative offset after a vec4
+            
+            
 
             // link the vertex array and buffer and provide the stride as size of Vertex
             GL.VertexArrayVertexBuffer(_vertexArray, 0, _buffer, IntPtr.Zero, Vertex.SizeInBytes);
-            _initialized = true;
 
             CursorVisible = true;
 
@@ -176,6 +202,17 @@ namespace MiodenusAnimationConverter
             return data;
         }
 
+        protected override void OnKeyDown(KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Keys.W)
+            {
+                _scene.ModelGroups[0].Models[0].Move(1, 0, 0);
+                _scene.ModelGroups[0].Models[0].Scale(0.01f, 0.01f, 0.01f);
+                Logger.Trace("Scaled.");
+            }
+            base.OnKeyDown(e);
+        }
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             var timeStamp = Stopwatch.GetTimestamp();
@@ -189,6 +226,7 @@ namespace MiodenusAnimationConverter
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
             // Bind the VAO
             GL.BindVertexArray(_vertexArray);
+            
             _shaderPrograms[_currentProgramIndex].Use();
 
             _model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 1.0f), _angle);
