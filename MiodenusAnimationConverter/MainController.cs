@@ -19,11 +19,13 @@ namespace MiodenusAnimationConverter
         private readonly bool _isMainWindowVisible = true;
         private readonly byte _mainWindowFrequency = 60;
         private readonly string _animationFilename = "";
-        private readonly string[] _modelFilenames = { "DebugAssets/Rhm_Borsig_12_8.stl",
-                                                      "DebugAssets/Jagdtiger.stl",
-                                                      "DebugAssets/IS-6.stl",
-                                                      "DebugAssets/Sphere.stl",
-                                                      "DebugAssets/Bottle.stl" };    // Временное решение.
+        private readonly string[] _modelFilenames = {
+                "DebugAssets/Rhm_Borsig_12_8.stl",
+                //"DebugAssets/Jagdtiger.stl",
+                //"DebugAssets/IS-6.stl",
+                //"DebugAssets/Sphere.stl",
+                //"DebugAssets/Bottle.stl",
+        };
         private Scene.Scene _scene = new ();
         
         public MainController(string[] args)
@@ -75,7 +77,7 @@ namespace MiodenusAnimationConverter
 
             foreach (var filename in _modelFilenames)
             {
-                models[i] = loader.Load(filename, Color4.SteelBlue, false);
+                models[i] = loader.Load(filename, Color4.ForestGreen, false);
                 i++;
             }
 

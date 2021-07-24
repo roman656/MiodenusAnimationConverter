@@ -27,6 +27,8 @@ namespace MiodenusAnimationConverter
         private readonly string _videoPath;
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
+        
+        private readonly Color4 _backgroundColor = new (0.3f, 0.3f, 0.4f, 1.0f);
 
         private double _time;
         private int _vertexArray;
@@ -219,7 +221,7 @@ namespace MiodenusAnimationConverter
             _angle += (float)((timeStamp - _lastTimestamp) / (double)_freq);
             _lastTimestamp = timeStamp;
 
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // Bind the VBO
@@ -242,6 +244,8 @@ namespace MiodenusAnimationConverter
 
             // This draws the triangle.
             GL.DrawArrays(PrimitiveType.Triangles, 0, _verticeCount);
+            
+            GL.BindVertexArray(0);
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
