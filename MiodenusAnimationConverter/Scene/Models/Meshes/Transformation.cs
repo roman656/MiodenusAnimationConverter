@@ -1,3 +1,4 @@
+using System.Globalization;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
@@ -21,6 +22,14 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
             Location = Vector3.Zero;
             Rotation = Quaternion.Identity;
             Scale = Vector3.One;
+        }
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                    $"Transformation: [ Location: ({Location.X}, {Location.Y}, {Location.Z}) "
+                    + $"| Rotation: ({Rotation.X}, {Rotation.Y}, {Rotation.Z}, {Rotation.W}) "
+                    + $"| Scale: ({Scale.X}, {Scale.Y}, {Scale.Z}) ]");
         }
     }
 }

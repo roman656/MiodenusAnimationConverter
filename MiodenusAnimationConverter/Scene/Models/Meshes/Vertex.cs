@@ -1,3 +1,4 @@
+using System.Globalization;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
@@ -43,6 +44,15 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
             _transformation.Scale.X *= scaleX;
             _transformation.Scale.Y *= scaleY;
             _transformation.Scale.Z *= scaleZ;
+        }
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                    $"Vertex:\n\tPosition: ({Position.X}, {Position.Y}, {Position.Z})\n\t"
+                    + $"Normal: ({Normal.X}, {Normal.Y}, {Normal.Z})\n\t"
+                    + $"Color: ({Color.R}, {Color.G}, {Color.B}, {Color.A})\n\t"
+                    + _transformation);
         }
     }
 }

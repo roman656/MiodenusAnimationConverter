@@ -45,27 +45,26 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
 
         public void Move(float deltaX, float deltaY, float deltaZ)
         {
-            foreach (var vertex in Vertexes)
+            for (var i = 0; i < VertexesAmount; i++)
             {
-                vertex.Move(deltaX, deltaY, deltaZ);
+                Vertexes[i].Move(deltaX, deltaY, deltaZ);
             }
         }
 
         public void Rotate(float angle, Vector3 vector)
         {
-            foreach (var vertex in Vertexes)
+            for (var i = 0; i < VertexesAmount; i++)
             {
-                vertex.Rotate(angle, vector);
+                Vertexes[i].Rotate(angle, vector);
             }
         }
 
         public void Scale(float scaleX, float scaleY, float scaleZ)
         {
-            foreach (var vertex in Vertexes)
+            for (var i = 0; i < VertexesAmount; i++)
             {
-                vertex.Scale(scaleX, scaleY, scaleZ);
+                Vertexes[i].Scale(scaleX, scaleY, scaleZ);
             }
         }
-
     }
 }

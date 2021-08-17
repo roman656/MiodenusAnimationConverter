@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 
@@ -13,8 +14,9 @@ namespace MiodenusAnimationConverter
             VertexArrayObjectIndex = GL.GenVertexArray();
         }
 
+        public List<int> VertexBufferObjectIndexes => new (_vertexBufferObjectIndexes);
+
         public void AddVertexBufferObject(in float[] data, int elementsPerVertex,
-                VertexAttribPointerType elementType = VertexAttribPointerType.Float,
                 BufferUsageHint bufferUsageHint = BufferUsageHint.StaticDraw)
         {
             var vertexBufferObjectIndex = GL.GenBuffer();
@@ -26,7 +28,7 @@ namespace MiodenusAnimationConverter
             GL.EnableVertexAttribArray(_vertexBufferObjectIndexes.Count);
             GL.VertexAttribPointer(_vertexBufferObjectIndexes.Count,
                     elementsPerVertex,
-                    elementType,
+                    VertexAttribPointerType.Float,
                     false,
                     0,
                     0);
@@ -34,6 +36,16 @@ namespace MiodenusAnimationConverter
             
             GL.BindBuffer(BufferTarget.ArrayBuffer,0);
             GL.BindVertexArray(0);
+        }
+
+        public void UpdateVertexBufferObject(int vertexBufferObjectIndex, in float[] newData)
+        {
+            if (_vertexBufferObjectIndexes.Contains(vertexBufferObjectIndex))
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObjectIndex);
+                GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, newData.Length * sizeof(float), newData);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            }
         }
 
         public void Draw(int vertexesAmount, PrimitiveType mode = PrimitiveType.Triangles)

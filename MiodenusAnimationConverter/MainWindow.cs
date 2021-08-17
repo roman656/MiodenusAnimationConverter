@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Media;
-using MiodenusAnimationConverter.Scene.Models;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
@@ -37,7 +35,7 @@ namespace MiodenusAnimationConverter
         private int _buffer;
         
         private int _vertexesAmount;
-        private long _screenshotId = 0;
+        private long _screenshotId;
 
         private Matrix4 _model;
         private Matrix4 _view;
@@ -55,6 +53,15 @@ namespace MiodenusAnimationConverter
         private Vertex[] _vertexes;
         private Transformation[] _transformations;
         private VertexArrayObject _mainVao;
+        private PrimitiveType _drawMode = PrimitiveType.Triangles;
+        private int _locationVboIndex;
+        private int _rotationVboIndex;
+        private int _scaleVboIndex;
+        private bool _hasTransformed;
+        
+        private float[] _vertexesLocation;
+        private float[] _vertexesRotation;
+        private float[] _vertexesScale;
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -98,19 +105,35 @@ namespace MiodenusAnimationConverter
         protected override void OnLoad()
         {
             _model = Matrix4.Identity;
-            _vertexes = _scene.Vertexes;
-            _transformations = new Transformation[_vertexes.Length];
             
+            _scene.ModelGroups[0].Scale(0.01f, 0.01f, 0.01f);
+            _scene.ModelGroups[0].Move(50, 0, 0);
+
+            _vertexes = _scene.Vertexes;
+
             var vertexesPositions = new float[_vertexes.Length * 3];
             var vertexesNormals = new float[_vertexes.Length * 3];
             var vertexesColors = new float[_vertexes.Length * 4];
+            
+            _vertexesLocation = new float[_vertexes.Length * 3];
+            _vertexesRotation = new float[_vertexes.Length * 4];
+            _vertexesScale = new float[_vertexes.Length * 3];
 
             for (int i = 0, j = 0, k = 0; i < _vertexes.Length; i += 1, j += 3, k += 4)
             {
-                _transformations[i] = new Transformation(_vertexes[i].Transformation.Location,
-                                                         _vertexes[i].Transformation.Rotation,
-                                                         _vertexes[i].Transformation.Scale);
+                _vertexesLocation[j] = _vertexes[i].Transformation.Location.X;
+                _vertexesLocation[j + 1] = _vertexes[i].Transformation.Location.Y;
+                _vertexesLocation[j + 2] = _vertexes[i].Transformation.Location.Z;
                 
+                _vertexesRotation[k] = _vertexes[i].Transformation.Rotation.X;
+                _vertexesRotation[k + 1] = _vertexes[i].Transformation.Rotation.Y;
+                _vertexesRotation[k + 2] = _vertexes[i].Transformation.Rotation.Z;
+                _vertexesRotation[k + 3] = _vertexes[i].Transformation.Rotation.W;
+                
+                _vertexesScale[j] = _vertexes[i].Transformation.Scale.X;
+                _vertexesScale[j + 1] = _vertexes[i].Transformation.Scale.Y;
+                _vertexesScale[j + 2] = _vertexes[i].Transformation.Scale.Z;
+
                 vertexesPositions[j] = _vertexes[i].Position.X;
                 vertexesPositions[j + 1] = _vertexes[i].Position.Y;
                 vertexesPositions[j + 2] = _vertexes[i].Position.Z;
@@ -130,6 +153,13 @@ namespace MiodenusAnimationConverter
             _mainVao.AddVertexBufferObject(vertexesPositions, 3);
             _mainVao.AddVertexBufferObject(vertexesNormals, 3);
             _mainVao.AddVertexBufferObject(vertexesColors, 4);
+            
+            _mainVao.AddVertexBufferObject(_vertexesLocation, 3, BufferUsageHint.StreamDraw);
+            _locationVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
+            _mainVao.AddVertexBufferObject(_vertexesRotation, 4, BufferUsageHint.StreamDraw);
+            _rotationVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
+            _mainVao.AddVertexBufferObject(_vertexesScale, 3, BufferUsageHint.StreamDraw);
+            _scaleVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
             
             CursorVisible = _isCursorVisible;
             _vertexesAmount = _vertexes.Length;
@@ -158,24 +188,91 @@ namespace MiodenusAnimationConverter
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
-            if (e.Key == Keys.W)
+            switch (e.Key)
             {
-                _scene.ModelGroups[0].Models[0].Move(1, 0, 0);
-                _scene.ModelGroups[0].Models[0].Scale(0.01f, 0.01f, 0.01f);
+                case Keys.W:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Move(0, 25, 0);
+                    }
+                    
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.S:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Move(0, -25, 0);
+                    }
+                    
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.A:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Move(25, 0, 0);
+                    }
+                    
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.D:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Move(-25, 0, 0);
+                    }
+
+                    _hasTransformed = true;
+                    break;
+                }
             }
+
             base.OnKeyDown(e);
+        }
+
+        private void UpdateModelsTransformation()
+        {
+            if (_hasTransformed)
+            {
+                for (int i = 0, j = 0, k = 0; i < _vertexes.Length; i += 1, j += 3, k += 4)
+                {
+                    _vertexesLocation[j] = _vertexes[i].Transformation.Location.X;
+                    _vertexesLocation[j + 1] = _vertexes[i].Transformation.Location.Y;
+                    _vertexesLocation[j + 2] = _vertexes[i].Transformation.Location.Z;
+
+                    _vertexesRotation[k] = _vertexes[i].Transformation.Rotation.X;
+                    _vertexesRotation[k + 1] = _vertexes[i].Transformation.Rotation.Y;
+                    _vertexesRotation[k + 2] = _vertexes[i].Transformation.Rotation.Z;
+                    _vertexesRotation[k + 3] = _vertexes[i].Transformation.Rotation.W;
+
+                    _vertexesScale[j] = _vertexes[i].Transformation.Scale.X;
+                    _vertexesScale[j + 1] = _vertexes[i].Transformation.Scale.Y;
+                    _vertexesScale[j + 2] = _vertexes[i].Transformation.Scale.Z;
+                }
+
+                _mainVao.UpdateVertexBufferObject(_locationVboIndex, _vertexesLocation);
+                _mainVao.UpdateVertexBufferObject(_rotationVboIndex, _vertexesRotation);
+                _mainVao.UpdateVertexBufferObject(_scaleVboIndex, _vertexesScale);
+            }
+            
+            _hasTransformed = false;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            var timeStamp = Stopwatch.GetTimestamp();
-            _angle += (float)((timeStamp - _lastTimestamp) / (double)_freq);
-            _lastTimestamp = timeStamp;
-
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            _shaderPrograms[_currentProgramIndex].Use();
+            UpdateModelsTransformation();
+
+            var timeStamp = Stopwatch.GetTimestamp();
+            //_angle += (float)((timeStamp - _lastTimestamp) / (double)_freq);
+            _lastTimestamp = timeStamp;
 
             _model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 1.0f), _angle);
             _view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.0f, 0.0f), Vector3.UnitY);
@@ -188,7 +285,8 @@ namespace MiodenusAnimationConverter
             location = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "projection");
             GL.UniformMatrix4(location, 1, false, Matrix4ToArray(_projection));
             
-            _mainVao.Draw(_vertexesAmount);
+            _shaderPrograms[_currentProgramIndex].Use();
+            _mainVao.Draw(_vertexesAmount, _drawMode);
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);

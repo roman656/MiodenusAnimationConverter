@@ -22,9 +22,9 @@ namespace MiodenusAnimationConverter
         private readonly byte _mainWindowFrequency = 60;
         private readonly string _animationFilename = "";
         private readonly string[] _modelFilenames = {
-                "DebugAssets/Rhm_Borsig_12_8.stl",
+                //"DebugAssets/Rhm_Borsig_12_8.stl",
                 //"DebugAssets/Jagdtiger.stl",
-                //"DebugAssets/IS-6.stl",
+                "DebugAssets/IS-6.stl",
                 //"DebugAssets/Sphere.stl",
                 //"DebugAssets/Bottle.stl",
         };
