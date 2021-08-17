@@ -63,6 +63,7 @@ namespace MiodenusAnimationConverter
         private float[] _vertexesRotation;
         private float[] _vertexesScale;
         private float _rotationRate = 1.0f;
+        private Vector3 _lightPosition = new (0, 10, 10);
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -107,7 +108,7 @@ namespace MiodenusAnimationConverter
         {
             _model = Matrix4.Identity;
             
-            _scene.ModelGroups[0].Scale(0.01f, 0.01f, 0.01f);
+            _scene.ModelGroups[0].Scale(0.02f, 0.02f, 0.02f);
 
             _vertexes = _scene.Vertexes;
 
@@ -260,6 +261,13 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
+                case Keys.Q:
+                {
+                    _lightPosition.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 2.0);
+                    //_lightPosition.Y = (float)(Math.Sin(Stopwatch.GetTimestamp() / 2.0) * 1.0f);
+                    
+                    break;
+                }
             }
 
             base.OnKeyDown(e);
@@ -307,6 +315,9 @@ namespace MiodenusAnimationConverter
             _model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 1.0f), _angle);
             _view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.0f, 0.0f), Vector3.UnitY);
             _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (_FOV / 180f), Size.X / (float)Size.X, 0.2f, 256.0f);
+            
+            var lightPositionLocation = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "light_position");
+            GL.Uniform3(lightPositionLocation, _lightPosition.X, _lightPosition.Y, _lightPosition.Z);
 
             var location = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "model");
             GL.UniformMatrix4(location, 1, false, Matrix4ToArray(_model));

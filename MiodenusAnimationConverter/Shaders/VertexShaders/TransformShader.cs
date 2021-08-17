@@ -17,14 +17,13 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
                 layout (location = 5) in vec3 t_scale;
 
                 out vec4 vertex_color;
-                out vec3 original_normal;
-                out vec3 transformed_normal;
+                out vec3 vertex_normal;
+                out vec3 vertex_position;
 
                 uniform mat4 model;
                 uniform mat4 view;
                 uniform mat4 projection;
 
-                vec3 cross_product(const in vec3 vector_a, const in vec3 vector_b);
                 vec3 move(const in vec3 vector, const in vec3 delta);
                 vec3 rotate(const in vec3 vector, const in vec4 quaternion);
                 vec3 scale(const in vec3 vector, const in vec3 new_scale);
@@ -39,16 +38,8 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
                     gl_Position = projection * view * model * vec4(t_position, 1.0f);
 
                     vertex_color = color;
-                    original_normal = vec3(color);
-                    mat3 normal_matrix = transpose(inverse(mat3(view * model)));
-                    transformed_normal = normal_matrix * original_normal;
-                }
-
-                vec3 cross_product(const in vec3 vector_a, const in vec3 vector_b)
-                {
-                    return vec3(vector_a.y * vector_b.z - vector_a.z * vector_b.y,
-                                vector_a.z * vector_b.x - vector_a.x * vector_b.z,
-                                vector_a.x * vector_b.y - vector_a.y * vector_b.x);
+                    vertex_normal = t_normal;
+                    vertex_position = t_position;
                 }
 
                 vec3 move(const in vec3 vector, const in vec3 delta)
@@ -64,7 +55,7 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
 
                 vec3 rotate(const in vec3 vector, const in vec4 quaternion)
                 {
-                    return (vector + 2.0f * cross_product(quaternion.xyz, cross_product(quaternion.xyz, vector) + quaternion.w * vector));
+                    return (vector + 2.0f * cross(quaternion.xyz, cross(quaternion.xyz, vector) + quaternion.w * vector));
                 }
 
                 vec3 scale(const in vec3 vector, const in vec3 new_scale)
@@ -87,6 +78,7 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
                     vertex_normal = move(vertex_normal, t_location);
                     vertex_normal = rotate(vertex_normal, t_rotation);
                     vertex_normal = scale(vertex_normal, t_scale);
+                    vertex_normal = normalize(vertex_normal);
                 }
                 ";
     }
