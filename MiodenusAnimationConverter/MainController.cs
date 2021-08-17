@@ -23,8 +23,8 @@ namespace MiodenusAnimationConverter
         private readonly string _animationFilename = "";
         private readonly string[] _modelFilenames = {
                 //"DebugAssets/Rhm_Borsig_12_8.stl",
-                //"DebugAssets/Jagdtiger.stl",
-                "DebugAssets/IS-6.stl",
+                "DebugAssets/Jagdtiger.stl",
+                //"DebugAssets/IS-6.stl",
                 //"DebugAssets/Sphere.stl",
                 //"DebugAssets/Bottle.stl",
         };
@@ -84,7 +84,7 @@ namespace MiodenusAnimationConverter
 
             foreach (var filename in _modelFilenames)
             {
-                models[i] = loader.Load(filename, Color4.ForestGreen, false);
+                models[i] = loader.Load(filename, GetRandomColor(), false);
                 i++;
             }
 
@@ -96,15 +96,26 @@ namespace MiodenusAnimationConverter
             Logger.Trace("Loading models finished.");
         }
 
+        private Color4 GetRandomColor()
+        {
+            var random = new Random();
+            return new Color4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1.0f);
+        }
+
         private AnimationFile.ModelAnimationFile GenerateDebugMAF()
         {
-            AnimationFile.ModelAnimationFile maf = new AnimationFile.ModelAnimationFile();
-            maf.AnimationInfo.AnimationName = "Generated debug animation";
-            maf.AnimationInfo.FPS = 60;
-            maf.AnimationInfo.Version = 1;
-            maf.AnimationInfo.VideoName = "test.mp4";
-            maf.AnimationInfo.TimeLength = 15;
-            maf.AnimationInfo.Type = "MAF";
+            var maf = new AnimationFile.ModelAnimationFile
+            {
+                AnimationInfo =
+                {
+                    AnimationName = "Generated debug animation",
+                    FPS = 60,
+                    Version = 1,
+                    VideoName = "test.mp4",
+                    TimeLength = 15,
+                    Type = "MAF"
+                }
+            };
 
             maf.Models.Add(new AnimationFile.ModelInfo()
             {

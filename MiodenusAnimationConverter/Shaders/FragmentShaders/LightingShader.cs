@@ -11,6 +11,7 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
                 in vec4 vertex_color;
                 in vec3 original_normal;
                 in vec3 transformed_normal;
+
                 out vec4 color;
 
                 void main(void)

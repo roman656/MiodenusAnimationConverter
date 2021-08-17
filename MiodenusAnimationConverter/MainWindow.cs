@@ -62,6 +62,7 @@ namespace MiodenusAnimationConverter
         private float[] _vertexesLocation;
         private float[] _vertexesRotation;
         private float[] _vertexesScale;
+        private float _rotationRate = 1.0f;
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -107,7 +108,6 @@ namespace MiodenusAnimationConverter
             _model = Matrix4.Identity;
             
             _scene.ModelGroups[0].Scale(0.01f, 0.01f, 0.01f);
-            _scene.ModelGroups[0].Move(50, 0, 0);
 
             _vertexes = _scene.Vertexes;
 
@@ -194,7 +194,7 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Move(0, 25, 0);
+                        _vertexes[i].Move(0, -25, 0);
                     }
                     
                     _hasTransformed = true;
@@ -204,7 +204,7 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Move(0, -25, 0);
+                        _vertexes[i].Move(0, 25, 0);
                     }
                     
                     _hasTransformed = true;
@@ -214,7 +214,7 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Move(25, 0, 0);
+                        _vertexes[i].Move(-25, 0, 0);
                     }
                     
                     _hasTransformed = true;
@@ -224,7 +224,37 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Move(-25, 0, 0);
+                        _vertexes[i].Move(25, 0, 0);
+                    }
+
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.E:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Rotate((float)Math.PI / 6, new Vector3(1, 0, 0));
+                    }
+
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.R:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Rotate((float)Math.PI / 6, new Vector3(0, 1, 0));
+                    }
+
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.T:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Rotate((float)Math.PI / 6, new Vector3(0, 0, 1));
                     }
 
                     _hasTransformed = true;
@@ -271,7 +301,7 @@ namespace MiodenusAnimationConverter
             UpdateModelsTransformation();
 
             var timeStamp = Stopwatch.GetTimestamp();
-            //_angle += (float)((timeStamp - _lastTimestamp) / (double)_freq);
+            //_angle += (float)((timeStamp - _lastTimestamp) / (double)_freq) * _rotationRate;
             _lastTimestamp = timeStamp;
 
             _model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 1.0f), _angle);
