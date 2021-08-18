@@ -6,7 +6,7 @@ namespace MiodenusAnimationConverter.Scene
 {
     public class Scene
     {
-        public List<ICamera> Cameras;
+        public List<Camera> Cameras = new ();
         public List<ModelGroup> ModelGroups = new ();
 
         public Scene() {}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene;
+using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Scene.Models;
 using Newtonsoft.Json;
 using NLog;
@@ -39,10 +40,12 @@ namespace MiodenusAnimationConverter
             
             Logger.Trace("Processing of command line arguments is finished.");
 
-            string maf_filePath = "demo.maf.json";
+            var maf_filePath = "demo.maf.json";
             var maf = this.GenerateDebugMAF();
-            this.WriteAnimationFile(maf_filePath, maf);
+            WriteAnimationFile(maf_filePath, maf);
             Logger.Trace($"Test MAF file generated to '{maf_filePath}'");
+            
+            _scene.Cameras.Add(new Camera(Vector3.UnitZ * 4, _mainWindowWidth / (float)_mainWindowHeight));
             
             LoadModels();
            

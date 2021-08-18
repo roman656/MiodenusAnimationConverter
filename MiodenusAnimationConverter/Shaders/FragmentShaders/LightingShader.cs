@@ -8,34 +8,49 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
         public const string Code = @"
                 #version 330 core
 
-                in vec4 vertex_color;
-                in vec3 vertex_normal;
-                in vec3 vertex_position;
+                in vertex_shader_output
+                {
+                    vec3 position;
+                    vec3 normal;
+                    vec4 color;
+                } vertex;
 
                 out vec4 color;
 
                 uniform vec3 light_position;
+                uniform vec4 light_color;
+                uniform vec3 view_position;
 
-                vec4 ambient_lighting(const in vec4 light_color, const in float ambient_strength);
-                vec4 point_lighting(const in vec4 light_color);
+                const float AMBIENT_STRENGTH = 0.3f;
+                const float SPECULAR_STRENGTH = 0.8f;
+                const int MATERIAL_SHININESS = 32;
+
+                vec4 ambient_lighting();
+                vec4 diffuse_lighting();
+                vec4 specular_lighting();
 
                 void main(void)
                 {
-                    vec4 light_color = vec4(1.0f);
-                    float ambient_strength = 0.2f;
-
-                    color = (ambient_lighting(light_color, ambient_strength) + point_lighting(light_color)) * vertex_color;
+                    color = (ambient_lighting() + diffuse_lighting() + specular_lighting()) * vertex.color;
                 }
 
-                vec4 ambient_lighting(const in vec4 light_color, const in float ambient_strength)
+                vec4 ambient_lighting()
                 {
-                    return (ambient_strength * light_color);
+                    return (AMBIENT_STRENGTH * light_color);
                 }
 
-                vec4 point_lighting(const in vec4 light_color)
+                vec4 diffuse_lighting()
                 {
-                    vec3 light_direction = normalize(light_position - vertex_position);
-                    return (max(dot(vertex_normal, light_direction), 0.0f) * light_color);
+                    vec3 light_direction = normalize(light_position - vertex.position);
+                    return (max(dot(vertex.normal, light_direction), 0.0f) * light_color);
+                }
+
+                vec4 specular_lighting()
+                {
+                    vec3 light_direction = normalize(light_position - vertex.position);
+                    vec3 view_direction = normalize(view_position - vertex.position);
+                    vec3 reflect_direction = reflect(-light_direction, vertex.normal);
+                    return (SPECULAR_STRENGTH * light_color * pow(max(dot(view_direction, reflect_direction), 0.0f), MATERIAL_SHININESS));
                 }
                 ";
     }

@@ -9,6 +9,7 @@ using MiodenusAnimationConverter.Media;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
+using MiodenusAnimationConverter.Shaders.GeometryShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
 using NLog;
 using OpenTK.Graphics.OpenGL;
@@ -63,7 +64,8 @@ namespace MiodenusAnimationConverter
         private float[] _vertexesRotation;
         private float[] _vertexesScale;
         private float _rotationRate = 1.0f;
-        private Vector3 _lightPosition = new (0, 10, 10);
+        private Vector3 _lightPosition = new (0, 50, 10);
+        private bool _isDebugMode;
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -88,15 +90,28 @@ namespace MiodenusAnimationConverter
         {
             Logger.Trace("Shader pograms initialization started.");
             
-            var shaders = new List<Shader>
+            var mainShaders = new List<Shader>
             {
                 new (TransformShader.Code, TransformShader.Type),
                 new (LightingShader.Code, LightingShader.Type)
             };
+            
+            var debugShaders = new List<Shader>
+            {
+                new (TransformShader.Code, TransformShader.Type),
+                new (NormalsShader.Code, NormalsShader.Type),
+                new (ColorShader.Code, ColorShader.Type)
+            };
 
-            _shaderPrograms.Add(new ShaderProgram(shaders));
+            _shaderPrograms.Add(new ShaderProgram(mainShaders));
+            _shaderPrograms.Add(new ShaderProgram(debugShaders));
 
-            foreach (var shader in shaders)
+            foreach (var shader in mainShaders)
+            {
+                shader.Delete();
+            }
+
+            foreach (var shader in debugShaders)
             {
                 shader.Delete();
             }
@@ -108,7 +123,8 @@ namespace MiodenusAnimationConverter
         {
             _model = Matrix4.Identity;
             
-            _scene.ModelGroups[0].Scale(0.02f, 0.02f, 0.02f);
+            _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
+            _scene.ModelGroups[0].Rotate((float) (-Math.PI / 2.0), new Vector3(1.0f, 0.0f, 0.0f));
 
             _vertexes = _scene.Vertexes;
 
@@ -235,7 +251,7 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Rotate((float)Math.PI / 6, new Vector3(1, 0, 0));
+                        _vertexes[i].Rotate((float)Math.PI / 8, new Vector3(1, 0, 0));
                     }
 
                     _hasTransformed = true;
@@ -245,7 +261,7 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Rotate((float)Math.PI / 6, new Vector3(0, 1, 0));
+                        _vertexes[i].Rotate((float)Math.PI / 8, new Vector3(0, 1, 0));
                     }
 
                     _hasTransformed = true;
@@ -255,7 +271,7 @@ namespace MiodenusAnimationConverter
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
-                        _vertexes[i].Rotate((float)Math.PI / 6, new Vector3(0, 0, 1));
+                        _vertexes[i].Rotate((float)Math.PI / 8, new Vector3(0, 0, 1));
                     }
 
                     _hasTransformed = true;
@@ -263,9 +279,13 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.Q:
                 {
-                    _lightPosition.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 2.0);
-                    //_lightPosition.Y = (float)(Math.Sin(Stopwatch.GetTimestamp() / 2.0) * 1.0f);
-                    
+                    _lightPosition.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 20.0);
+                    break;
+                }
+                case Keys.B:
+                {
+                    _isDebugMode = !_isDebugMode;
+                    Logger.Trace($"Debug mode: {_isDebugMode}");
                     break;
                 }
             }
@@ -312,22 +332,28 @@ namespace MiodenusAnimationConverter
             //_angle += (float)((timeStamp - _lastTimestamp) / (double)_freq) * _rotationRate;
             _lastTimestamp = timeStamp;
 
-            _model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 1.0f), _angle);
+            _model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), _angle);
             _view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.0f, 0.0f), Vector3.UnitY);
             _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (_FOV / 180f), Size.X / (float)Size.X, 0.2f, 256.0f);
-            
-            var lightPositionLocation = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "light_position");
-            GL.Uniform3(lightPositionLocation, _lightPosition.X, _lightPosition.Y, _lightPosition.Z);
 
-            var location = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "model");
-            GL.UniformMatrix4(location, 1, false, Matrix4ToArray(_model));
-            location = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "view");
-            GL.UniformMatrix4(location, 1, false, Matrix4ToArray(_view));
-            location = GL.GetUniformLocation(_shaderPrograms[_currentProgramIndex].ProgramId, "projection");
-            GL.UniformMatrix4(location, 1, false, Matrix4ToArray(_projection));
-            
             _shaderPrograms[_currentProgramIndex].Use();
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("model", _model, false);
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _view, false);
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _projection, false);
+            _shaderPrograms[_currentProgramIndex].SetVector3("light_position", _lightPosition);
+            _shaderPrograms[_currentProgramIndex].SetVector4("light_color", new Vector4(1.0f));
+            _shaderPrograms[_currentProgramIndex].SetVector3("view_position", new Vector3(0.0f, 0.0f, 5.0f));
             _mainVao.Draw(_vertexesAmount, _drawMode);
+
+            if (_isDebugMode)
+            {
+                _shaderPrograms[_currentProgramIndex + 1].Use();
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("model", _model, false);
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _view, false);
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _projection, false);
+
+                _mainVao.Draw(_vertexesAmount, PrimitiveType.Lines);
+            }
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
