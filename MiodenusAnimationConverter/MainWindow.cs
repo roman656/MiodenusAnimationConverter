@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Media;
+using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
@@ -39,8 +40,7 @@ namespace MiodenusAnimationConverter
         
         private int _vertexesAmount;
         private long _screenshotId;
-
-        private Matrix4 _model;
+        
         private Matrix4 _view;
         private Matrix4 _projection;
         private float _FOV = 45.0f;
@@ -50,7 +50,6 @@ namespace MiodenusAnimationConverter
 
         private List<BitmapVideoFrameWrapper> frames = new ();
         private bool _isCursorVisible = true;
-        private float _angle;
         private Scene.Scene _scene;
         private VideoRecorder _video;
         private Vertex[] _vertexes;
@@ -66,7 +65,8 @@ namespace MiodenusAnimationConverter
         private float[] _vertexesRotation;
         private float[] _vertexesScale;
         private float _rotationRate = 1.0f;
-        private Vector3 _lightPosition = new (0, 50, 10);
+        private LightPoint _lightPoint1 = new (new Vector3(0.0f, 10.0f, 0.0f), new Vector4(1.0f));
+        private LightPoint _lightPoint2 = new (new Vector3(0.0f, 10.0f, 0.0f), new Vector4(1.0f));
         private bool _isDebugMode;
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
@@ -123,8 +123,6 @@ namespace MiodenusAnimationConverter
 
         protected override void OnLoad()
         {
-            _model = Matrix4.Identity;
-            
             _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[0].Rotate((float) (-Math.PI / 2.0), new Vector3(1.0f, 0.0f, 0.0f));
 
@@ -281,13 +279,33 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.Q:
                 {
-                    _lightPosition.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 20.0);
+                    _lightPoint1.Position.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 20.0);
                     break;
                 }
                 case Keys.B:
                 {
                     _isDebugMode = !_isDebugMode;
                     Logger.Trace($"Debug mode: {_isDebugMode}");
+                    break;
+                }
+                case Keys.M:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Scale(0.99f, 0.99f, 0.99f);
+                    }
+
+                    _hasTransformed = true;
+                    break;
+                }
+                case Keys.N:
+                {
+                    for (var i = 0; i < _vertexesAmount; i++)
+                    {
+                        _vertexes[i].Scale(1.01f, 1.01f, 1.01f);
+                    }
+
+                    _hasTransformed = true;
                     break;
                 }
             }
@@ -322,6 +340,13 @@ namespace MiodenusAnimationConverter
             
             _hasTransformed = false;
         }
+        
+        private Color4 GetRandomColor()
+        {
+            var colors = new [] { Color4.Red, Color4.Orange, Color4.Yellow, Color4.Green, Color4.LightBlue, Color4.Blue, Color4.Violet };
+            var random = new Random();
+            return colors[random.Next(colors.Length)];
+        }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -331,47 +356,46 @@ namespace MiodenusAnimationConverter
             UpdateModelsTransformation();
 
             var timeStamp = Stopwatch.GetTimestamp();
-            _angle += (float)((timeStamp - _lastTimestamp) / (double)_freq) * _rotationRate;
             _lastTimestamp = timeStamp;
-
-            _model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), _angle);
+            _lightPoint1.Rotate((float)Math.PI / 50, new Vector3(0, 0, 1));
+            _lightPoint1.Color = (Vector4)GetRandomColor();
+            
+            _lightPoint2.Rotate(-(float)Math.PI / 30, new Vector3(0, 0, 1));
+            _lightPoint2.Color = (Vector4)GetRandomColor();
+            
             _view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.0f, 0.0f), Vector3.UnitY);
             _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (_FOV / 180f), Size.X / (float)Size.X, 0.2f, 256.0f);
 
-            CheckGLErrors();
-            
             _shaderPrograms[_currentProgramIndex].Use();
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("model", _model, false);
             _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _view, false);
             _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _projection, false);
-            _shaderPrograms[_currentProgramIndex].SetVector3("light_position", _lightPosition);
-            _shaderPrograms[_currentProgramIndex].SetVector4("light_color", new Vector4(1.0f));
+            _shaderPrograms[_currentProgramIndex].SetVector3("light_position_1", _lightPoint1.Position);
+            _shaderPrograms[_currentProgramIndex].SetVector4("light_color_1", _lightPoint1.Color);
+            _shaderPrograms[_currentProgramIndex].SetVector3("light_position_2", _lightPoint2.Position);
+            _shaderPrograms[_currentProgramIndex].SetVector4("light_color_2", _lightPoint2.Color);
             _shaderPrograms[_currentProgramIndex].SetVector3("view_position", new Vector3(0.0f, 0.0f, 5.0f));
             
             CheckGLErrors();
             
-            //_mainVao.Draw(_vertexesAmount, _drawMode);
+            _mainVao.Draw(_vertexesAmount, _drawMode);
             
             CheckGLErrors();
 
             if (_isDebugMode)
             {
                 _shaderPrograms[_currentProgramIndex + 1].Use();
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("model", _model, false);
                 _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _view, false);
                 _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _projection, false);
 
                 CheckGLErrors();
                 
-                _mainVao.Draw(_vertexesAmount, PrimitiveType.Triangles);
+                _mainVao.Draw(_vertexesAmount);
                 
                 CheckGLErrors();
             }
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
-            
-            CheckGLErrors();
 
             //frames.Add(video.CreateVideoFrame());
             //TakeScreenshot(_screenshotsPath);

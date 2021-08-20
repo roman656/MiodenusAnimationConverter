@@ -5,7 +5,6 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
     public struct Transformation
     {
-        public const byte SizeInBytes = (3 + 4 + 3) * sizeof(float);
         public Vector3 Location;
         public Quaternion Rotation;
         public Vector3 Scale;

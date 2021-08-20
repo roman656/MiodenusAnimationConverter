@@ -14,14 +14,15 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
 
                 in vertex_shader_output
                 {
-                    vec3 position;
-                    vec3 normal;
+                    vec4 position;
+                    vec4 normal;
                     vec4 color;
                 } vertexes[];
 
+                uniform mat4 view;
                 uniform mat4 projection;
                  
-                const float MAGNITUDE = 0.2f;
+                const float MAGNITUDE = 0.15f;
                                   
                 void generate_normal_line(const in int vertex_index);
               
@@ -34,10 +35,10 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
 
                 void generate_normal_line(const in int vertex_index)
                 {
-                    gl_Position = projection * gl_in[vertex_index].gl_Position;
+                    gl_Position = projection * view * vertexes[vertex_index].position;
                     EmitVertex();
 
-                    gl_Position = projection * (gl_in[vertex_index].gl_Position + vec4(vertexes[vertex_index].normal, 0.0) * MAGNITUDE);
+                    gl_Position = projection * view * (vertexes[vertex_index].position + vertexes[vertex_index].normal * MAGNITUDE);
                     EmitVertex();
 
                     EndPrimitive();

@@ -5,7 +5,6 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
     public struct Vertex : IMovable, IRotatable, IScalable
     {
-        public const byte SizeInBytes = (3 + 3 + 4) * sizeof(float) + Transformation.SizeInBytes;
         public readonly Vector3 Position;
         public readonly Vector3 Normal;
         public readonly Color4 Color;
@@ -36,7 +35,6 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
         public void Rotate(float angle, Vector3 vector)
         {
             _transformation.Rotation *= Quaternion.FromAxisAngle(vector, angle);
-            _transformation.Rotation.Normalize();
         }
 
         public void Scale(float scaleX, float scaleY, float scaleZ)

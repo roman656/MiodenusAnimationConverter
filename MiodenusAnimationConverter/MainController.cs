@@ -87,7 +87,7 @@ namespace MiodenusAnimationConverter
 
             foreach (var filename in _modelFilenames)
             {
-                models[i] = loader.Load(filename, GetRandomColor(), false);
+                models[i] = loader.Load(filename, Color4.White /*GetRandomColor()*/, false);
                 i++;
             }
 
