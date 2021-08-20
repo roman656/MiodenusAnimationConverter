@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.CompilerServices;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Media;
@@ -17,6 +18,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using ErrorCode = OpenTK.Graphics.OpenGL.ErrorCode;
 
 namespace MiodenusAnimationConverter
 {
@@ -329,13 +331,15 @@ namespace MiodenusAnimationConverter
             UpdateModelsTransformation();
 
             var timeStamp = Stopwatch.GetTimestamp();
-            //_angle += (float)((timeStamp - _lastTimestamp) / (double)_freq) * _rotationRate;
+            _angle += (float)((timeStamp - _lastTimestamp) / (double)_freq) * _rotationRate;
             _lastTimestamp = timeStamp;
 
             _model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), _angle);
             _view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.0f, 0.0f), Vector3.UnitY);
             _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (_FOV / 180f), Size.X / (float)Size.X, 0.2f, 256.0f);
 
+            CheckGLErrors();
+            
             _shaderPrograms[_currentProgramIndex].Use();
             _shaderPrograms[_currentProgramIndex].SetMatrix4("model", _model, false);
             _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _view, false);
@@ -343,7 +347,12 @@ namespace MiodenusAnimationConverter
             _shaderPrograms[_currentProgramIndex].SetVector3("light_position", _lightPosition);
             _shaderPrograms[_currentProgramIndex].SetVector4("light_color", new Vector4(1.0f));
             _shaderPrograms[_currentProgramIndex].SetVector3("view_position", new Vector3(0.0f, 0.0f, 5.0f));
-            _mainVao.Draw(_vertexesAmount, _drawMode);
+            
+            CheckGLErrors();
+            
+            //_mainVao.Draw(_vertexesAmount, _drawMode);
+            
+            CheckGLErrors();
 
             if (_isDebugMode)
             {
@@ -352,14 +361,37 @@ namespace MiodenusAnimationConverter
                 _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _view, false);
                 _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _projection, false);
 
-                _mainVao.Draw(_vertexesAmount, PrimitiveType.Lines);
+                CheckGLErrors();
+                
+                _mainVao.Draw(_vertexesAmount, PrimitiveType.Triangles);
+                
+                CheckGLErrors();
             }
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
+            
+            CheckGLErrors();
 
             //frames.Add(video.CreateVideoFrame());
             //TakeScreenshot(_screenshotsPath);
+        }
+
+        private void CheckGLErrors(int sleepTime = 1000, [CallerLineNumber] int lineNumber = -1, [CallerMemberName] string caller = null)
+        {
+            var hasError = false;
+            ErrorCode errorCode;
+            
+            while ((errorCode = GL.GetError()) != ErrorCode.NoError)
+            {
+                hasError = true;
+                Logger.Error($"{caller}: detected OpenGL error on line {lineNumber}. Type: {errorCode}.");
+            }
+
+            if (hasError)
+            {
+                System.Threading.Thread.Sleep(sleepTime);
+            }
         }
 
         private void TakeScreenshot(in string path)

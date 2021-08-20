@@ -9,7 +9,8 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 #version 330 core
 
                 layout (triangles) in;
-                layout (line_strip, max_vertices = 8) out;
+                layout (line_strip) out;
+                layout (max_vertices = 6) out;
 
                 in vertex_shader_output
                 {
@@ -23,7 +24,7 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 const float MAGNITUDE = 0.2f;
                                   
                 void generate_normal_line(const in int vertex_index);
-                 
+              
                 void main(void)
                 {
                     generate_normal_line(0);
