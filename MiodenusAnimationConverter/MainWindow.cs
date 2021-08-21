@@ -65,8 +65,8 @@ namespace MiodenusAnimationConverter
         private float[] _vertexesRotation;
         private float[] _vertexesScale;
         private float _rotationRate = 1.0f;
-        private LightPoint _lightPoint1 = new (new Vector3(0.0f, 10.0f, 0.0f), new Vector4(1.0f));
-        private LightPoint _lightPoint2 = new (new Vector3(0.0f, 10.0f, 0.0f), new Vector4(1.0f));
+        private LightPoint _lightPoint1;
+        private LightPoint _lightPoint2;
         private bool _isDebugMode;
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
@@ -123,6 +123,9 @@ namespace MiodenusAnimationConverter
 
         protected override void OnLoad()
         {
+            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 4.0f, 0.0f), Color4.Blue);
+            _lightPoint2 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 0.0f, 2.0f), Color4.White);
+            
             _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[0].Rotate((float) (-Math.PI / 2.0), new Vector3(1.0f, 0.0f, 0.0f));
 
@@ -357,23 +360,18 @@ namespace MiodenusAnimationConverter
 
             var timeStamp = Stopwatch.GetTimestamp();
             _lastTimestamp = timeStamp;
-            _lightPoint1.Rotate((float)Math.PI / 50, new Vector3(0, 0, 1));
-            _lightPoint1.Color = (Vector4)GetRandomColor();
             
-            _lightPoint2.Rotate(-(float)Math.PI / 30, new Vector3(0, 0, 1));
-            _lightPoint2.Color = (Vector4)GetRandomColor();
+            _lightPoint1.Rotate((float)Math.PI / 50, new Vector3(0, 0, 1));
+            //_lightPoint1.Color = GetRandomColor();
             
             _view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 5.0f), new Vector3(0.0f, 0.0f, 0.0f), Vector3.UnitY);
             _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (_FOV / 180f), Size.X / (float)Size.X, 0.2f, 256.0f);
-
-            _shaderPrograms[_currentProgramIndex].Use();
+            
             _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _view, false);
             _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _projection, false);
-            _shaderPrograms[_currentProgramIndex].SetVector3("light_position_1", _lightPoint1.Position);
-            _shaderPrograms[_currentProgramIndex].SetVector4("light_color_1", _lightPoint1.Color);
-            _shaderPrograms[_currentProgramIndex].SetVector3("light_position_2", _lightPoint2.Position);
-            _shaderPrograms[_currentProgramIndex].SetVector4("light_color_2", _lightPoint2.Color);
-            _shaderPrograms[_currentProgramIndex].SetVector3("view_position", new Vector3(0.0f, 0.0f, 5.0f));
+            //_shaderPrograms[_currentProgramIndex].SetVector3("view_position", new Vector3(0.0f, 0.0f, 5.0f));
+            _lightPoint1.SetTo(_shaderPrograms[_currentProgramIndex]);
+            _lightPoint2.SetTo(_shaderPrograms[_currentProgramIndex]);
             
             CheckGLErrors();
             
@@ -383,7 +381,6 @@ namespace MiodenusAnimationConverter
 
             if (_isDebugMode)
             {
-                _shaderPrograms[_currentProgramIndex + 1].Use();
                 _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _view, false);
                 _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _projection, false);
 

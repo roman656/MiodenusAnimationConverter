@@ -16,10 +16,10 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
                 layout (location = 4) in vec4 t_rotation;
                 layout (location = 5) in vec3 t_scale;
 
-                out vertex_shader_output
+                out VertexShaderOutput
                 {
-                    vec4 position;
-                    vec4 normal;
+                    vec3 position;
+                    vec3 normal;
                     vec4 color;
                 } transformed_vertex;
 
@@ -38,11 +38,11 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
 
                     transform(t_position, t_normal);                 
                     
-                    transformed_vertex.position = vec4(t_position, 1.0f);
-                    transformed_vertex.normal = vec4(t_normal, 1.0f);
+                    transformed_vertex.position = t_position;
+                    transformed_vertex.normal = t_normal;
                     transformed_vertex.color = color;
 
-                    gl_Position = projection * view * transformed_vertex.position;
+                    gl_Position = projection * view * vec4(t_position, 1.0f);
                 }
 
                 vec3 move(const in vec3 vector, const in vec3 delta)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Graphics.OpenGL;
@@ -64,33 +65,64 @@ namespace MiodenusAnimationConverter.Shaders
             GL.UseProgram(ProgramId);
         }
         
+        public void SetBool(string name, bool value)
+        {
+            var data = value ? 1 : 0;
+            Use();
+            GL.Uniform1(_uniformsLocations[name], data);
+        }
+        
         public void SetInt(string name, int data)
         {
-            GL.UseProgram(ProgramId);
+            Use();
+            GL.Uniform1(_uniformsLocations[name], data);
+        }
+        
+        public void SetUInt(string name, uint data)
+        {
+            Use();
             GL.Uniform1(_uniformsLocations[name], data);
         }
         
         public void SetFloat(string name, float data)
         {
-            GL.UseProgram(ProgramId);
+            Use();
+            GL.Uniform1(_uniformsLocations[name], data);
+        }
+        
+        public void SetDouble(string name, double data)
+        {
+            Use();
             GL.Uniform1(_uniformsLocations[name], data);
         }
         
         public void SetMatrix4(string name, Matrix4 data, bool transpose = true)
         {
-            GL.UseProgram(ProgramId);
+            Use();
             GL.UniformMatrix4(_uniformsLocations[name], transpose, ref data);
+        }
+        
+        public void SetVector2(string name, Vector2 data)
+        {
+            Use();
+            GL.Uniform2(_uniformsLocations[name], data);
         }
         
         public void SetVector3(string name, Vector3 data)
         {
-            GL.UseProgram(ProgramId);
+            Use();
             GL.Uniform3(_uniformsLocations[name], data);
         }
         
         public void SetVector4(string name, Vector4 data)
         {
-            GL.UseProgram(ProgramId);
+            Use();
+            GL.Uniform4(_uniformsLocations[name], data);
+        }
+        
+        public void SetColor4(string name, Color4 data)
+        {
+            Use();
             GL.Uniform4(_uniformsLocations[name], data);
         }
     }

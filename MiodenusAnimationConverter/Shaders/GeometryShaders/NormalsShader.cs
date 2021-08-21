@@ -9,20 +9,19 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 #version 330 core
 
                 layout (triangles) in;
-                layout (line_strip) out;
-                layout (max_vertices = 6) out;
+                layout (line_strip, max_vertices = 6) out;
 
-                in vertex_shader_output
+                in VertexShaderOutput
                 {
-                    vec4 position;
-                    vec4 normal;
+                    vec3 position;
+                    vec3 normal;
                     vec4 color;
                 } vertexes[];
 
                 uniform mat4 view;
                 uniform mat4 projection;
                  
-                const float MAGNITUDE = 0.15f;
+                const float MAGNITUDE = 0.05f;
                                   
                 void generate_normal_line(const in int vertex_index);
               
@@ -35,10 +34,10 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
 
                 void generate_normal_line(const in int vertex_index)
                 {
-                    gl_Position = projection * view * vertexes[vertex_index].position;
+                    gl_Position = projection * view * vec4(vertexes[vertex_index].position, 1.0f);
                     EmitVertex();
 
-                    gl_Position = projection * view * (vertexes[vertex_index].position + vertexes[vertex_index].normal * MAGNITUDE);
+                    gl_Position = projection * view * vec4((vertexes[vertex_index].position + vertexes[vertex_index].normal * MAGNITUDE), 1.0f);
                     EmitVertex();
 
                     EndPrimitive();
