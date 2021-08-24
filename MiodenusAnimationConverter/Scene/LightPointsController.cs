@@ -1,10 +1,11 @@
+using MiodenusAnimationConverter.Shaders;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
 {
     public class LightPointsController
     {
-        private const ushort LightPointsTotalAmount = 2;
+        private const ushort LightPointsTotalAmount = 8;
         private LightPoint[] _lightPoints = new LightPoint[LightPointsTotalAmount];
         private int _lightPointsAvaliable = LightPointsTotalAmount;
 
@@ -33,6 +34,14 @@ namespace MiodenusAnimationConverter.Scene
             }
 
             return result;
+        }
+
+        public void SetLightPointsTo(ShaderProgram program)
+        {
+            for (var i = 0; i < LightPointsTotalAmount; i++)
+            {
+                _lightPoints[i].SetTo(program);
+            }
         }
     }
 }

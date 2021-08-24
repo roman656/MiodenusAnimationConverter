@@ -44,10 +44,12 @@ namespace MiodenusAnimationConverter
             var maf = this.GenerateDebugMAF();
             WriteAnimationFile(maf_filePath, maf);
             Logger.Trace($"Test MAF file generated to '{maf_filePath}'");
-            
-            _scene.Cameras.Add(new Camera(Vector3.UnitZ * 4, _mainWindowWidth / (float)_mainWindowHeight));
-            
+
             LoadModels();
+
+            Logger.Trace("Creating main camera...");
+            _scene.Cameras.Add(new Camera(new Vector3(0.0f, 0.5f, 3.0f), _mainWindowWidth, _mainWindowHeight));
+            Logger.Trace("Main camera was successfully created.");
            
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();

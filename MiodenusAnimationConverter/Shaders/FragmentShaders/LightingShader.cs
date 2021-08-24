@@ -8,7 +8,7 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
         public const string Code = @"
                 #version 330 core
 
-                #define LIGHT_POINTS_AMOUNT 2
+                #define LIGHT_POINTS_AMOUNT 8
 
                 struct LightPoint
                 {

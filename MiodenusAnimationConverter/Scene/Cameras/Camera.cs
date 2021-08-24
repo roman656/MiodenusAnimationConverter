@@ -1,122 +1,175 @@
-using System;
+using NLog;
 using OpenTK.Mathematics;
 using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
-    public class Camera : ICamera
+    public class Camera : IMovable, IRotatable
     {
-        public Vector3 Position;
-        // This is simply the aspect ratio of the viewport, used for the projection matrix.
-        public float AspectRatio { private get; set; }
-
-        /* Вектора, необходимые для определения поворота камеры. */
+        private const float FovMinValue = 1.0f;
+        private const float FovMaxValue = 180.0f;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private int _viewportWidth = 1;
+        private int _viewportHeight = 1;
+        private float _viewportAspectRatio;
+        private float _fov = MathHelper.PiOver2;    // Угол поля зрения в направлении оси OY (в радианах).
+        private float _distanceToTheNearClipPlane = 0.01f;
+        private float _distanceToTheFarClipPlane = 100.0f;
         private Vector3 _front = -Vector3.UnitZ;
         private Vector3 _up = Vector3.UnitY;
         private Vector3 _right = Vector3.UnitX;
+        private Matrix4 _view;
+        private Matrix4 _projection;
+        public Vector3 Position;
 
-        // Rotation around the X axis (radians)
-        private float _pitch;
-
-        // Rotation around the Y axis (radians)
-        private float _yaw = -MathHelper.PiOver2; // Without this, you would be started rotated 90 degrees right.
-
-        // The field of view of the camera (radians)
-        private float _fov = MathHelper.PiOver2;
-
-        public Camera(Vector3 position, float aspectRatio)
+        public Camera(Vector3 position, int viewportWidth, int viewportHeight)
         {
             Position = position;
-            AspectRatio = aspectRatio;
+            ViewportWidth = viewportWidth;
+            ViewportHeight = viewportHeight;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                    _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
         }
 
-        public Vector3 Front => _front;
-        public Vector3 Up => _up;
-        public Vector3 Right => _right;
-
-        // We convert from degrees to radians as soon as the property is set to improve performance.
-        public float Pitch
+        public int ViewportWidth
         {
-            get => MathHelper.RadiansToDegrees(_pitch);
+            get => _viewportWidth;
             set
             {
-                // We clamp the pitch value between -89 and 89 to prevent the camera from going upside down, and a bunch
-                // of weird "bugs" when you are using euler angles for rotation.
-                // If you want to read more about this you can try researching a topic called gimbal lock
-                var angle = MathHelper.Clamp(value, -89f, 89f);
-                _pitch = MathHelper.DegreesToRadians(angle);
-                UpdateVectors();
+                if (value > 0)
+                {
+                    _viewportWidth = value;
+                    _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
+                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for ViewportWidth parameter. Expected: value greater than 0. Got:"
+                            + $" {value}. Viewport width was not changed.");
+                }
+            }
+        }
+        
+        public int ViewportHeight
+        {
+            get => _viewportHeight;
+            set
+            {
+                if (value > 0)
+                {
+                    _viewportHeight = value;
+                    _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
+                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for ViewportHeight parameter. Expected: value greater than 0. Got:"
+                                + $" {value}. Viewport height was not changed.");
+                }
             }
         }
 
-        // We convert from degrees to radians as soon as the property is set to improve performance.
-        public float Yaw
-        {
-            get => MathHelper.RadiansToDegrees(_yaw);
-            set
-            {
-                _yaw = MathHelper.DegreesToRadians(value);
-                UpdateVectors();
-            }
-        }
-
-        // The field of view (FOV) is the vertical angle of the camera view.
-        // This has been discussed more in depth in a previous tutorial,
-        // but in this tutorial, you have also learned how we can use this to simulate a zoom feature.
-        // We convert from degrees to radians as soon as the property is set to improve performance.
         public float Fov
         {
             get => MathHelper.RadiansToDegrees(_fov);
             set
             {
-                var angle = MathHelper.Clamp(value, 1f, 45f);
-                _fov = MathHelper.DegreesToRadians(angle);
+                if ((value >= FovMinValue) && (value <= FovMaxValue))
+                {
+                    _fov = MathHelper.DegreesToRadians(value);
+                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for Fov parameter. Expected: minimum value"
+                            + $" is {FovMinValue}; maximum value is {FovMaxValue}. Got: {value}. FOV was not changed.");
+                }
             }
         }
 
-        // Get the view matrix using the amazing LookAt function described more in depth on the web tutorials
-        public Matrix4 GetViewMatrix()
+        public float DistanceToTheNearClipPlane
         {
-            return Matrix4.LookAt(Position, Position + _front, _up);
+            get => _distanceToTheNearClipPlane;
+            set
+            {
+                if (value > 0.0f)
+                {
+                    _distanceToTheNearClipPlane = value;
+                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for DistanceToTheNearClipPlane parameter. Expected: value"
+                            + $" greater than 0. Got: {value}. Distance to the near clip plane was not changed.");
+                }
+            }
         }
-
-        // Get the projection matrix using the same method we have used up until this point
-        public Matrix4 GetProjectionMatrix()
+        
+        public float DistanceToTheFarClipPlane
         {
-            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
+            get => _distanceToTheFarClipPlane;
+            set
+            {
+                if (value > 0.0f)
+                {
+                    _distanceToTheFarClipPlane = value;
+                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for DistanceToTheFarClipPlane parameter. Expected: value"
+                                + $" greater than 0. Got: {value}. Distance to the far clip plane was not changed.");
+                }
+            }
         }
+        
+        public Matrix4 ViewMatrix => _view;
+        public Matrix4 ProjectionMatrix => _projection;
 
-        // This function is going to update the direction vertices using some of the math learned in the web tutorials.
-        private void UpdateVectors()
+        /* TODO: убрать лишний доворот при вращении вокруг оси OY. */
+        public void LookAt(Vector3 target)
         {
-            // First, the front matrix is calculated using some basic trigonometry.
-            _front.X = MathF.Cos(_pitch) * MathF.Cos(_yaw);
-            _front.Y = MathF.Sin(_pitch);
-            _front.Z = MathF.Cos(_pitch) * MathF.Sin(_yaw);
-
-            // We need to make sure the vectors are all normalized, as otherwise we would get some funky results.
-            _front = Vector3.Normalize(_front);
-
-            // Calculate both the right and the up vector using cross product.
-            // Note that we are calculating the right from the global up; this behaviour might
-            // not be what you need for all cameras so keep this in mind if you do not want a FPS camera.
-            _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
-            _up = Vector3.Normalize(Vector3.Cross(_right, _front));
+            var rotationAxis = Vector3.Normalize(target - Position) + _front;
+            RotateViewDirection(MathHelper.Pi, rotationAxis);
+            RotateViewDirection(MathHelper.Pi, _front);
         }
 
         public void Move(float deltaX, float deltaY, float deltaZ)
         {
-            throw new System.NotImplementedException();
+            Position.X += deltaX;
+            Position.Y += deltaY;
+            Position.Z += deltaZ;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
+        }
+
+        public void MoveInViewDirection(float delta)
+        {
+            Position.X += _front.X * delta;
+            Position.Y += _front.Y * delta;
+            Position.Z += _front.Z * delta;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
 
         public void Rotate(float angle, Vector3 vector)
         {
-            throw new System.NotImplementedException();
+            Position = Quaternion.FromAxisAngle(vector, angle) * Position;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
 
-        public void Scale(float scaleX, float scaleY, float scaleZ)
+        public void RotateViewDirection(float angle, Vector3 vector)
         {
-            throw new System.NotImplementedException();
+            var rotation = Quaternion.FromAxisAngle(vector, angle);
+
+            _front = Vector3.Normalize(rotation * _front);
+            _right = Vector3.Normalize(rotation * _right);
+            _up = Vector3.Normalize(rotation * _up);
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
     }
 }
