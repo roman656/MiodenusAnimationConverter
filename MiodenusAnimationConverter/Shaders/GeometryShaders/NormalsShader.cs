@@ -21,7 +21,7 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 uniform mat4 view;
                 uniform mat4 projection;
                  
-                const float MAGNITUDE = 0.05f;
+                const float MAGNITUDE = 0.03f;
                                   
                 void generate_normal_line(const in int vertex_index);
               

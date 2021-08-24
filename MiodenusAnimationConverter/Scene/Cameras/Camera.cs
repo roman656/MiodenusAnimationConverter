@@ -1,6 +1,5 @@
 using NLog;
 using OpenTK.Mathematics;
-using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
@@ -131,6 +130,9 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         
         public Matrix4 ViewMatrix => _view;
         public Matrix4 ProjectionMatrix => _projection;
+        public Vector3 Front => _front;
+        public Vector3 Right => _right;
+        public Vector3 Up => _up;
 
         /* TODO: убрать лишний доворот при вращении вокруг оси OY. */
         public void LookAt(Vector3 target)
@@ -153,6 +155,22 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             Position.X += _front.X * delta;
             Position.Y += _front.Y * delta;
             Position.Z += _front.Z * delta;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
+        }
+        
+        public void MoveInRightDirection(float delta)
+        {
+            Position.X += _right.X * delta;
+            Position.Y += _right.Y * delta;
+            Position.Z += _right.Z * delta;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
+        }
+        
+        public void MoveInUpDirection(float delta)
+        {
+            Position.X += _up.X * delta;
+            Position.Y += _up.Y * delta;
+            Position.Z += _up.Z * delta;
             _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
 

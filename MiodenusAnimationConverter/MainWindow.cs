@@ -8,7 +8,6 @@ using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Media;
 using MiodenusAnimationConverter.Scene;
-using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
@@ -34,22 +33,14 @@ namespace MiodenusAnimationConverter
         
         private readonly Color4 _backgroundColor = new (0.3f, 0.3f, 0.4f, 1.0f);
 
-        private double _time;
-        private int _vertexArray;
-        private int _vertexArray2;
-        private int _buffer;
-        
         private int _vertexesAmount;
         private long _screenshotId;
         
         private float _angle;
-        private float _FOV = 45.0f;
-
-        private float _lastTimestamp = Stopwatch.GetTimestamp();
-        private float _freq = Stopwatch.Frequency;
+        private double _deltaTime;
 
         private List<BitmapVideoFrameWrapper> frames = new ();
-        private bool _isCursorVisible = true;
+        private bool _isCursorGrabbed = true;
         private Scene.Scene _scene;
         private VideoRecorder _video;
         private Vertex[] _vertexes;
@@ -180,7 +171,7 @@ namespace MiodenusAnimationConverter
             _mainVao.AddVertexBufferObject(_vertexesScale, 3, BufferUsageHint.StreamDraw);
             _scaleVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
             
-            CursorVisible = _isCursorVisible;
+            CursorGrabbed = _isCursorGrabbed;
             _vertexesAmount = _vertexes.Length;
 
             InitializeShaderPrograms();
@@ -189,27 +180,62 @@ namespace MiodenusAnimationConverter
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
         }
-        
-        private float[] Matrix4ToArray(Matrix4 matrix)
-        {
-            var data = new float[16];
 
-            for (byte i = 0; i < 4; i++)
+        private void UpdateModelsTransformation()
+        {
+            if (_hasTransformed)
             {
-                for (byte j = 0; j < 4; j++)
+                for (int i = 0, j = 0, k = 0; i < _vertexes.Length; i += 1, j += 3, k += 4)
                 {
-                    data[i * 4 + j] = matrix[i, j];
+                    _vertexesLocation[j] = _vertexes[i].Transformation.Location.X;
+                    _vertexesLocation[j + 1] = _vertexes[i].Transformation.Location.Y;
+                    _vertexesLocation[j + 2] = _vertexes[i].Transformation.Location.Z;
+
+                    _vertexesRotation[k] = _vertexes[i].Transformation.Rotation.X;
+                    _vertexesRotation[k + 1] = _vertexes[i].Transformation.Rotation.Y;
+                    _vertexesRotation[k + 2] = _vertexes[i].Transformation.Rotation.Z;
+                    _vertexesRotation[k + 3] = _vertexes[i].Transformation.Rotation.W;
+
+                    _vertexesScale[j] = _vertexes[i].Transformation.Scale.X;
+                    _vertexesScale[j + 1] = _vertexes[i].Transformation.Scale.Y;
+                    _vertexesScale[j + 2] = _vertexes[i].Transformation.Scale.Z;
                 }
+
+                _mainVao.UpdateVertexBufferObject(_locationVboIndex, _vertexesLocation);
+                _mainVao.UpdateVertexBufferObject(_rotationVboIndex, _vertexesRotation);
+                _mainVao.UpdateVertexBufferObject(_scaleVboIndex, _vertexesScale);
             }
             
-            return data;
+            _hasTransformed = false;
+        }
+        
+        protected override void OnUpdateFrame(FrameEventArgs args)
+        {
+            base.OnUpdateFrame(args);
+            
+            if (!IsFocused)
+            {
+                return;
+            }
+
+            if (IsAnyKeyDown)
+            {
+                _scene.Cameras[0].ProcessKeyboard(KeyboardState, _deltaTime);
+            }
         }
 
-        protected override void OnKeyDown(KeyboardKeyEventArgs e)
+        protected override void OnKeyDown(KeyboardKeyEventArgs args)
         {
-            switch (e.Key)
+            base.OnKeyDown(args);
+
+            switch (args.Key)
             {
-                case Keys.W:
+                case Keys.B:
+                {
+                    _isDebugMode = !_isDebugMode;
+                    break;
+                }
+                case Keys.Up:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
@@ -219,7 +245,7 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
-                case Keys.S:
+                case Keys.Down:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
@@ -229,7 +255,7 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
-                case Keys.A:
+                case Keys.Left:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
@@ -239,7 +265,7 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
-                case Keys.D:
+                case Keys.Right:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
@@ -284,12 +310,6 @@ namespace MiodenusAnimationConverter
                     _lightPoint1.Position.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 20.0);
                     break;
                 }
-                case Keys.B:
-                {
-                    _isDebugMode = !_isDebugMode;
-                    Logger.Trace($"Debug mode: {_isDebugMode}");
-                    break;
-                }
                 case Keys.M:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
@@ -315,103 +335,37 @@ namespace MiodenusAnimationConverter
                     _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
                     break;
                 }
-                case Keys.Up:
-                {
-                    _scene.Cameras[0].Move(0.0f, 0.0f, -0.1f);
-                    break;
-                }
-                case Keys.Down:
-                {
-                    _scene.Cameras[0].Move(0.0f, 0.0f, 0.1f);
-                    break;
-                }
-                case Keys.Right:
-                {
-                    _scene.Cameras[0].Move(0.1f, 0.0f, 0.0f);
-                    break;
-                }
-                case Keys.Left:
-                {
-                    _scene.Cameras[0].Move(-0.1f, 0.0f, 0.0f);
-                    break;
-                }
-                case Keys.Space:
-                {
-                    _scene.Cameras[0].Move(0.0f, 0.1f, 0.0f);
-                    break;
-                }
-                case Keys.LeftShift:
-                {
-                    _scene.Cameras[0].Move(0.0f, -0.1f, 0.0f);
-                    break;
-                }
-                case Keys.Z:
-                {
-                    _scene.Cameras[0].Rotate(MathHelper.Pi, new Vector3(1.0f, 0.0f, 0.0f));
-                    break;
-                }
-                case Keys.V:
-                {
-                    _scene.Cameras[0].RotateViewDirection(-0.1f, new Vector3(1.0f, 1.0f, 1.0f));
-                    break;
-                }
             }
-
-            base.OnKeyDown(e);
         }
 
-        private void UpdateModelsTransformation()
+        protected override void OnMouseMove(MouseMoveEventArgs e)
         {
-            if (_hasTransformed)
-            {
-                for (int i = 0, j = 0, k = 0; i < _vertexes.Length; i += 1, j += 3, k += 4)
-                {
-                    _vertexesLocation[j] = _vertexes[i].Transformation.Location.X;
-                    _vertexesLocation[j + 1] = _vertexes[i].Transformation.Location.Y;
-                    _vertexesLocation[j + 2] = _vertexes[i].Transformation.Location.Z;
-
-                    _vertexesRotation[k] = _vertexes[i].Transformation.Rotation.X;
-                    _vertexesRotation[k + 1] = _vertexes[i].Transformation.Rotation.Y;
-                    _vertexesRotation[k + 2] = _vertexes[i].Transformation.Rotation.Z;
-                    _vertexesRotation[k + 3] = _vertexes[i].Transformation.Rotation.W;
-
-                    _vertexesScale[j] = _vertexes[i].Transformation.Scale.X;
-                    _vertexesScale[j + 1] = _vertexes[i].Transformation.Scale.Y;
-                    _vertexesScale[j + 2] = _vertexes[i].Transformation.Scale.Z;
-                }
-
-                _mainVao.UpdateVertexBufferObject(_locationVboIndex, _vertexesLocation);
-                _mainVao.UpdateVertexBufferObject(_rotationVboIndex, _vertexesRotation);
-                _mainVao.UpdateVertexBufferObject(_scaleVboIndex, _vertexesScale);
-            }
-            
-            _hasTransformed = false;
+            base.OnMouseMove(e);
+            _scene.Cameras[0].ProcessMouseMovement(MouseState);
         }
-        
-        private Color4 GetRandomColor()
+
+        protected override void OnMouseWheel(MouseWheelEventArgs args)
         {
-            var colors = new [] { Color4.Red, Color4.Orange, Color4.Yellow, Color4.Green, Color4.LightBlue, Color4.Blue, Color4.Violet };
-            var random = new Random();
-            return colors[random.Next(colors.Length)];
+            base.OnMouseWheel(args);
+            _scene.Cameras[0].ProcessMouseScroll(args, KeyboardState);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            base.OnRenderFrame(e);
+            
+            _deltaTime = e.Time;
+            
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             UpdateModelsTransformation();
-
-            var timeStamp = Stopwatch.GetTimestamp();
-            _angle = (float)((timeStamp - _lastTimestamp) / (double)_freq) * _rotationRate;
-            _lastTimestamp = timeStamp;
-
-            _lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
-            //_lightPoint1.Color = GetRandomColor();
+            
+            _angle = (float)(_deltaTime * _rotationRate);
+            //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
             _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.Cameras[0].ViewMatrix, false);
             _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _scene.Cameras[0].ProjectionMatrix, false);
-            //_shaderPrograms[_currentProgramIndex].SetVector3("view_position", new Vector3(0.0f, 0.0f, 5.0f));
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
             CheckGLErrors();
@@ -433,7 +387,6 @@ namespace MiodenusAnimationConverter
             }
 
             Context.SwapBuffers();
-            base.OnRenderFrame(e);
 
             //frames.Add(video.CreateVideoFrame());
             //TakeScreenshot(_screenshotsPath);

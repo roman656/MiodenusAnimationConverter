@@ -7,7 +7,7 @@ namespace MiodenusAnimationConverter.Scene
     public class Scene
     {
         public readonly LightPointsController LightPointsController = new ();
-        public List<Camera> Cameras = new ();
+        public List<DebugCamera> Cameras = new ();
         public List<ModelGroup> ModelGroups = new ();
 
         public Scene() {}

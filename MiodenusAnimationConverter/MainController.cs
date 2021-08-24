@@ -47,10 +47,10 @@ namespace MiodenusAnimationConverter
 
             LoadModels();
 
-            Logger.Trace("Creating main camera...");
-            _scene.Cameras.Add(new Camera(new Vector3(0.0f, 0.5f, 3.0f), _mainWindowWidth, _mainWindowHeight));
-            Logger.Trace("Main camera was successfully created.");
-           
+            Logger.Trace("Creating debug camera...");
+            _scene.Cameras.Add(new DebugCamera(new Vector3(0.0f, 0.5f, 3.0f), _mainWindowWidth, _mainWindowHeight));
+            Logger.Trace("debug camera was successfully created.");
+
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
             
