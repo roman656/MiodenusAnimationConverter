@@ -11,7 +11,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private int _viewportWidth = 1;
         private int _viewportHeight = 1;
         private float _viewportAspectRatio;
-        private float _fov = MathHelper.PiOver2;    // Угол поля зрения в направлении оси OY (в радианах).
+        private float _fov = MathHelper.PiOver3;    // Угол поля зрения в направлении оси OY (в радианах).
         private float _distanceToTheNearClipPlane = 0.01f;
         private float _distanceToTheFarClipPlane = 100.0f;
         private Vector3 _front = -Vector3.UnitZ;
@@ -28,6 +28,19 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             ViewportHeight = viewportHeight;
             _view = Matrix4.LookAt(Position, Position + _front, _up);
             _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
+                    _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+        }
+
+        public void Reset()
+        {
+            _front = -Vector3.UnitZ;
+            _up = Vector3.UnitY;
+            _right = Vector3.UnitX;
+            _fov = MathHelper.PiOver3;
+            _distanceToTheNearClipPlane = 0.01f;
+            _distanceToTheFarClipPlane = 100.0f;
+            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, 
                     _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
         }
 
@@ -133,8 +146,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public Vector3 Front => _front;
         public Vector3 Right => _right;
         public Vector3 Up => _up;
-
-        /* TODO: убрать лишний доворот при вращении вокруг оси OY. */
+        
         public void LookAt(Vector3 target)
         {
             var rotationAxis = Vector3.Normalize(target - Position) + _front;
@@ -180,13 +192,15 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
 
+        /* TODO: изменить способ получения вектора _right. Использовать кватернионы. */
         public void RotateViewDirection(float angle, Vector3 vector)
         {
             var rotation = Quaternion.FromAxisAngle(vector, angle);
 
             _front = Vector3.Normalize(rotation * _front);
-            _right = Vector3.Normalize(rotation * _right);
-            _up = Vector3.Normalize(rotation * _up);
+            //_right = Vector3.Normalize(rotation * _right);
+            _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
+            _up = Vector3.Normalize(Vector3.Cross(_right, _front));
             _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
     }

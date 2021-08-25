@@ -330,9 +330,19 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
-                case Keys.L:
+                case Keys.H:
                 {
                     _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
+                    break;
+                }
+                case Keys.L:
+                {
+                    _scene.Cameras[0].SwitchCoordinateSystem();
+                    break;
+                }
+                case Keys.I:
+                {
+                    _scene.Cameras[0].LookAt(new Vector3(0.0f));
                     break;
                 }
             }
@@ -362,6 +372,8 @@ namespace MiodenusAnimationConverter
             UpdateModelsTransformation();
             
             _angle = (float)(_deltaTime * _rotationRate);
+            /*_scene.Cameras[0].Rotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
+            _scene.Cameras[0].LookAt(new Vector3(0.0f));*/
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
             _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.Cameras[0].ViewMatrix, false);
