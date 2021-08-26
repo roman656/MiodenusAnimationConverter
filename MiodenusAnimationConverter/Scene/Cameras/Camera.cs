@@ -196,20 +196,11 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public void RotateViewDirection(float angle, Vector3 vector)
         {
             var rotation = Quaternion.FromAxisAngle(vector, angle);
-            var lastFront = _front;
-            
-            _front = Vector3.Normalize(rotation * _front);
 
-            if (Vector3.CalculateAngle(_front, Vector3.UnitY) <= MathHelper.DegreesToRadians(1.0f)
-                    || Vector3.CalculateAngle(_front, -Vector3.UnitY) <= MathHelper.DegreesToRadians(1.0f))
-            {
-                _front = lastFront;
-                return;
-            }
-            
-            //_right = Vector3.Normalize(rotation * _right);
-            _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
-            _up = Vector3.Normalize(Vector3.Cross(_right, _front));
+            _front = Vector3.Normalize(rotation * _front);
+            _right = Vector3.Normalize(rotation * _right);
+            //_right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
+            _up = Vector3.Normalize(rotation * _up);//Vector3.Normalize(Vector3.Cross(_right, _front));
             _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
     }

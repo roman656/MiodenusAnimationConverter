@@ -29,7 +29,7 @@ namespace MiodenusAnimationConverter
                 //"DebugAssets/Sphere.stl",
                 //"DebugAssets/Bottle.stl",
         };
-        private Scene.Scene _scene = new ();
+        private Scene.Scene _scene;
         
         public MainController(string[] args)
         {
@@ -45,11 +45,9 @@ namespace MiodenusAnimationConverter
             WriteAnimationFile(maf_filePath, maf);
             Logger.Trace($"Test MAF file generated to '{maf_filePath}'");
 
+            _scene = new (_mainWindowWidth, _mainWindowHeight);
+            
             LoadModels();
-
-            Logger.Trace("Creating debug camera...");
-            _scene.Cameras.Add(new DebugCamera(new Vector3(0.0f, 0.5f, 3.0f), _mainWindowWidth, _mainWindowHeight));
-            Logger.Trace("debug camera was successfully created.");
 
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();

@@ -150,6 +150,35 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                     Move(0.0f, -velocity, 0.0f);
                 }
             }
+            
+            if (keyboardState.IsKeyDown(Keys.Q))
+            {
+                if (UseLocalCoordinateSystem)
+                {
+                    RotateViewDirection(-velocity, Front);
+                }
+                else
+                {
+                    RotateViewDirection(-velocity, -Vector3.UnitZ);
+                }
+            }
+
+            if (keyboardState.IsKeyDown(Keys.E))
+            {
+                if (UseLocalCoordinateSystem)
+                {
+                    RotateViewDirection(velocity, Front);
+                }
+                else
+                {
+                    RotateViewDirection(velocity, -Vector3.UnitZ);
+                }
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.C) && keyboardState.IsKeyDown(Keys.R))
+            {
+                Reset();
+            }
         }
         
         public void ProcessMouseMovement(MouseState mouseState, float mouseSensitivity = 0.004f)

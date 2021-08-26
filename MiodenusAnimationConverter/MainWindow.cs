@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -114,6 +113,7 @@ namespace MiodenusAnimationConverter
 
         protected override void OnLoad()
         {
+            _scene.CamerasController.Initialize();
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, 0.0f), Color4.White);
 
             _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
@@ -220,7 +220,7 @@ namespace MiodenusAnimationConverter
 
             if (IsAnyKeyDown)
             {
-                _scene.Cameras[0].ProcessKeyboard(KeyboardState, _deltaTime);
+                _scene.CamerasController.DebugCameras[0].ProcessKeyboard(KeyboardState, _deltaTime);
             }
         }
 
@@ -275,7 +275,7 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
-                case Keys.E:
+                case Keys.Y:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
@@ -285,7 +285,7 @@ namespace MiodenusAnimationConverter
                     _hasTransformed = true;
                     break;
                 }
-                case Keys.R:
+                case Keys.U:
                 {
                     for (var i = 0; i < _vertexesAmount; i++)
                     {
@@ -303,11 +303,6 @@ namespace MiodenusAnimationConverter
                     }
 
                     _hasTransformed = true;
-                    break;
-                }
-                case Keys.Q:
-                {
-                    _lightPoint1.Position.X = (float)(1.0 + Math.Sin(Stopwatch.GetTimestamp()) * 20.0);
                     break;
                 }
                 case Keys.M:
@@ -337,12 +332,12 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.L:
                 {
-                    _scene.Cameras[0].SwitchCoordinateSystem();
+                    _scene.CamerasController.DebugCameras[0].SwitchCoordinateSystem();
                     break;
                 }
                 case Keys.I:
                 {
-                    _scene.Cameras[0].LookAt(new Vector3(0.0f));
+                    _scene.CamerasController.DebugCameras[0].LookAt(new Vector3(0.0f));
                     break;
                 }
             }
@@ -351,13 +346,13 @@ namespace MiodenusAnimationConverter
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
-            _scene.Cameras[0].ProcessMouseMovement(MouseState);
+            _scene.CamerasController.DebugCameras[0].ProcessMouseMovement(MouseState);
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs args)
         {
             base.OnMouseWheel(args);
-            _scene.Cameras[0].ProcessMouseScroll(args, KeyboardState);
+            _scene.CamerasController.DebugCameras[0].ProcessMouseScroll(args, KeyboardState);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -376,8 +371,8 @@ namespace MiodenusAnimationConverter
             _scene.Cameras[0].LookAt(new Vector3(0.0f));*/
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.Cameras[0].ViewMatrix, false);
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _scene.Cameras[0].ProjectionMatrix, false);
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.CamerasController.DebugCameras[0].ViewMatrix, false);
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _scene.CamerasController.DebugCameras[0].ProjectionMatrix, false);
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
             CheckGLErrors();
@@ -388,8 +383,8 @@ namespace MiodenusAnimationConverter
 
             if (_isDebugMode)
             {
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _scene.Cameras[0].ViewMatrix, false);
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _scene.Cameras[0].ProjectionMatrix, false);
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _scene.CamerasController.DebugCameras[0].ViewMatrix, false);
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _scene.CamerasController.DebugCameras[0].ProjectionMatrix, false);
 
                 CheckGLErrors();
                 
