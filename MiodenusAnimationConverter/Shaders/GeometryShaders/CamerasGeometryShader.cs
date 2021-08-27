@@ -8,36 +8,42 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
         public const string Code = @"
                 #version 330 core
 
-                layout (triangles) in;
+                layout (points) in;
                 layout (line_strip, max_vertices = 6) out;
 
                 in VertexShaderOutput
                 {
+                    float fov;
+                    float distance_to_the_near_clip_plane;
+                    float distance_to_the_far_clip_plane;
+                    vec3 front;
+                    vec3 right;
+                    vec3 up;
                     vec3 position;
-                    vec3 normal;
-                    vec4 color;
-                } vertexes[];
+                } cameras[];
+
+                out vec4 vertex_color;
 
                 uniform mat4 view;
                 uniform mat4 projection;
                  
                 const float MAGNITUDE = 0.03f;
                                   
-                void generate_normal_line(const in int vertex_index);
+                void create_local_coordinate_system(const in vec3 front, const in vec3 right, const in vec3 up, const in vec3 position);
               
                 void main(void)
                 {
-                    generate_normal_line(0);
-                    generate_normal_line(1);
-                    generate_normal_line(2);
+                    create_local_coordinate_system(cameras[0].front, cameras[0].right, cameras[0].up, cameras[0].position);
                 }
 
-                void generate_normal_line(const in int vertex_index)
+                void create_local_coordinate_system(const in vec3 front, const in vec3 right, const in vec3 up, const in vec3 position)
                 {
-                    gl_Position = projection * view * vec4(vertexes[vertex_index].position, 1.0f);
+                    vertex_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    gl_Position = projection * view * vec4(position, 1.0f);
                     EmitVertex();
 
-                    gl_Position = projection * view * vec4((vertexes[vertex_index].position + vertexes[vertex_index].normal * MAGNITUDE), 1.0f);
+                    vertex_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    gl_Position = projection * view * vec4((position + front * MAGNITUDE), 1.0f);
                     EmitVertex();
 
                     EndPrimitive();

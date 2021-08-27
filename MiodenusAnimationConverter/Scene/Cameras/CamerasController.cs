@@ -4,6 +4,8 @@ using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.GeometryShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
 using NLog;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
@@ -51,8 +53,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 
         public void Initialize()
         {
-            InitializeVao();
             InitializeShaderProgram();
+            InitializeVao();
         }
 
         private void InitializeVao()
@@ -125,10 +127,12 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             Logger.Trace("Shader pogram initialization finished.");
         }
 
-        public void DrawCameras()
+        public void DrawCameras(Matrix4 view, Matrix4 projection)
         {
-            _shaderProgram.Use();
-            _vao.Draw(AllCamerasAmount);
+            _shaderProgram.SetMatrix4("view", view, false);
+            _shaderProgram.SetMatrix4("projection", projection, false);
+
+            _vao.Draw(AllCamerasAmount, PrimitiveType.Lines);
         }
     }
 }

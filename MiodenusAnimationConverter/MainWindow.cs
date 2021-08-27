@@ -58,6 +58,7 @@ namespace MiodenusAnimationConverter
         private LightPoint _lightPoint1;
         private LightPoint _lightPoint2;
         private bool _isDebugMode;
+        private bool _isDrawCamerasModeActive;
 
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -340,6 +341,11 @@ namespace MiodenusAnimationConverter
                     _scene.CamerasController.DebugCameras[0].LookAt(new Vector3(0.0f));
                     break;
                 }
+                case Keys.V:
+                {
+                    _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
+                    break;
+                }
             }
         }
 
@@ -390,6 +396,12 @@ namespace MiodenusAnimationConverter
                 
                 _mainVao.Draw(_vertexesAmount);
                 
+                CheckGLErrors();
+            }
+
+            if (_isDrawCamerasModeActive)
+            {
+                _scene.CamerasController.DrawCameras(_scene.CamerasController.DebugCameras[0].ViewMatrix, _scene.CamerasController.DebugCameras[0].ProjectionMatrix);
                 CheckGLErrors();
             }
 

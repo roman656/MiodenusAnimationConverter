@@ -108,7 +108,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             get => _distanceToTheNearClipPlane;
             set
             {
-                if (value > 0.0f)
+                if ((value > 0.0f) && (value < _distanceToTheFarClipPlane))
                 {
                     _distanceToTheNearClipPlane = value;
                     _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
@@ -117,7 +117,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 else
                 {
                     Logger.Warn("Wrong value for DistanceToTheNearClipPlane parameter. Expected: value"
-                            + $" greater than 0. Got: {value}. Distance to the near clip plane was not changed.");
+                            + $" greater than 0 and less than {_distanceToTheFarClipPlane} (distance to the far"
+                            + $" clip plane). Got: {value}. Distance to the near clip plane was not changed.");
                 }
             }
         }
@@ -127,7 +128,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             get => _distanceToTheFarClipPlane;
             set
             {
-                if (value > 0.0f)
+                if (value > _distanceToTheNearClipPlane)
                 {
                     _distanceToTheFarClipPlane = value;
                     _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
@@ -136,7 +137,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 else
                 {
                     Logger.Warn("Wrong value for DistanceToTheFarClipPlane parameter. Expected: value"
-                                + $" greater than 0. Got: {value}. Distance to the far clip plane was not changed.");
+                            + $" greater than {_distanceToTheNearClipPlane} (distance to the near"
+                            + $" clip plane). Got: {value}. Distance to the far clip plane was not changed.");
                 }
             }
         }
