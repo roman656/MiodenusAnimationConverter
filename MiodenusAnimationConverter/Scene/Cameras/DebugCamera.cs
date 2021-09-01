@@ -203,20 +203,20 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public void ProcessMouseScroll(MouseWheelEventArgs args, KeyboardState keyboardState,
                 float scrollSensitivity = 2.0f)
         {
-            if (keyboardState.IsKeyDown(Keys.LeftControl))
-            {
-                Fov -= args.OffsetY * scrollSensitivity;
-            }
-            else
+            if (keyboardState.IsKeyDown(Keys.LeftAlt))
             {
                 if (args.OffsetY > 0.0f)
                 {
-                    _movementSpeed += _movementSpeedDelta;
+                    MovementSpeed += _movementSpeedDelta;
                 }
-                else if (_movementSpeed > _movementSpeedDelta)
+                else
                 {
-                    _movementSpeed -= _movementSpeedDelta;
+                    MovementSpeed -= _movementSpeedDelta;
                 }
+            }
+            else
+            {
+                Fov -= args.OffsetY * scrollSensitivity;
             }
         }
     }

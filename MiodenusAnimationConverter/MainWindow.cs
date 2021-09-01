@@ -50,6 +50,7 @@ namespace MiodenusAnimationConverter
         private int _rotationVboIndex;
         private int _scaleVboIndex;
         private bool _hasTransformed;
+        private bool _isCursorModeActive;
         
         private float[] _vertexesLocation;
         private float[] _vertexesRotation;
@@ -218,9 +219,16 @@ namespace MiodenusAnimationConverter
             {
                 return;
             }
-
-            if (IsAnyKeyDown)
+            
+            if (KeyboardState.IsKeyDown(Keys.LeftControl))
             {
+                CursorVisible = true;
+                _isCursorModeActive = true;
+            }
+            else
+            {
+                _isCursorModeActive = false;
+                CursorGrabbed = true;
                 _scene.CamerasController.DebugCameras[0].ProcessKeyboard(KeyboardState, _deltaTime);
             }
         }
@@ -352,13 +360,20 @@ namespace MiodenusAnimationConverter
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
-            _scene.CamerasController.DebugCameras[0].ProcessMouseMovement(MouseState);
+            if (!_isCursorModeActive)
+            {
+                _scene.CamerasController.DebugCameras[0].ProcessMouseMovement(MouseState);
+            }
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs args)
         {
             base.OnMouseWheel(args);
-            _scene.CamerasController.DebugCameras[0].ProcessMouseScroll(args, KeyboardState);
+
+            if (!_isCursorModeActive)
+            {
+                _scene.CamerasController.DebugCameras[0].ProcessMouseScroll(args, KeyboardState);
+            }
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
