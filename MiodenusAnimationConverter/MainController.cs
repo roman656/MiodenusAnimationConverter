@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene;
-using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Scene.Models;
 using Newtonsoft.Json;
 using NLog;

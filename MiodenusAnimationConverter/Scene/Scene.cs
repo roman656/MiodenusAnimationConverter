@@ -25,14 +25,21 @@ namespace MiodenusAnimationConverter.Scene
             {
                 var vertexes = new List<Vertex>();
 
-                foreach (var modelGroup in ModelGroups)
+                for (var i = 0; i < ModelGroups.Count; i++)
                 {
-                    foreach (var model in modelGroup.Models)
+                    var modelGroup = ModelGroups[i];
+
+                    for (var j = 0; j < modelGroup.Models.Count; j++)
                     {
-                        foreach (var triangle in model.Mesh.Triangles)
+                        var model = modelGroup.Models[j];
+
+                        for (var k = 0; k < model.Mesh.Triangles.Length; k++)
                         {
-                            foreach (var vertex in triangle.Vertexes)
+                            var triangle = model.Mesh.Triangles[k];
+
+                            for (var l = 0; l < triangle.Vertexes.Length; l++)
                             {
+                                var vertex = triangle.Vertexes[l];
                                 vertexes.Add(vertex);
                             }
                         }

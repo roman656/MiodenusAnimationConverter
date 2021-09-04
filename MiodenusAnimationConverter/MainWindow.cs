@@ -229,7 +229,7 @@ namespace MiodenusAnimationConverter
             {
                 _isCursorModeActive = false;
                 CursorGrabbed = true;
-                _scene.CamerasController.DebugCameras[0].ProcessKeyboard(KeyboardState, _deltaTime);
+                _scene.CamerasController.CurrentDebugCamera.ProcessKeyboard(KeyboardState, _deltaTime);
             }
         }
 
@@ -341,12 +341,12 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.L:
                 {
-                    _scene.CamerasController.DebugCameras[0].SwitchCoordinateSystem();
+                    _scene.CamerasController.CurrentDebugCamera.SwitchCoordinateSystem();
                     break;
                 }
                 case Keys.I:
                 {
-                    _scene.CamerasController.DebugCameras[0].LookAt(new Vector3(0.0f));
+                    _scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f));
                     break;
                 }
                 case Keys.V:
@@ -362,7 +362,7 @@ namespace MiodenusAnimationConverter
             base.OnMouseMove(e);
             if (!_isCursorModeActive)
             {
-                _scene.CamerasController.DebugCameras[0].ProcessMouseMovement(MouseState);
+                _scene.CamerasController.CurrentDebugCamera.ProcessMouseMovement(MouseState);
             }
         }
 
@@ -372,7 +372,7 @@ namespace MiodenusAnimationConverter
 
             if (!_isCursorModeActive)
             {
-                _scene.CamerasController.DebugCameras[0].ProcessMouseScroll(args, KeyboardState);
+                _scene.CamerasController.CurrentDebugCamera.ProcessMouseScroll(args, KeyboardState);
             }
         }
 
@@ -388,12 +388,12 @@ namespace MiodenusAnimationConverter
             UpdateModelsTransformation();
             
             _angle = (float)(_deltaTime * _rotationRate);
-            /*_scene.Cameras[0].Rotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
-            _scene.Cameras[0].LookAt(new Vector3(0.0f));*/
+            //_scene.CamerasController.DebugCameras[0].Rotate(_angle, new Vector3(1.0f, 0.0f, 0.0f));
+            //_scene.CamerasController.DebugCameras[0].LookAt(new Vector3(0.0f));
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.CamerasController.DebugCameras[0].ViewMatrix, false);
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _scene.CamerasController.DebugCameras[0].ProjectionMatrix, false);
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.CamerasController.CurrentDebugCamera.ViewMatrix, false);
+            _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _scene.CamerasController.CurrentDebugCamera.ProjectionMatrix, false);
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
             CheckGLErrors();
@@ -404,8 +404,8 @@ namespace MiodenusAnimationConverter
 
             if (_isDebugMode)
             {
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _scene.CamerasController.DebugCameras[0].ViewMatrix, false);
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _scene.CamerasController.DebugCameras[0].ProjectionMatrix, false);
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _scene.CamerasController.CurrentDebugCamera.ViewMatrix, false);
+                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _scene.CamerasController.CurrentDebugCamera.ProjectionMatrix, false);
 
                 CheckGLErrors();
                 
@@ -416,13 +416,13 @@ namespace MiodenusAnimationConverter
 
             if (_isDrawCamerasModeActive)
             {
-                _scene.CamerasController.DrawCameras(_scene.CamerasController.DebugCameras[0].ViewMatrix, _scene.CamerasController.DebugCameras[0].ProjectionMatrix);
+                _scene.CamerasController.DrawCameras(_scene.CamerasController.CurrentDebugCamera);
                 CheckGLErrors();
             }
 
             Context.SwapBuffers();
 
-            //frames.Add(video.CreateVideoFrame());
+            //frames.Add(_video.CreateVideoFrame());
             //TakeScreenshot(_screenshotsPath);
         }
 
@@ -465,8 +465,8 @@ namespace MiodenusAnimationConverter
                 FrameRate = 60
             };
             
-            video.CreateVideo(videoFramesSource);
-*/
+            _video.CreateVideo(videoFramesSource);
+*/            
             _mainVao.Delete();
             
             foreach (var shaderProgram in _shaderPrograms)
