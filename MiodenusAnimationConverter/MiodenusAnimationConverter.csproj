@@ -33,6 +33,9 @@
       <None Update="DebugAssets\Sphere.stl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="DebugAssets\KV_2\Gun.stl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

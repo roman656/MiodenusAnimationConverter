@@ -388,8 +388,8 @@ namespace MiodenusAnimationConverter
             UpdateModelsTransformation();
             
             _angle = (float)(_deltaTime * _rotationRate);
-            //_scene.CamerasController.DebugCameras[0].Rotate(_angle, new Vector3(1.0f, 0.0f, 0.0f));
-            //_scene.CamerasController.DebugCameras[0].LookAt(new Vector3(0.0f));
+            //_scene.CamerasController.CurrentDebugCamera.Rotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
+            //_scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
             _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.CamerasController.CurrentDebugCamera.ViewMatrix, false);
