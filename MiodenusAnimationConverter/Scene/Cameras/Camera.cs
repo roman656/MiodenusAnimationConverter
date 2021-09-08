@@ -3,6 +3,9 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
+    /// <summary>
+    /// Камера общего назначения.
+    /// </summary>
     public class Camera : IMovable, IRotatable
     {
         private const float FovMinValue = 1.0f;
@@ -31,6 +34,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                     _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
         }
 
+        /// <summary>Метод, устанавливающий параметры камеры в значения по умолчанию.</summary>
+        /// <remarks>положение камеры и размеры окна остаются прежними.</remarks>
         public void Reset()
         {
             _front = -Vector3.UnitZ;
@@ -43,7 +48,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, 
                     _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
         }
-
+        
         public int ViewportWidth
         {
             get => _viewportWidth;

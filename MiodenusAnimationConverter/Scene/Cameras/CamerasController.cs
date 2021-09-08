@@ -112,8 +112,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 
         public void Initialize()
         {
-            InitializeShaderProgram();
             InitializeVao();
+            InitializeShaderProgram();
         }
 
         private void InitializeVao()
@@ -152,7 +152,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 (up[j], up[j + 1], up[j + 2]) = camera.Up;
                 (position[j], position[j + 1], position[j + 2]) = camera.Position;
             }
-
+            
             _vao = new VertexArrayObject();
             _vao.AddVertexBufferObject(fov, 1);
             _vao.AddVertexBufferObject(distanceToTheNearClipPlane, 1);
@@ -195,7 +195,13 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             _shaderProgram.SetMatrix4("view", currentCamera.ViewMatrix, false);
             _shaderProgram.SetMatrix4("projection", currentCamera.ProjectionMatrix, false);
 
-            _vao.Draw(AllCamerasAmount, PrimitiveType.LineStrip);
+            _vao.Draw(AllCamerasAmount);
+        }
+
+        public void Delete()
+        {
+            _vao.Delete();
+            _shaderProgram.Delete();
         }
     }
 }

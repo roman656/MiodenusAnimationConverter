@@ -468,11 +468,13 @@ namespace MiodenusAnimationConverter
             _video.CreateVideo(videoFramesSource);
 */            
             _mainVao.Delete();
-            
+
             foreach (var shaderProgram in _shaderPrograms)
             {
                 shaderProgram.Delete();
             }
+            
+            _scene.CamerasController.Delete();
             
             base.OnClosed();
         }
