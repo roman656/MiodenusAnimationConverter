@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene;
-using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Scene.Models;
 using Newtonsoft.Json;
 using NLog;
@@ -25,11 +24,11 @@ namespace MiodenusAnimationConverter
         private readonly string[] _modelFilenames = {
                 //"DebugAssets/Rhm_Borsig_12_8.stl",
                 "DebugAssets/Jagdtiger.stl",
-                //"DebugAssets/IS-6.stl",
+                "DebugAssets/IS-6.stl",
                 //"DebugAssets/Sphere.stl",
                 //"DebugAssets/Bottle.stl",
         };
-        private Scene.Scene _scene = new ();
+        private Scene.Scene _scene;
         
         public MainController(string[] args)
         {
@@ -45,11 +44,9 @@ namespace MiodenusAnimationConverter
             WriteAnimationFile(maf_filePath, maf);
             Logger.Trace($"Test MAF file generated to '{maf_filePath}'");
 
+            _scene = new Scene.Scene(_mainWindowWidth, _mainWindowHeight);
+            
             LoadModels();
-
-            Logger.Trace("Creating debug camera...");
-            _scene.Cameras.Add(new DebugCamera(new Vector3(0.0f, 0.5f, 3.0f), _mainWindowWidth, _mainWindowHeight));
-            Logger.Trace("debug camera was successfully created.");
 
             _mainWindow = CreateMainWindow();
             _mainWindow.Run();
@@ -95,7 +92,9 @@ namespace MiodenusAnimationConverter
 
             foreach (var model in models)
             {
-                _scene.ModelGroups.Add(new ModelGroup(model));
+                var tempGroup = new ModelGroup();
+                tempGroup.Models.Add(model);
+                _scene.ModelGroups.Add(tempGroup);
             }
 
             Logger.Trace("Loading models finished.");

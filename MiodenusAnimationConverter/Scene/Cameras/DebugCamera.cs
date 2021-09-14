@@ -150,6 +150,35 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                     Move(0.0f, -velocity, 0.0f);
                 }
             }
+            
+            if (keyboardState.IsKeyDown(Keys.Q))
+            {
+                if (UseLocalCoordinateSystem)
+                {
+                    RotateViewDirection(-velocity, Front);
+                }
+                else
+                {
+                    RotateViewDirection(-velocity, -Vector3.UnitZ);
+                }
+            }
+
+            if (keyboardState.IsKeyDown(Keys.E))
+            {
+                if (UseLocalCoordinateSystem)
+                {
+                    RotateViewDirection(velocity, Front);
+                }
+                else
+                {
+                    RotateViewDirection(velocity, -Vector3.UnitZ);
+                }
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.C) && keyboardState.IsKeyDown(Keys.R))
+            {
+                Reset();
+            }
         }
         
         public void ProcessMouseMovement(MouseState mouseState, float mouseSensitivity = 0.004f)
@@ -174,20 +203,20 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public void ProcessMouseScroll(MouseWheelEventArgs args, KeyboardState keyboardState,
                 float scrollSensitivity = 2.0f)
         {
-            if (keyboardState.IsKeyDown(Keys.LeftControl))
-            {
-                Fov -= args.OffsetY * scrollSensitivity;
-            }
-            else
+            if (keyboardState.IsKeyDown(Keys.LeftAlt))
             {
                 if (args.OffsetY > 0.0f)
                 {
-                    _movementSpeed += _movementSpeedDelta;
+                    MovementSpeed += _movementSpeedDelta;
                 }
-                else if (_movementSpeed > _movementSpeedDelta)
+                else
                 {
-                    _movementSpeed -= _movementSpeedDelta;
+                    MovementSpeed -= _movementSpeedDelta;
                 }
+            }
+            else
+            {
+                Fov -= args.OffsetY * scrollSensitivity;
             }
         }
     }

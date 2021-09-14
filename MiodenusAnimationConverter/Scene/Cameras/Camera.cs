@@ -3,6 +3,9 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
+    /// <summary>
+    /// Камера общего назначения.
+    /// </summary>
     public class Camera : IMovable, IRotatable
     {
         private const float FovMinValue = 1.0f;
@@ -31,6 +34,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                     _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
         }
 
+        /// <summary>Метод, устанавливающий параметры камеры в значения по умолчанию.</summary>
+        /// <remarks>положение камеры и размеры окна остаются прежними.</remarks>
         public void Reset()
         {
             _front = -Vector3.UnitZ;
@@ -43,7 +48,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, 
                     _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
         }
-
+        
         public int ViewportWidth
         {
             get => _viewportWidth;
@@ -108,7 +113,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             get => _distanceToTheNearClipPlane;
             set
             {
-                if (value > 0.0f)
+                if ((value > 0.0f) && (value < _distanceToTheFarClipPlane))
                 {
                     _distanceToTheNearClipPlane = value;
                     _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
@@ -117,7 +122,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 else
                 {
                     Logger.Warn("Wrong value for DistanceToTheNearClipPlane parameter. Expected: value"
-                            + $" greater than 0. Got: {value}. Distance to the near clip plane was not changed.");
+                            + $" greater than 0 and less than {_distanceToTheFarClipPlane} (distance to the far"
+                            + $" clip plane). Got: {value}. Distance to the near clip plane was not changed.");
                 }
             }
         }
@@ -127,7 +133,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             get => _distanceToTheFarClipPlane;
             set
             {
-                if (value > 0.0f)
+                if (value > _distanceToTheNearClipPlane)
                 {
                     _distanceToTheFarClipPlane = value;
                     _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
@@ -136,7 +142,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 else
                 {
                     Logger.Warn("Wrong value for DistanceToTheFarClipPlane parameter. Expected: value"
-                                + $" greater than 0. Got: {value}. Distance to the far clip plane was not changed.");
+                            + $" greater than {_distanceToTheNearClipPlane} (distance to the near"
+                            + $" clip plane). Got: {value}. Distance to the far clip plane was not changed.");
                 }
             }
         }
@@ -191,24 +198,13 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             Position = Quaternion.FromAxisAngle(vector, angle) * Position;
             _view = Matrix4.LookAt(Position, Position + _front, _up);
         }
-
-        /* TODO: изменить способ получения вектора _right. Использовать кватернионы. */
+        
         public void RotateViewDirection(float angle, Vector3 vector)
         {
             var rotation = Quaternion.FromAxisAngle(vector, angle);
-            var lastFront = _front;
-            
-            _front = Vector3.Normalize(rotation * _front);
 
-            if (Vector3.CalculateAngle(_front, Vector3.UnitY) <= MathHelper.DegreesToRadians(1.0f)
-                    || Vector3.CalculateAngle(_front, -Vector3.UnitY) <= MathHelper.DegreesToRadians(1.0f))
-            {
-                _front = lastFront;
-                return;
-            }
-            
-            //_right = Vector3.Normalize(rotation * _right);
-            _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
+            _front = Vector3.Normalize(rotation * _front);
+            _right = Vector3.Normalize(rotation * _right);
             _up = Vector3.Normalize(Vector3.Cross(_right, _front));
             _view = Matrix4.LookAt(Position, Position + _front, _up);
         }

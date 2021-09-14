@@ -1,39 +1,61 @@
 using System.Collections.Generic;
+using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Scene.Models;
+using MiodenusAnimationConverter.Shaders;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
 {
     public class ModelGroup : IMovable, IRotatable, IScalable
     {
-        public List<Model> Models = new ();
+        public readonly List<Model> Models = new ();
 
-        public ModelGroup(Model model)
+        public void Draw(in ShaderProgram shaderProgram, in Camera camera, PrimitiveType mode = PrimitiveType.Triangles)
         {
-            Models.Add(model);
+            for (var i = 0; i < Models.Count; i++)
+            {
+                Models[i].Draw(shaderProgram, camera, mode);
+            }
+        }
+
+        public void Initialize()
+        {
+            for (var i = 0; i < Models.Count; i++)
+            {
+                Models[i].Initialize();
+            }
         }
         
+        public void Delete()
+        {
+            for (var i = 0; i < Models.Count; i++)
+            {
+                Models[i].Delete();
+            }
+        }
+
         public void Move(float deltaX, float deltaY, float deltaZ)
         {
-            foreach (var model in Models)
+            for (var i = 0; i < Models.Count; i++)
             {
-                model.Move(deltaX, deltaY, deltaZ);
+                Models[i].Move(deltaX, deltaY, deltaZ);
             }
         }
 
         public void Rotate(float angle, Vector3 vector)
         {
-            foreach (var model in Models)
+            for (var i = 0; i < Models.Count; i++)
             {
-                model.Rotate(angle, vector);
+                Models[i].Rotate(angle, vector);
             }
         }
 
         public void Scale(float scaleX, float scaleY, float scaleZ)
         {
-            foreach (var model in Models)
+            for (var i = 0; i < Models.Count; i++)
             {
-                model.Scale(scaleX, scaleY, scaleZ);
+                Models[i].Scale(scaleX, scaleY, scaleZ);
             }
         }
     }
