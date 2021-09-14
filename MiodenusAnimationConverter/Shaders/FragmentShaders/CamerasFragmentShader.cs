@@ -5,7 +5,6 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
     public static class CamerasFragmentShader
     {
         public const ShaderType Type = ShaderType.FragmentShader;
-
         public const string Code = @"
                 #version 330 core
 
@@ -16,7 +15,7 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
                 void main(void)
                 {
                     color = vertex_color;
-                } 
+                }
                 ";
     }
 }

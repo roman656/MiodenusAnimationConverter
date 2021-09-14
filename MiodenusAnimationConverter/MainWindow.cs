@@ -7,7 +7,6 @@ using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Media;
 using MiodenusAnimationConverter.Scene;
-using MiodenusAnimationConverter.Scene.Models.Meshes;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.GeometryShaders;
@@ -29,32 +28,16 @@ namespace MiodenusAnimationConverter
         private readonly string _videoPath;
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
-        
         private readonly Color4 _backgroundColor = new (0.3f, 0.3f, 0.4f, 1.0f);
-
-        private int _vertexesAmount;
         private long _screenshotId;
-        
         private float _angle;
         private double _deltaTime;
-
         private List<BitmapVideoFrameWrapper> frames = new ();
         private bool _isCursorGrabbed = true;
         private Scene.Scene _scene;
         private VideoRecorder _video;
-        private Vertex[] _vertexes;
-        private Transformation[] _transformations;
-        private VertexArrayObject _mainVao;
         private PrimitiveType _drawMode = PrimitiveType.Triangles;
-        private int _locationVboIndex;
-        private int _rotationVboIndex;
-        private int _scaleVboIndex;
-        private bool _hasTransformed;
         private bool _isCursorModeActive;
-        
-        private float[] _vertexesLocation;
-        private float[] _vertexesRotation;
-        private float[] _vertexesScale;
         private float _rotationRate = 2.0f;
         private LightPoint _lightPoint1;
         private LightPoint _lightPoint2;
@@ -115,66 +98,17 @@ namespace MiodenusAnimationConverter
 
         protected override void OnLoad()
         {
-            _scene.CamerasController.Initialize();
+            _scene.Initialize();
+            
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, 0.0f), Color4.White);
 
             _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[0].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
-
-            _vertexes = _scene.Vertexes;
-
-            var vertexesPositions = new float[_vertexes.Length * 3];
-            var vertexesNormals = new float[_vertexes.Length * 3];
-            var vertexesColors = new float[_vertexes.Length * 4];
-            
-            _vertexesLocation = new float[_vertexes.Length * 3];
-            _vertexesRotation = new float[_vertexes.Length * 4];
-            _vertexesScale = new float[_vertexes.Length * 3];
-
-            for (int i = 0, j = 0, k = 0; i < _vertexes.Length; i += 1, j += 3, k += 4)
-            {
-                _vertexesLocation[j] = _vertexes[i].Transformation.Location.X;
-                _vertexesLocation[j + 1] = _vertexes[i].Transformation.Location.Y;
-                _vertexesLocation[j + 2] = _vertexes[i].Transformation.Location.Z;
-                
-                _vertexesRotation[k] = _vertexes[i].Transformation.Rotation.X;
-                _vertexesRotation[k + 1] = _vertexes[i].Transformation.Rotation.Y;
-                _vertexesRotation[k + 2] = _vertexes[i].Transformation.Rotation.Z;
-                _vertexesRotation[k + 3] = _vertexes[i].Transformation.Rotation.W;
-                
-                _vertexesScale[j] = _vertexes[i].Transformation.Scale.X;
-                _vertexesScale[j + 1] = _vertexes[i].Transformation.Scale.Y;
-                _vertexesScale[j + 2] = _vertexes[i].Transformation.Scale.Z;
-
-                vertexesPositions[j] = _vertexes[i].Position.X;
-                vertexesPositions[j + 1] = _vertexes[i].Position.Y;
-                vertexesPositions[j + 2] = _vertexes[i].Position.Z;
-                
-                vertexesNormals[j] = _vertexes[i].Normal.X;
-                vertexesNormals[j + 1] = _vertexes[i].Normal.Y;
-                vertexesNormals[j + 2] = _vertexes[i].Normal.Z;
-
-                vertexesColors[k] = _vertexes[i].Color.R;
-                vertexesColors[k + 1] = _vertexes[i].Color.G;
-                vertexesColors[k + 2] = _vertexes[i].Color.B;
-                vertexesColors[k + 3] = _vertexes[i].Color.A;
-            }
-            
-            _mainVao = new VertexArrayObject();
-            
-            _mainVao.AddVertexBufferObject(vertexesPositions, 3);
-            _mainVao.AddVertexBufferObject(vertexesNormals, 3);
-            _mainVao.AddVertexBufferObject(vertexesColors, 4);
-            
-            _mainVao.AddVertexBufferObject(_vertexesLocation, 3, BufferUsageHint.StreamDraw);
-            _locationVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
-            _mainVao.AddVertexBufferObject(_vertexesRotation, 4, BufferUsageHint.StreamDraw);
-            _rotationVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
-            _mainVao.AddVertexBufferObject(_vertexesScale, 3, BufferUsageHint.StreamDraw);
-            _scaleVboIndex = _mainVao.VertexBufferObjectIndexes[^1];
+            _scene.ModelGroups[1].Scale(0.025f, 0.025f, 0.025f);
+            _scene.ModelGroups[1].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
+            _scene.ModelGroups[1].Move(60.0f, -20.0f, 0.0f);
             
             CursorGrabbed = _isCursorGrabbed;
-            _vertexesAmount = _vertexes.Length;
 
             InitializeShaderPrograms();
             
@@ -183,34 +117,6 @@ namespace MiodenusAnimationConverter
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
         }
 
-        private void UpdateModelsTransformation()
-        {
-            if (_hasTransformed)
-            {
-                for (int i = 0, j = 0, k = 0; i < _vertexes.Length; i += 1, j += 3, k += 4)
-                {
-                    _vertexesLocation[j] = _vertexes[i].Transformation.Location.X;
-                    _vertexesLocation[j + 1] = _vertexes[i].Transformation.Location.Y;
-                    _vertexesLocation[j + 2] = _vertexes[i].Transformation.Location.Z;
-
-                    _vertexesRotation[k] = _vertexes[i].Transformation.Rotation.X;
-                    _vertexesRotation[k + 1] = _vertexes[i].Transformation.Rotation.Y;
-                    _vertexesRotation[k + 2] = _vertexes[i].Transformation.Rotation.Z;
-                    _vertexesRotation[k + 3] = _vertexes[i].Transformation.Rotation.W;
-
-                    _vertexesScale[j] = _vertexes[i].Transformation.Scale.X;
-                    _vertexesScale[j + 1] = _vertexes[i].Transformation.Scale.Y;
-                    _vertexesScale[j + 2] = _vertexes[i].Transformation.Scale.Z;
-                }
-
-                _mainVao.UpdateVertexBufferObject(_locationVboIndex, _vertexesLocation);
-                _mainVao.UpdateVertexBufferObject(_rotationVboIndex, _vertexesRotation);
-                _mainVao.UpdateVertexBufferObject(_scaleVboIndex, _vertexesScale);
-            }
-            
-            _hasTransformed = false;
-        }
-        
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             base.OnUpdateFrame(args);
@@ -246,92 +152,47 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.Up:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Move(0, -25, 0);
-                    }
-                    
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Move(0.0f, -20.0f, 0.0f);
                     break;
                 }
                 case Keys.Down:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Move(0, 25, 0);
-                    }
-                    
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Move(0.0f, 20.0f, 0.0f);
                     break;
                 }
                 case Keys.Left:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Move(-25, 0, 0);
-                    }
-                    
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Move(-20.0f, 0.0f, 0.0f);
                     break;
                 }
                 case Keys.Right:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Move(25, 0, 0);
-                    }
-
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Move(20.0f, 0.0f, 0.0f);
                     break;
                 }
                 case Keys.Y:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Rotate((float)Math.PI / 8, new Vector3(1, 0, 0));
-                    }
-
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(1, 0, 0));
                     break;
                 }
                 case Keys.U:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Rotate((float)Math.PI / 8, new Vector3(0, 1, 0));
-                    }
-
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 1, 0));
                     break;
                 }
                 case Keys.T:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Rotate((float)Math.PI / 8, new Vector3(0, 0, 1));
-                    }
-
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 0, 1));
                     break;
                 }
                 case Keys.M:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Scale(0.99f, 0.99f, 0.99f);
-                    }
-
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Scale(0.99f, 0.99f, 0.99f);
                     break;
                 }
                 case Keys.N:
                 {
-                    for (var i = 0; i < _vertexesAmount; i++)
-                    {
-                        _vertexes[i].Scale(1.01f, 1.01f, 1.01f);
-                    }
-
-                    _hasTransformed = true;
+                    _scene.ModelGroups[0].Scale(1.01f, 1.01f, 1.01f);
                     break;
                 }
                 case Keys.H:
@@ -385,31 +246,32 @@ namespace MiodenusAnimationConverter
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            UpdateModelsTransformation();
-            
             _angle = (float)(_deltaTime * _rotationRate);
             //_scene.CamerasController.CurrentDebugCamera.Rotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             //_scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("view", _scene.CamerasController.CurrentDebugCamera.ViewMatrix, false);
-            _shaderPrograms[_currentProgramIndex].SetMatrix4("projection", _scene.CamerasController.CurrentDebugCamera.ProjectionMatrix, false);
-            _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
+             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
             CheckGLErrors();
-            
-            _mainVao.Draw(_vertexesAmount, _drawMode);
-            
+
+            for (var i = 0; i < _scene.ModelGroups.Count; i++)
+            {
+                _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex],
+                        _scene.CamerasController.CurrentDebugCamera, _drawMode);
+            }
+
             CheckGLErrors();
 
             if (_isDebugMode)
             {
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("view", _scene.CamerasController.CurrentDebugCamera.ViewMatrix, false);
-                _shaderPrograms[_currentProgramIndex + 1].SetMatrix4("projection", _scene.CamerasController.CurrentDebugCamera.ProjectionMatrix, false);
-
                 CheckGLErrors();
                 
-                _mainVao.Draw(_vertexesAmount);
+                for (var i = 0; i < _scene.ModelGroups.Count; i++)
+                {
+                    _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex + 1],
+                            _scene.CamerasController.CurrentDebugCamera);
+                }
                 
                 CheckGLErrors();
             }
@@ -421,7 +283,7 @@ namespace MiodenusAnimationConverter
             }
 
             Context.SwapBuffers();
-
+            
             //frames.Add(_video.CreateVideoFrame());
             //TakeScreenshot(_screenshotsPath);
         }
@@ -467,7 +329,10 @@ namespace MiodenusAnimationConverter
             
             _video.CreateVideo(videoFramesSource);
 */            
-            _mainVao.Delete();
+            for (var i = 0; i < _scene.ModelGroups.Count; i++)
+            {
+                _scene.ModelGroups[i].Delete();
+            }
 
             foreach (var shaderProgram in _shaderPrograms)
             {

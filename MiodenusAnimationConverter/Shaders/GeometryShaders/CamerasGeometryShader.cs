@@ -46,6 +46,22 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                     gl_Position = projection * view * vec4((position + front * MAGNITUDE), 1.0f);
                     EmitVertex();
 
+                    vertex_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    gl_Position = projection * view * vec4(position, 1.0f);
+                    EmitVertex();
+
+                    vertex_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    gl_Position = projection * view * vec4((position + right * MAGNITUDE), 1.0f);
+                    EmitVertex();
+
+                    vertex_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    gl_Position = projection * view * vec4(position, 1.0f);
+                    EmitVertex();
+
+                    vertex_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    gl_Position = projection * view * vec4((position + up * MAGNITUDE), 1.0f);
+                    EmitVertex();
+
                     EndPrimitive();
                 }
                 ";

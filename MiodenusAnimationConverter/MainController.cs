@@ -24,7 +24,7 @@ namespace MiodenusAnimationConverter
         private readonly string[] _modelFilenames = {
                 //"DebugAssets/Rhm_Borsig_12_8.stl",
                 "DebugAssets/Jagdtiger.stl",
-                //"DebugAssets/IS-6.stl",
+                "DebugAssets/IS-6.stl",
                 //"DebugAssets/Sphere.stl",
                 //"DebugAssets/Bottle.stl",
         };
@@ -44,7 +44,7 @@ namespace MiodenusAnimationConverter
             WriteAnimationFile(maf_filePath, maf);
             Logger.Trace($"Test MAF file generated to '{maf_filePath}'");
 
-            _scene = new (_mainWindowWidth, _mainWindowHeight);
+            _scene = new Scene.Scene(_mainWindowWidth, _mainWindowHeight);
             
             LoadModels();
 
@@ -92,7 +92,9 @@ namespace MiodenusAnimationConverter
 
             foreach (var model in models)
             {
-                _scene.ModelGroups.Add(new ModelGroup(model));
+                var tempGroup = new ModelGroup();
+                tempGroup.Models.Add(model);
+                _scene.ModelGroups.Add(tempGroup);
             }
 
             Logger.Trace("Loading models finished.");

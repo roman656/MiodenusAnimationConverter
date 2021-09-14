@@ -3,8 +3,11 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
-    /// <summary>Структура, содержащая параметры трансформации <see cref="Vertex">вершины</see>.</summary>
-    /// <remarks>Используется для перевода <see cref="Vertex">вершины</see> в глобальную систему координат.</remarks>
+    /// <summary>Структура, содержащая параметры трансформации <see cref="Mesh">полигональной сетки</see>.</summary>
+    /// <remarks>
+    /// Используется для перевода всех <see cref="Vertex">вершин</see> полигональной сетки
+    /// в глобальную систему координат.
+    /// </remarks>
     public struct Transformation
     {
         /// <summary>
@@ -22,7 +25,7 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
         /// </summary>
         public Vector3 Scale;
 
-        /// <summary>Конструктор структуры <see cref="Transformation">трансформации</see>.</summary>
+        /// <summary>Конструктор структуры трансформации.</summary>
         /// <param name="location">значение параметра <see cref="Location">сдвига</see>.</param>
         /// <param name="rotation">значение параметра <see cref="Rotation">поворота</see>.</param>
         /// <param name="scale">значение параметра <see cref="Scale">масштаба</see>.</param>

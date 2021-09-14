@@ -4,7 +4,6 @@ using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.GeometryShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
 using NLog;
-using OpenTK.Graphics.OpenGL;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
@@ -186,12 +185,6 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 
         public void DrawCameras(in Camera currentCamera)
         {
-            if (currentCamera == null)
-            {
-                Logger.Warn("DrawCameras: currentCamera argument can not be null. Nothing was drawn.");
-                return;
-            }
-            
             _shaderProgram.SetMatrix4("view", currentCamera.ViewMatrix, false);
             _shaderProgram.SetMatrix4("projection", currentCamera.ProjectionMatrix, false);
 

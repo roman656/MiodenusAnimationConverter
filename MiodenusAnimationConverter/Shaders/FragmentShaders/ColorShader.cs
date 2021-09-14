@@ -5,7 +5,6 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
     public static class ColorShader
     {
         public const ShaderType Type = ShaderType.FragmentShader;
-
         public const string Code = @"
                 #version 330 core
 
