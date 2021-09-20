@@ -100,14 +100,17 @@ namespace MiodenusAnimationConverter
         {
             _scene.Initialize();
             
-            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, 0.0f), Color4.White);
+            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
             _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[0].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
             _scene.ModelGroups[1].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[1].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
             _scene.ModelGroups[1].Move(60.0f, -20.0f, 0.0f);
-            
+            _scene.ModelGroups[2].Scale(0.016f, 0.016f, 0.016f);
+            _scene.ModelGroups[2].Rotate(-MathHelper.Pi, new Vector3(0.0f, 0.0f, 1.0f));
+            _scene.ModelGroups[2].Move(100.0f, 0.0f, 30.0f);
+
             CursorGrabbed = _isCursorGrabbed;
 
             InitializeShaderPrograms();
@@ -236,7 +239,7 @@ namespace MiodenusAnimationConverter
                 _scene.CamerasController.CurrentDebugCamera.ProcessMouseScroll(args, KeyboardState);
             }
         }
-
+        
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
@@ -245,7 +248,7 @@ namespace MiodenusAnimationConverter
             
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+            
             _angle = (float)(_deltaTime * _rotationRate);
             //_scene.CamerasController.CurrentDebugCamera.Rotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             //_scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));

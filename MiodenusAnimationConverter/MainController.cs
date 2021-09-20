@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using MiodenusAnimationConverter.Animation;
+using MiodenusAnimationConverter.AnimationFile;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models;
+using MiodenusAnimationConverter.Scene.Models.Meshes;
 using Newtonsoft.Json;
 using NLog;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using ModelInfo = MiodenusAnimationConverter.Animation.ModelInfo;
 
 namespace MiodenusAnimationConverter
 {
@@ -22,9 +26,9 @@ namespace MiodenusAnimationConverter
         private readonly byte _mainWindowFrequency = 60;
         private readonly string _animationFilename = "";
         private readonly string[] _modelFilenames = {
-                //"DebugAssets/Rhm_Borsig_12_8.stl",
                 "DebugAssets/Jagdtiger.stl",
                 "DebugAssets/IS-6.stl",
+                "DebugAssets/Rhm_Borsig_12_8.stl",
                 //"DebugAssets/Sphere.stl",
                 //"DebugAssets/Bottle.stl",
         };
