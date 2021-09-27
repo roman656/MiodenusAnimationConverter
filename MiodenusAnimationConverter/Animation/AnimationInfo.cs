@@ -9,6 +9,8 @@ namespace MiodenusAnimationConverter.Animation
         public string VideoName;
         public int TimeLength;
         public int Fps;
+        public int FrameWidth;
+        public int FrameHeight;
 
         public AnimationInfo(string type = "maf",
                              string version = "1.0",
@@ -16,7 +18,9 @@ namespace MiodenusAnimationConverter.Animation
                              string videoType = "mp4",
                              string videoName = "UnnamedVideo",
                              int timeLength = -1,
-                             int fps = 60)
+                             int fps = 60,
+                             int frameWidth = 600,
+                             int frameHeight = 600)
         {
             Type = type;
             Version = version;
@@ -25,6 +29,8 @@ namespace MiodenusAnimationConverter.Animation
             VideoName = videoName;
             TimeLength = timeLength;
             Fps = fps;
+            FrameWidth = frameWidth;
+            FrameHeight = frameHeight;
         }
     }
 }

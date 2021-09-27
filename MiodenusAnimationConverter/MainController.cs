@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
-using MiodenusAnimationConverter.Animation;
-using MiodenusAnimationConverter.AnimationFile;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models;
-using MiodenusAnimationConverter.Scene.Models.Meshes;
 using Newtonsoft.Json;
 using NLog;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using ModelInfo = MiodenusAnimationConverter.Animation.ModelInfo;
 
 namespace MiodenusAnimationConverter
 {
@@ -24,7 +20,6 @@ namespace MiodenusAnimationConverter
         private readonly ushort _mainWindowHeight = 600;
         private readonly bool _isMainWindowVisible = true;
         private readonly byte _mainWindowFrequency = 60;
-        private readonly string _animationFilename = "";
         private readonly string[] _modelFilenames = {
                 "DebugAssets/Jagdtiger.stl",
                 "DebugAssets/IS-6.stl",
@@ -33,20 +28,16 @@ namespace MiodenusAnimationConverter
                 //"DebugAssets/Bottle.stl",
         };
         private Scene.Scene _scene;
-        
-        public MainController(string[] args)
+        public int ExitCode = 0;
+
+        public MainController(CommandLineOptions options)
         {
             Logger.Trace("<=====Start=====>");
-            Logger.Trace("Processing of command line arguments is started.");
             
-            //var argumentsHandler = new CommandLineArgumentsHandler(args);
-            
-            Logger.Trace("Processing of command line arguments is finished.");
-
-            var maf_filePath = "demo.maf.json";
-            var maf = this.GenerateDebugMAF();
-            WriteAnimationFile(maf_filePath, maf);
-            Logger.Trace($"Test MAF file generated to '{maf_filePath}'");
+            Logger.Trace("AnimationFilePath: {0}",options.AnimationFilePath);
+            Logger.Trace("UseQuietMode: {0}",options.UseQuietMode);
+            Logger.Trace("UseViewMode: {0}",options.UseViewMode);
+            Logger.Trace("FrameIndex: {0}",options.FrameIndex);
 
             _scene = new Scene.Scene(_mainWindowWidth, _mainWindowHeight);
             
