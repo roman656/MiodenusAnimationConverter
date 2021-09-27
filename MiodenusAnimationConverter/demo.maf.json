@@ -1,0 +1,208 @@
+{
+  "AnimationInfo": {
+    "Type": "MAF",
+    "Version": 1.0,
+    "AnimationName": "Generated debug animation",
+    "VideoName": "test.mp4",
+    "TimeLength": 15.0,
+    "FPS": 60
+  },
+  "Models": [
+    {
+      "ID": 0,
+      "Name": "Борщ",
+      "FileName": "DebugAssets/Rhm_Borsig_12_8.stl",
+      "MD5": "",
+      "BaseTransform": {
+        "Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotations": [
+          {
+            "Angle": 90.0,
+            "Vector": [
+              1.0,
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "Scale": 1.0
+      }
+    },
+    {
+      "ID": 1,
+      "Name": "Тигр",
+      "FileName": "DebugAssets/Jagdtiger.stl",
+      "MD5": "",
+      "BaseTransform": {
+        "Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotations": [],
+        "Scale": 1.0
+      }
+    },
+    {
+      "ID": 2,
+      "Name": "Объект 252",
+      "FileName": "DebugAssets/IS-6.stl",
+      "MD5": "",
+      "BaseTransform": {
+        "Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotations": [],
+        "Scale": 1.0
+      }
+    },
+    {
+      "ID": 3,
+      "Name": "Сфера",
+      "FileName": "DebugAssets/Sphere.stl",
+      "MD5": "",
+      "BaseTransform": {
+        "Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotations": [],
+        "Scale": 1.0
+      }
+    },
+    {
+      "ID": 4,
+      "Name": "Духи",
+      "FileName": "DebugAssets/Bottle.stl",
+      "MD5": "",
+      "BaseTransform": {
+        "Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotations": [],
+        "Scale": 1.0
+      }
+    }
+  ],
+  "Actions": [
+    {
+      "Values": [
+        {
+          "Time": 0.0,
+          "Transform": {
+            "Translation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotations": [],
+            "Scale": 1.0
+          }
+        },
+        {
+          "Time": 10.0,
+          "Transform": {
+            "Translation": [
+              0.0,
+              10.0,
+              0.0
+            ],
+            "Rotations": [],
+            "Scale": 1.0
+          }
+        }
+      ],
+      "ID": 0,
+      "StartTime": 0.0,
+      "TimeLength": 10.0,
+      "UseInterpolation": false
+    },
+    {
+      "Values": [
+        {
+          "Time": 0.0,
+          "Transform": {
+            "Translation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotations": [],
+            "Scale": 1.0
+          }
+        },
+        {
+          "Time": 10.0,
+          "Transform": {
+            "Translation": [
+              0.0,
+              0.0,
+              5.0
+            ],
+            "Rotations": [],
+            "Scale": 1.0
+          }
+        }
+      ],
+      "ID": 1,
+      "StartTime": 2.0,
+      "TimeLength": 10.0,
+      "UseInterpolation": false
+    },
+    {
+      "Values": [
+        {
+          "Time": 0.0,
+          "Transform": {
+            "Translation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotations": [],
+            "Scale": 1.0
+          }
+        },
+        {
+          "Time": 10.0,
+          "Transform": {
+            "Translation": [
+              15.0,
+              0.0,
+              0.0
+            ],
+            "Rotations": [],
+            "Scale": 1.0
+          }
+        }
+      ],
+      "ID": 2,
+      "StartTime": 4.0,
+      "TimeLength": 10.0,
+      "UseInterpolation": false
+    }
+  ],
+  "Bindings": [
+    {
+      "ModelID": 0,
+      "ActionID": 0
+    },
+    {
+      "ModelID": 1,
+      "ActionID": 1
+    },
+    {
+      "ModelID": 2,
+      "ActionID": 2
+    }
+  ]
+}
