@@ -24,7 +24,7 @@
 
 Команда, представленная ниже, создаст итоговый видеофайл сборки, используя анимационный файл *animation.maf*. Приложение не будет выводить какие-либо сообщения в консоль.
 
-`$ MiodenusAnimationConverter --animation "path/to/animation.maf" --quiet`
+`$ ./MiodenusAnimationConverter --animation "path/to/animation.maf" --quiet`
 
 ## Анимационный файл
 
