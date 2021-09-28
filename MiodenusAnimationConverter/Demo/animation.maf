@@ -34,7 +34,7 @@
       "name": "nut_6x9",
       "type": "stl",
       "filename": "path/to/nut_6x9.stl",
-      "color": "yellow",
+      "color": [1.0, 0.0, 0.0],
       "baseTransformation":
       {
         "location": [0.0, 0.0, 20.0],
@@ -44,7 +44,7 @@
           "unit": "deg",
           "vector": [1.0, 0.0, 0.0]
         },
-        "scale": 0.5
+        "scale": [0.5, 0.5, 0.5]
       }
     }
   ],
@@ -57,7 +57,7 @@
         {
           "time": 0,
           "isModelVisible": true,
-          "color": "red",
+          "color": [0.0, 1.0, 0.0],
           "transformation":
           {
             "location": [0.0, 0.0, 0.0],
@@ -67,7 +67,7 @@
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
             },
-            "scale": 1.0
+            "scale": [1.0, 1.0, 1.0]
           }
         },
         {

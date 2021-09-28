@@ -9,8 +9,11 @@ namespace MiodenusAnimationConverter.Loaders.AnimationLoaders
         public Animation.Animation Load(in string filename)
         {
             CheckAnimationFile(filename);
-            Animation.Animation maf = JsonConvert.DeserializeObject<Animation.Animation>(File.ReadAllText(filename));
-            return maf;
+            
+            var content = File.ReadAllText(filename);
+            var animation = JsonConvert.DeserializeObject<Animation.MAFStructure.Animation>(content);
+            
+            return new Animation.Animation(animation);
         }
         
         private static void CheckAnimationFile(in string filename)
