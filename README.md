@@ -12,121 +12,121 @@
 
 ```json
 {
-    "animationInfo":
+  "animationInfo":
+  {
+    "type": "maf",
+    "version": "1.0",
+    "name": "AnimationDemo",
+    "videoType": "mp4",
+    "videoName": "ResultVideo",
+    "timeLength": 3600,
+    "fps": 60,
+    "frameWidth": 600,
+    "frameHeight": 600
+  },
+  "modelsInfo":
+  [
     {
-        "type": "maf",
-        "version": "1.0",
-        "name": "AnimationDemo",
-        "videoType": "mp4",
-        "videoName": "ResultVideo",
-        "timeLength": 3600,
-        "fps": 60,
-        "frameWidth": 600,
-        "frameHeight": 600
+      "name": "bolt_25x8",
+      "type": "stl",
+      "filename": "path/to/bolt_25x8.stl",
+      "color": [0.0, 1.0, 0.0],
+      "baseTransformation":
+      {
+        "location": [0.0, 0.0, 0.0],
+        "rotation":
+        {
+          "angle": 5.0,
+          "unit": "rad",
+          "vector": [0.0, 1.0, 0.0]
+        },
+        "scale": [0.5, 0.5, 0.5]
+      }
     },
-    "modelsInfo":
-    [
+    {
+      "name": "nut_6x9",
+      "type": "stl",
+      "filename": "path/to/nut_6x9.stl",
+      "color": [1.0, 0.0, 0.0],
+      "baseTransformation":
+      {
+        "location": [0.0, 0.0, 20.0],
+        "rotation":
         {
-            "name": "bolt_25x8",
-            "type": "stl",
-            "filename": "path/to/bolt_25x8.stl",
-            "color": [0.0, 1.0, 0.0],
-            "baseTransformation":
+          "angle": 90.0,
+          "unit": "deg",
+          "vector": [1.0, 0.0, 0.0]
+        },
+        "scale": [0.5, 0.5, 0.5]
+      }
+    }
+  ],
+  "actions":
+  [
+    {
+      "name": "nut rotation",
+      "states":
+      [
+        {
+          "time": 0,
+          "isModelVisible": true,
+          "color": [0.0, 1.0, 0.0],
+          "transformation":
+          {
+            "location": [0.0, 0.0, 0.0],
+            "rotation":
             {
-                "location": [0.0, 0.0, 0.0],
-                "rotation":
-                {
-                    "angle": 5.0,
-                    "unit": "rad",
-                    "vector": [0.0, 1.0, 0.0]
-                },
-                "scale": [0.5, 0.5, 0.5]
-            }
+              "angle": 10.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "scale": [1.0, 1.0, 1.0]
+          }
         },
         {
-            "name": "nut_6x9",
-            "type": "stl",
-            "filename": "path/to/nut_6x9.stl",
-            "color": "yellow",
-            "baseTransformation":
+          "time": 1500,
+          "transformation":
+          {
+            "location": [0.0, 0.0, -20.0],
+            "rotation":
             {
-                "location": [0.0, 0.0, 20.0],
-                "rotation":
-                {
-                    "angle": 90.0,
-                    "unit": "deg",
-                    "vector": [1.0, 0.0, 0.0]
-                },
-                "scale": 0.5
+              "angle": 180.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
             }
-        }
-    ],
-    "actions":
-    [
-        {
-            "name": "nut rotation",
-            "states":
-            [
-                {
-                    "time": 0,
-                    "isModelVisible": true,
-                    "color": "red",
-                    "transformation":
-                    {
-                        "location": [0.0, 0.0, 0.0],
-                        "rotation":
-                        {
-                            "angle": 10.0,
-                            "unit": "deg",
-                            "vector": [1.0, 0.0, 0.0]
-                        },
-                        "scale": 1.0
-                    }
-                },
-                {
-                    "time": 1500,
-                    "transformation":
-                    {
-                        "location": [0.0, 0.0, -20.0],
-                        "rotation":
-                        {
-                            "angle": 180.0,
-                            "unit": "deg",
-                            "vector": [1.0, 0.0, 0.0]
-                        }
-                    }
-                },
-                {
-                    "time": 3000,
-                    "transformation":
-                    {
-                        "rotation":
-                        {
-                            "angle": -7.0,
-                            "vector": [0.0, 1.0, 0.0]
-                        }
-                    }
-                }
-            ]
-        }
-    ],
-    "bindings":
-    [
-        {
-            "modelName": "nut_6x9",
-            "actionName": "nut rotation",
-            "startTime": 10,
-            "timeLength": 3500,
-            "useInterpolation": true
+          }
         },
         {
-            "modelName": "bolt_25x8",
-            "actionName": "nut rotation",
-            "startTime": 2000,
-            "timeLength": 100,
-            "useInterpolation": false
+          "time": 3000,
+          "transformation":
+          {
+            "rotation":
+            {
+              "angle": -7.0,
+              "vector": [0.0, 1.0, 0.0]
+            }
+          }
         }
-    ]
+      ]
+    }
+  ],
+  "bindings":
+  [
+    {
+      "modelName": "nut_6x9",
+      "actionName": "nut rotation",
+      "startTime": 10,
+      "timeLength": 3500,
+      "useInterpolation": true
+    },
+    {
+      "modelName": "bolt_25x8",
+      "actionName": "nut rotation",
+      "startTime": 2000,
+      "timeLength": 100,
+      "useInterpolation": false
+    }
+  ]
 }
 ```
 
