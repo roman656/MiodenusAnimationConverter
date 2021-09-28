@@ -33,12 +33,8 @@ namespace MiodenusAnimationConverter
         public MainController(CommandLineOptions options)
         {
             Logger.Trace("<=====Start=====>");
-            
-            Logger.Trace("AnimationFilePath: {0}",options.AnimationFilePath);
-            Logger.Trace("UseQuietMode: {0}",options.UseQuietMode);
-            Logger.Trace("UseViewMode: {0}",options.UseViewMode);
-            Logger.Trace("FrameIndex: {0}",options.FrameIndex);
-
+            Logger.Trace(options.AnimationFilePath);
+            Logger.Trace(options.UseQuietMode);
             _scene = new Scene.Scene(_mainWindowWidth, _mainWindowHeight);
             
             LoadModels();
