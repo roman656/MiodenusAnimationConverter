@@ -1,10 +1,138 @@
 # MiodenusAnimationConverter
 
-*MiodenusAnimationConverter* - это консольное приложение, входящее в состав *Miodenus Project*, отвечающее за преобразование входных данных (см. ниже) в итоговый видеофайл, содержащий анимацию сборки.
+*MiodenusAnimationConverter* - это консольное приложение, входящее в состав *Miodenus Project*, отвечающее за преобразование входных данных ([см. ниже](#входные-данные)) в итоговый видеофайл, содержащий анимацию сборки.
 
 ## Входные данные
 
-На вход данное приложение принимает файл, описывающий анимацию сборки (см. ниже).
+На вход данное приложение принимает файл, описывающий анимацию сборки. Его структура представлена ниже.
+
+### Анимационный файл
+
+Ниже представлен пример содержимого анимационного файла.
+
+```json
+{
+    "animationInfo":
+    {
+        "type": "maf",
+        "version": "1.0",
+        "name": "AnimationDemo",
+        "videoType": "mp4",
+        "videoName": "ResultVideo",
+        "timeLength": 3600,
+        "fps": 60,
+        "frameWidth": 600,
+        "frameHeight": 600
+    },
+    "modelsInfo":
+    [
+        {
+            "name": "bolt_25x8",
+            "type": "stl",
+            "filename": "path/to/bolt_25x8.stl",
+            "color": [0.0, 1.0, 0.0],
+            "baseTransformation":
+            {
+                "location": [0.0, 0.0, 0.0],
+                "rotation":
+                {
+                    "angle": 5.0,
+                    "unit": "rad",
+                    "vector": [0.0, 1.0, 0.0]
+                },
+                "scale": [0.5, 0.5, 0.5]
+            }
+        },
+        {
+            "name": "nut_6x9",
+            "type": "stl",
+            "filename": "path/to/nut_6x9.stl",
+            "color": "yellow",
+            "baseTransformation":
+            {
+                "location": [0.0, 0.0, 20.0],
+                "rotation":
+                {
+                    "angle": 90.0,
+                    "unit": "deg",
+                    "vector": [1.0, 0.0, 0.0]
+                },
+                "scale": 0.5
+            }
+        }
+    ],
+    "actions":
+    [
+        {
+            "name": "nut rotation",
+            "states":
+            [
+                {
+                    "time": 0,
+                    "isModelVisible": true,
+                    "color": "red",
+                    "transformation":
+                    {
+                        "location": [0.0, 0.0, 0.0],
+                        "rotation":
+                        {
+                            "angle": 10.0,
+                            "unit": "deg",
+                            "vector": [1.0, 0.0, 0.0]
+                        },
+                        "scale": 1.0
+                    }
+                },
+                {
+                    "time": 1500,
+                    "transformation":
+                    {
+                        "location": [0.0, 0.0, -20.0],
+                        "rotation":
+                        {
+                            "angle": 180.0,
+                            "unit": "deg",
+                            "vector": [1.0, 0.0, 0.0]
+                        }
+                    }
+                },
+                {
+                    "time": 3000,
+                    "transformation":
+                    {
+                        "rotation":
+                        {
+                            "angle": -7.0,
+                            "vector": [0.0, 1.0, 0.0]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "bindings":
+    [
+        {
+            "modelName": "nut_6x9",
+            "actionName": "nut rotation",
+            "startTime": 10,
+            "timeLength": 3500,
+            "useInterpolation": true
+        },
+        {
+            "modelName": "bolt_25x8",
+            "actionName": "nut rotation",
+            "startTime": 2000,
+            "timeLength": 100,
+            "useInterpolation": false
+        }
+    ]
+}
+```
+
+## Выходные данные
+
+В результате работы приложения будет получен видеофайл, содержащий анимацию сборки. В случае передачи особых аргументов результат работы приложения может быть другим ([см. ниже](#таблица-аргументов)).
 
 ## Запуск из консоли
 ### Таблица аргументов
@@ -25,100 +153,3 @@
 Команда, представленная ниже, создаст итоговый видеофайл сборки, используя анимационный файл *animation.maf*. Приложение не будет выводить какие-либо сообщения в консоль.
 
 `$ ./MiodenusAnimationConverter --animation "path/to/animation.maf" --quiet`
-
-## Анимационный файл
-
-Ниже представлен пример содержимого анимационного файла.
-
-```json
-{
-    "animationInfo": {
-        "type": "maf",
-        "version": 1.0,
-        "animationName": "Anim1",
-        "videoName": "Animation1.avi",
-        "timeLength": 3600,
-        "fps": 30
-    },
-    "models": [
-    {
-        "id": 0,
-        "name": "model1",
-        "filename": "model_1.stl",
-        "md5": "1BC29B36F623BA82AAF6724FD3B16718",
-        "transform": {
-            "translation": [0.0, 0.0, 0.0],
-            "rotation": {
-                "angle": 5.0,
-                "vector": [0.0, 1.0, 2.0]
-            },
-            "scale": 1.0
-        }
-    },
-    {
-        "id": 1,
-        "name": "model2",
-        "filename": "model_2.stl",
-        "md5": "1BC29B36FAAF6724FD3B16718623BA82",
-        "transform": {
-            "translation": [0.0, 20.0, 0.0],
-            "rotation": {
-                "angle": 15.0,
-                "vector": [3.0, 1.0, 0.0]
-            },
-            "scale": 1.02
-        }
-    }
-    ],
-    "actions": [
-        {
-            "id": 0,
-            "name": "rotation of model1",
-            "startTime": 10,
-            "timeLength": 3000,
-            "useInterpolation": true,
-            "values": [
-                {
-                    "time": 0,
-                    "rotation": {
-                        "angle": 5.0,
-                        "vector": [0.0, 1.0, 2.0]
-                    }
-                },
-                {
-                    "time": 1500,
-                    "rotation": {
-                        "angle": 35.0,
-                        "vector": [0.0, 1.0, 2.0]
-                    }
-                },
-                {
-                    "time": 3000,
-                    "rotation": {
-                        "angle": 95.0,
-                        "vector": [0.0, 1.0, 2.0]
-                    }
-                }
-            ]
-        }
-    ],
-    "bindings": [
-        {
-            "modelId": 0,
-            "actionId": 0
-        },
-        {
-            "modelId": 1,
-            "actionId": 0
-        }
-    ],
-    "animationInfo": {
-        "type": "maf",
-        "version": 1.0,
-        "animationName": "Anim1",
-        "videoName": "Animation1.avi",
-        "timeLength": 3600,
-        "fps": 30
-    }
-}
-```
