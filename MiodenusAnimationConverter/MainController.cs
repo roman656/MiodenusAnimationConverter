@@ -27,17 +27,16 @@ namespace MiodenusAnimationConverter
                 //"DebugAssets/Bottle.stl",
         };
         private Scene.Scene _scene;
-        public int ExitCode = 0;
 
         public MainController(CommandLineOptions options)
         {
             Logger.Trace("<=====Start=====>");
-            
+
             IAnimationLoader loader = new LoaderMaf();
             var animation = loader.Load(options.AnimationFilePath);
 
             _scene = new Scene.Scene(_mainWindowWidth, _mainWindowHeight);
-            
+
             LoadModels();
 
             _mainWindow = CreateMainWindow();
