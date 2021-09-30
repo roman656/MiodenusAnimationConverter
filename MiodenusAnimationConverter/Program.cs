@@ -14,34 +14,54 @@ namespace MiodenusAnimationConverter
 
         public static int Main(string[] args)
         {
-            var parser = new Parser(with =>
-            {
-                with.HelpWriter = null;
-                with.IgnoreUnknownArguments = false;
-            });
+            var parser = new Parser(with => with.HelpWriter = null);
             var parserResult = parser.ParseArguments<CommandLineOptions>(args);
             
-            parserResult.WithParsed(Run).WithNotParsed(errs => DisplayHelp(parserResult, errs));
+            parserResult.WithParsed(_ => Run(parserResult))
+                        .WithNotParsed(errs => DisplayHelp(parserResult, errs));
             
             return ExitCode;
         }
         
-        private static void Run(CommandLineOptions options)
+        private static void Run(ParserResult<CommandLineOptions> result)
         {
-            if (options.IsValid)
+            if (result.Value.IsValid)
             {
-                var mainController = new MainController(options);
+                var mainController = new MainController(result.Value);
+            }
+            else
+            {
+                var helpText = GenerateHelpText(result);
+                
+                helpText.Copyright += "\n\nERROR(S):\n  Incorrect value for some options.\n";
+                ExitCode = 1;
+                Console.Error.WriteLine(helpText);
+            }
+        }
+
+        private static void DisplayHelp(ParserResult<CommandLineOptions> result, IEnumerable<Error> errs)
+        {
+            var errors = errs.ToList();
+            var helpText = GenerateHelpText(result);
+
+            if (errors.IsHelp())
+            {
+                Console.WriteLine(helpText);
+            }
+            else if (errors.IsVersion())
+            {
+                Console.WriteLine(helpText.Heading);
             }
             else
             {
                 ExitCode = 1;
+                Console.Error.WriteLine(helpText);
             }
         }
 
-        private static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
+        private static HelpText GenerateHelpText(ParserResult<CommandLineOptions> result)
         {
-            var errors = errs.ToList();
-            var helpText = HelpText.AutoBuild(result, help =>
+            return HelpText.AutoBuild(result, help =>
             {
                 help.AddNewLineBetweenHelpSections = true;
                 help.AdditionalNewLineAfterOption = false;
@@ -49,16 +69,6 @@ namespace MiodenusAnimationConverter
                 help.Copyright = $"Copyright (C) {Year} roman656, PoorMercymain";
                 return HelpText.DefaultParsingErrorsHandler(result, help);
             }, example => example);
-            
-            if (!errors.IsVersion() && !errors.IsHelp())
-            {
-                ExitCode = 1;
-                Console.Error.WriteLine(helpText);
-            }
-            else
-            {
-                Console.WriteLine(helpText);
-            }
         }
     }
 }
