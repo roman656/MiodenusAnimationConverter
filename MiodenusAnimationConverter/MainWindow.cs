@@ -106,10 +106,7 @@ namespace MiodenusAnimationConverter
             _scene.ModelGroups[0].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
             _scene.ModelGroups[1].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[1].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
-            _scene.ModelGroups[1].Move(60.0f, -20.0f, 0.0f);
-            _scene.ModelGroups[2].Scale(0.016f, 0.016f, 0.016f);
-            _scene.ModelGroups[2].Rotate(-MathHelper.Pi, new Vector3(0.0f, 0.0f, 1.0f));
-            _scene.ModelGroups[2].Move(100.0f, 0.0f, 30.0f);
+            _scene.ModelGroups[1].Move(0.0f, 0.0f, 25.0f);
 
             CursorGrabbed = _isCursorGrabbed;
 
@@ -186,6 +183,8 @@ namespace MiodenusAnimationConverter
                 case Keys.T:
                 {
                     _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 0, 1));
+                    _scene.ModelGroups[1].Rotate(-(float)Math.PI / 8, new Vector3(0, 0, 1));
+                    _scene.ModelGroups[1].Move(0.0f, 0.0f, -0.2f);
                     break;
                 }
                 case Keys.M:

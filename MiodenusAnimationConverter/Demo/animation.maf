@@ -16,7 +16,7 @@
     {
       "name": "bolt_25x8",
       "type": "stl",
-      "filename": "path/to/bolt_25x8.stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
       "color": [0.0, 1.0, 0.0],
       "baseTransformation":
       {
@@ -33,7 +33,7 @@
     {
       "name": "nut_6x9",
       "type": "stl",
-      "filename": "path/to/nut_6x9.stl",
+      "filename": "Demo/Models/nut_6x9.stl",
       "color": [1.0, 0.0, 0.0],
       "baseTransformation":
       {

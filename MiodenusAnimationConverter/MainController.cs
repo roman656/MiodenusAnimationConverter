@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Loaders.AnimationLoaders;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
 using MiodenusAnimationConverter.Scene;
@@ -12,89 +14,115 @@ namespace MiodenusAnimationConverter
 {
     public class MainController
     {
+        private enum WorkMode
+        {
+            Default,
+            FrameView,
+            GetFrameImage
+        }
+        
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly MainWindow _mainWindow;
-        private readonly string _mainWindowTitle = "Miodenus Animation Converter";
-        private readonly ushort _mainWindowWidth = 600;
-        private readonly ushort _mainWindowHeight = 600;
-        private readonly bool _isMainWindowVisible = true;
-        private readonly byte _mainWindowFrequency = 60;
-        private readonly string[] _modelFilenames = {
-                "DebugAssets/Jagdtiger.stl",
-                "DebugAssets/IS-6.stl",
-                "DebugAssets/Rhm_Borsig_12_8.stl",
-                //"DebugAssets/Sphere.stl",
-                //"DebugAssets/Bottle.stl",
-        };
-        private Scene.Scene _scene;
+        private const string MainWindowTitle = "Miodenus Animation Converter";
 
         public MainController(CommandLineOptions options)
         {
             Logger.Trace("<=====Start=====>");
 
-            IAnimationLoader loader = new LoaderMaf();
-            var animation = loader.Load(options.AnimationFilePath);
+            try
+            {
+                var animation = LoadAnimation(options.AnimationFilePath);
+                var models = LoadModels(animation.ModelsInfo);
+                var scene = new Scene.Scene(animation.Info.FrameWidth, animation.Info.FrameHeight);
 
-            _scene = new Scene.Scene(_mainWindowWidth, _mainWindowHeight);
+                for (var i = 0; i < models.Count; i++)
+                {
+                    var tempGroup = new ModelGroup();
+                    tempGroup.Models.Add(models[i]);
+                    scene.ModelGroups.Add(tempGroup);
+                }
 
-            LoadModels();
+                CreateMainWindow(animation.Info, scene, DetermineWorkMode(options)).Run();
+            }
+            catch (Exception exception)
+            {
+                Logger.Fatal(exception);
+                Program.ExitCode = 2;
+            }
 
-            _mainWindow = CreateMainWindow();
-            _mainWindow.Run();
-            
             Logger.Trace("<======End======>");
             LogManager.Shutdown();
         }
+        
+        private static WorkMode DetermineWorkMode(CommandLineOptions options)
+        {
+            var result = WorkMode.Default;
 
-        private MainWindow CreateMainWindow()
+            if (options.WasFrameNumberToViewOptionGot)
+            {
+                result = WorkMode.FrameView;
+            }
+            else if (options.WasFrameNumberToGetImageOptionGot)
+            {
+                result = WorkMode.GetFrameImage;
+            }
+            
+            Logger.Trace("Working mode: {0}", result);
+            return result;
+        }
+
+        private static Animation.Animation LoadAnimation(in string animationFilePath)
+        {
+            Logger.Trace("Loading animation started.");
+            
+            IAnimationLoader loader = new LoaderMaf();
+            var animation = loader.Load(animationFilePath);
+            
+            Logger.Trace("Loading animation finished.");
+            return animation;
+        }
+        
+        private static List<Model> LoadModels(List<ModelInfo> modelsInfo)
+        {
+            Logger.Trace("Loading models started.");
+            
+            var models = new List<Model>();
+            IModelLoader loader = new LoaderStl();
+
+            foreach (var modelInfo in modelsInfo)
+            {
+                try
+                {
+                    models.Add(loader.Load(modelInfo.Filename, modelInfo.Color, modelInfo.UseCalculatedNormals));
+                }
+                catch (Exception exception)
+                {
+                    Logger.Warn(exception);
+                }
+            }
+
+            Logger.Trace("Loading models finished.");
+            return models;
+        }
+
+        private static MainWindow CreateMainWindow(AnimationInfo animationInfo, Scene.Scene scene, WorkMode workMode)
         {
             GameWindowSettings mainWindowSettings = new()
             {
                 IsMultiThreaded = true,
-                RenderFrequency = _mainWindowFrequency,
-                UpdateFrequency = _mainWindowFrequency
+                RenderFrequency = animationInfo.Fps,
+                UpdateFrequency = animationInfo.Fps
             };
-            
+
             NativeWindowSettings nativeWindowSettings = new()
             {
-                Size = new Vector2i(_mainWindowWidth, _mainWindowHeight),
-                Title = _mainWindowTitle,
+                Size = new Vector2i(animationInfo.FrameWidth, animationInfo.FrameHeight),
+                Title = MainWindowTitle,
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
-                StartVisible = _isMainWindowVisible
+                StartVisible = workMode == WorkMode.FrameView
             };
 
-            return new MainWindow(_scene, mainWindowSettings, nativeWindowSettings);
-        }
-
-        private void LoadModels()
-        {
-            Logger.Trace("Loading models started.");
-            
-            uint i = 0;
-            var models = new Model[_modelFilenames.Length];
-            IModelLoader loader = new LoaderStl();
-
-            foreach (var filename in _modelFilenames)
-            {
-                models[i] = loader.Load(filename, GetRandomColor(), false);
-                i++;
-            }
-
-            foreach (var model in models)
-            {
-                var tempGroup = new ModelGroup();
-                tempGroup.Models.Add(model);
-                _scene.ModelGroups.Add(tempGroup);
-            }
-
-            Logger.Trace("Loading models finished.");
-        }
-
-        private Color4 GetRandomColor()
-        {
-            var random = new Random();
-            return new Color4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1.0f);
+            return new MainWindow(scene, mainWindowSettings, nativeWindowSettings);
         }
     }
 }
