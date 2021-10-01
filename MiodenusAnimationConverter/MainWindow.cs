@@ -24,12 +24,12 @@ namespace MiodenusAnimationConverter
     public class MainWindow : GameWindow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly string _screenshotsPath;
-        private readonly string _videoPath;
+        private const string ScreenshotsPath = "screenshots";
+        private const string VideoPath = "videos";
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
         private readonly Color4 _backgroundColor = new (0.3f, 0.3f, 0.4f, 1.0f);
-        private long _screenshotId;
+        private int _screenshotId;
         private float _angle;
         private double _deltaTime;
         private List<BitmapVideoFrameWrapper> frames = new ();
@@ -47,12 +47,10 @@ namespace MiodenusAnimationConverter
         public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
             NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
-            _screenshotsPath = "screenshots";
-            _videoPath = "videos";
-            CheckPath(_screenshotsPath);
-            CheckPath(_videoPath);
+            CheckPath(ScreenshotsPath);
+            CheckPath(VideoPath);
             _scene = scene;
-            _video = new VideoRecorder(this,$"{_videoPath}/animation", "mp4", 60);
+            _video = new VideoRecorder(this,$"{VideoPath}/animation", "mp4", 60);
         }
 
         private static void CheckPath(in string path)
@@ -287,7 +285,7 @@ namespace MiodenusAnimationConverter
             Context.SwapBuffers();
             
             //frames.Add(_video.CreateVideoFrame());
-            //TakeScreenshot(_screenshotsPath);
+            //TakeScreenshot(_screenshotId++);
         }
 
         private void CheckGLErrors(int sleepTime = 1000, [CallerLineNumber] int lineNumber = -1, [CallerMemberName] string caller = null)
@@ -307,10 +305,10 @@ namespace MiodenusAnimationConverter
             }
         }
 
-        private void TakeScreenshot(in string path)
+        private void TakeScreenshot(int screenshotNumber)
         {
-            _screenshotId++;
-            new Screenshot(this).Save($"{path}/screenshot_{_screenshotId}", ImageFormat.Png);
+            new Screenshot(this).Save($"{ScreenshotsPath}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
+                    ImageFormat.Png);
         }
         
         public IEnumerable<IVideoFrame> GetBitmaps()
