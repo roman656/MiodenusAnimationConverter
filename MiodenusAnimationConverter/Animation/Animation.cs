@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using MiodenusAnimationConverter.Scene.Models.Meshes;
 
 namespace MiodenusAnimationConverter.Animation
 {
@@ -11,17 +10,15 @@ namespace MiodenusAnimationConverter.Animation
 
         public Animation(MAFStructure.Animation animation)
         {
-            Info = new AnimationInfo(animation.AnimationInfo.Type, animation.AnimationInfo.Version,
-                    animation.AnimationInfo.Name, animation.AnimationInfo.VideoType, animation.AnimationInfo.VideoName,
-                    animation.AnimationInfo.TimeLength, animation.AnimationInfo.Fps, animation.AnimationInfo.FrameWidth,
-                    animation.AnimationInfo.FrameHeight);
+            Info = new AnimationInfo(animation.AnimationInfo);
             ModelsInfo = new List<ModelInfo>();
+            Actions = new List<Action>();
+            
             foreach (var modelInfo in animation.ModelsInfo)
             {
-                ModelsInfo.Add(new ModelInfo(null, new Transformation(),
-                        modelInfo.Filename, modelInfo.Name, modelInfo.Type));
+                ModelsInfo.Add(new ModelInfo(modelInfo, null));
             }
-            Actions = new List<Action>();
+
             foreach (var action in animation.Actions)
             {
                 Actions.Add(new Action(null, action.Name));

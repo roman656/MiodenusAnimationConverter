@@ -1,4 +1,3 @@
-using System;
 using FFMpegCore;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
@@ -9,13 +8,11 @@ namespace MiodenusAnimationConverter.Media
     {
         public readonly string Type;
         public readonly string Filename;
-        public readonly byte Fps;
+        public readonly int Fps;
         private readonly MainWindow _window;
         
-        public VideoRecorder(in MainWindow window, in string videoFilename, in string videoType, byte videoFps)
+        public VideoRecorder(in MainWindow window, in string videoFilename, in string videoType, int videoFps)
         {
-            CheckArguments(videoFilename, videoType, videoFps);
-
             _window = window;
             Type = videoType;
             Filename = videoFilename;
@@ -52,23 +49,5 @@ namespace MiodenusAnimationConverter.Media
                     "Video: \n{{\n    Type: {0}\n    Time: {1}\n    Bitrate: {2}\n    Filename: {3}\n    FPS: {4}\n}}", 
                     Type, Time, Bitrate, Filename, Fps);
         }*/
-
-        private static void CheckArguments(in string videoFilename, in string videoType, byte videoFps)
-        {
-            if (videoFps <= 0)
-            {
-                throw new ArgumentException("Video FPS must be greater than 0.");
-            }
-
-            if (videoFilename.Equals(""))
-            {
-                throw new ArgumentException("Video filename can not be empty.");
-            }
-            
-            if (videoType.Equals(""))
-            {
-                throw new ArgumentException("Video type can not be empty.");
-            }
-        }
     }
 }

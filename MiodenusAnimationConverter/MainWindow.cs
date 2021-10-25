@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
+using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Media;
 using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Shaders;
@@ -43,14 +44,16 @@ namespace MiodenusAnimationConverter
         private LightPoint _lightPoint2;
         private bool _isDebugMode;
         private bool _isDrawCamerasModeActive;
+        private AnimationController _animationController;
 
-        public MainWindow(Scene.Scene scene, GameWindowSettings gameWindowSettings,
-            NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
+        public MainWindow(Animation.Animation animation, Scene.Scene scene, GameWindowSettings gameWindowSettings,
+                NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
             CheckPath(ScreenshotsPath);
             CheckPath(VideoPath);
             _scene = scene;
-            _video = new VideoRecorder(this,$"{VideoPath}/animation", "mp4", 60);
+            _video = new VideoRecorder(this,$"{VideoPath}/animation", "mp4", animation.Info.Fps);
+            _animationController = new AnimationController(animation, _scene);
         }
 
         private static void CheckPath(in string path)
@@ -97,14 +100,14 @@ namespace MiodenusAnimationConverter
         protected override void OnLoad()
         {
             _scene.Initialize();
-            
+
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
-            _scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
+            /*_scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[0].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
             _scene.ModelGroups[1].Scale(0.025f, 0.025f, 0.025f);
             _scene.ModelGroups[1].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
-            _scene.ModelGroups[1].Move(0.0f, 0.0f, 25.0f);
+            _scene.ModelGroups[1].Move(0.0f, 0.0f, 25.0f);*/
 
             CursorGrabbed = _isCursorGrabbed;
 

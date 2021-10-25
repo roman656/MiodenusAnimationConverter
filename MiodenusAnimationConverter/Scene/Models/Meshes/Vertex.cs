@@ -29,9 +29,9 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture,
-                    $"Vertex:\n\tPosition: ({Position.X}, {Position.Y}, {Position.Z})\n\t"
-                    + $"Normal: ({Normal.X}, {Normal.Y}, {Normal.Z})\n\t"
-                    + $"Color: ({Color.R}, {Color.G}, {Color.B}, {Color.A})\n");
+                    $"Vertex:\n\tPosition: ({Position.X}; {Position.Y}; {Position.Z})\n\t"
+                    + $"Normal: ({Normal.X}; {Normal.Y}; {Normal.Z})\n\t"
+                    + $"Color: ({Color.R}; {Color.G}; {Color.B}; {Color.A})\n");
         }
     }
 }

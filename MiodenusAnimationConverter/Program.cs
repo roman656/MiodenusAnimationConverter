@@ -33,6 +33,7 @@ namespace MiodenusAnimationConverter
             {
                 var helpText = GenerateHelpText(result);
                 
+                /* TODO: убрать костыль. */
                 helpText.Copyright += "\n\nERROR(S):\n  Incorrect value for some options.\n";
                 ExitCode = 1;
                 Console.Error.WriteLine(helpText);

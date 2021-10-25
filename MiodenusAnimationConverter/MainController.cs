@@ -41,7 +41,7 @@ namespace MiodenusAnimationConverter
                     scene.ModelGroups.Add(tempGroup);
                 }
 
-                CreateMainWindow(animation.Info, scene, DetermineWorkMode(options)).Run();
+                CreateMainWindow(animation, scene, DetermineWorkMode(options)).Run();
             }
             catch (Exception exception)
             {
@@ -104,25 +104,25 @@ namespace MiodenusAnimationConverter
             return models;
         }
 
-        private static MainWindow CreateMainWindow(AnimationInfo animationInfo, Scene.Scene scene, WorkMode workMode)
+        private static MainWindow CreateMainWindow(Animation.Animation animation, Scene.Scene scene, WorkMode workMode)
         {
             GameWindowSettings mainWindowSettings = new()
             {
                 IsMultiThreaded = true,
-                RenderFrequency = animationInfo.Fps,
-                UpdateFrequency = animationInfo.Fps
+                RenderFrequency = animation.Info.Fps,
+                UpdateFrequency = animation.Info.Fps
             };
 
             NativeWindowSettings nativeWindowSettings = new()
             {
-                Size = new Vector2i(animationInfo.FrameWidth, animationInfo.FrameHeight),
+                Size = new Vector2i(animation.Info.FrameWidth, animation.Info.FrameHeight),
                 Title = MainWindowTitle,
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
                 StartVisible = workMode == WorkMode.FrameView
             };
 
-            return new MainWindow(scene, mainWindowSettings, nativeWindowSettings);
+            return new MainWindow(animation, scene, mainWindowSettings, nativeWindowSettings);
         }
     }
 }
