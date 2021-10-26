@@ -92,7 +92,10 @@ namespace MiodenusAnimationConverter
             {
                 try
                 {
-                    models.Add(loader.Load(modelInfo.Filename, modelInfo.Color, modelInfo.UseCalculatedNormals));
+                    var model = loader.Load(modelInfo.Filename, modelInfo.Color, modelInfo.UseCalculatedNormals);
+                    
+                    model.Name = modelInfo.Name;
+                    models.Add(model);
                 }
                 catch (Exception exception)
                 {

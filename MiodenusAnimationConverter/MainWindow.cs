@@ -103,12 +103,6 @@ namespace MiodenusAnimationConverter
 
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
-            /*_scene.ModelGroups[0].Scale(0.025f, 0.025f, 0.025f);
-            _scene.ModelGroups[0].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
-            _scene.ModelGroups[1].Scale(0.025f, 0.025f, 0.025f);
-            _scene.ModelGroups[1].Rotate(-MathHelper.Pi / 2.0f, new Vector3(1.0f, 0.0f, 0.0f));
-            _scene.ModelGroups[1].Move(0.0f, 0.0f, 25.0f);*/
-
             CursorGrabbed = _isCursorGrabbed;
 
             InitializeShaderPrograms();

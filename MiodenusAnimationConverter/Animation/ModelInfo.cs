@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using FFMpegCore.Enums;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using OpenTK.Mathematics;
 
@@ -97,10 +96,17 @@ namespace MiodenusAnimationConverter.Animation
 
         public override string ToString()
         {
+            var bindings = "Action bindings:\n";
+
+            foreach (var actionBinding in ActionBindings)
+            {
+                bindings += $"\t{actionBinding}";
+            }
+            
             return string.Format(CultureInfo.InvariantCulture,
-                $"Model info:\n\tName: {Name}\n\tType: {Type}\n\tFilename: {Filename}\n\t"
-                + $"Use calculated normals: {UseCalculatedNormals}\n\tColor: ({Color.R}; {Color.G}; {Color.B};"
-                + $" {Color.A})\n\tBase transformation -> {BaseTransformation}\n\tAction bindings: {ActionBindings}\n");
+                    $"Model info:\n\tName: {Name}\n\tType: {Type}\n\tFilename: {Filename}\n\t"
+                    + $"Use calculated normals: {UseCalculatedNormals}\n\tColor: ({Color.R}; {Color.G}; {Color.B};"
+                    + $" {Color.A})\n\tBase transformation -> {BaseTransformation}\n\t{bindings}\n");
         }
     }
 }

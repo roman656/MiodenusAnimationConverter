@@ -30,9 +30,9 @@ namespace MiodenusAnimationConverter.Animation
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture,
-                $"Animation info:\n\tType: {Type}\n\tVersion: {Version}\n\tName: {Name}\n\tVideo type: {VideoType}\n\t"
-                + $"Video name: {VideoName}\n\tTime length: {TimeLength}\n\tFPS: {Fps}\n\tFrame width: {FrameWidth}\n\t"
-                + $"Frame height: {FrameHeight}\n");
+                    $"Animation info:\n\tType: {Type}\n\tVersion: {Version}\n\tName: {Name}\n\tVideo type: {VideoType}\n\t"
+                    + $"Video name: {VideoName}\n\tTime length: {TimeLength}\n\tFPS: {Fps}\n\tFrame width: {FrameWidth}\n\t"
+                    + $"Frame height: {FrameHeight}\n");
         }
     }
 }

@@ -9,6 +9,7 @@ namespace MiodenusAnimationConverter.Scene.Models
     public class Model : IMovable, IRotatable, IScalable 
     {
         private const int ColorChannelsAmount = 4;
+        public string Name;
         public readonly Mesh Mesh;
         private readonly int _vertexesAmount;
         private readonly float[] _vertexesColorsBuffer;

@@ -1,10 +1,12 @@
-using System.Numerics;
-using Vector3 = OpenTK.Mathematics.Vector3;
+using System.Collections.Generic;
+using MiodenusAnimationConverter.Scene;
+using NLog;
 
 namespace MiodenusAnimationConverter.Animation
 {
     public class AnimationController
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private Animation _animation;
         private Scene.Scene _scene;
         private int _currentFrameIndex;
@@ -13,32 +15,26 @@ namespace MiodenusAnimationConverter.Animation
         {
             _animation = animation;
             _scene = scene;
-            PrepareScene();
+            Initialize();
         }
 
-        private void PrepareScene()
+        private void Initialize()
         {
-            int i = 0;
+            var j = 0;
+            
+            for (var i = 0; i < _scene.ModelGroups.Count; i++)
             {
-                _scene.ModelGroups[i].Move(_animation.ModelsInfo[0].BaseTransformation.Location.X,
-                    _animation.ModelsInfo[0].BaseTransformation.Location.Y,
-                    _animation.ModelsInfo[0].BaseTransformation.Location.Z);
-                _animation.ModelsInfo[0].BaseTransformation.Rotation.ToAxisAngle(out Vector3 axis, out float angle);
-                _scene.ModelGroups[i].Rotate(angle, axis);
-                _scene.ModelGroups[i].Scale(_animation.ModelsInfo[0].BaseTransformation.Scale.X,
-                    _animation.ModelsInfo[0].BaseTransformation.Scale.Y,
-                    _animation.ModelsInfo[0].BaseTransformation.Scale.Z);
-            }
-            i++;
-            {
-                _scene.ModelGroups[i].Move(_animation.ModelsInfo[1].BaseTransformation.Location.X,
-                    _animation.ModelsInfo[1].BaseTransformation.Location.Y,
-                    _animation.ModelsInfo[1].BaseTransformation.Location.Z);
-                _animation.ModelsInfo[1].BaseTransformation.Rotation.ToAxisAngle(out Vector3 axis, out float angle);
-                _scene.ModelGroups[i].Rotate(angle, axis);
-                _scene.ModelGroups[i].Scale(_animation.ModelsInfo[1].BaseTransformation.Scale.X,
-                    _animation.ModelsInfo[1].BaseTransformation.Scale.Y,
-                    _animation.ModelsInfo[1].BaseTransformation.Scale.Z);
+                while (_scene.ModelGroups[i].Models[0].Name != _animation.ModelsInfo[j].Name)
+                {
+                    j++;
+                }
+                
+                _animation.ModelsInfo[j].BaseTransformation.Rotation.ToAxisAngle(out var axis, out var angle);
+                _scene.ModelGroups[i].Models[0].Move(_animation.ModelsInfo[j].BaseTransformation.Location.X, _animation.ModelsInfo[j].BaseTransformation.Location.Y,
+                    _animation.ModelsInfo[j].BaseTransformation.Location.Z);
+                _scene.ModelGroups[i].Models[0].Rotate(angle, axis);
+                _scene.ModelGroups[i].Models[0].Scale(_animation.ModelsInfo[j].BaseTransformation.Scale.X, _animation.ModelsInfo[j].BaseTransformation.Scale.Y,
+                    _animation.ModelsInfo[j].BaseTransformation.Scale.Z);
             }
         }
 
