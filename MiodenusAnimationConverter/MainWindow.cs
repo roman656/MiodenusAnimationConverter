@@ -239,7 +239,6 @@ namespace MiodenusAnimationConverter
             base.OnRenderFrame(e);
             
             _animationController.PrepareSceneToNextFrame();
-            
             _deltaTime = e.Time;
             
             GL.ClearColor(_backgroundColor);

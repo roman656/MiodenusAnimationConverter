@@ -55,14 +55,14 @@
       "states":
       [
         {
-          "time": 500,
+          "time": 100,
           "transformation":
           {
             "rotation":
             {
-              "angle": 90.0,
+              "angle": 0.0,
               "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
+              "vector": [0.0, 1.0, 0.0]
             }
           }
         },
@@ -72,45 +72,9 @@
           {
             "rotation":
             {
-              "angle": 90.0,
+              "angle": 360.0,
               "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            }
-          }
-        },
-        {
-          "time": 1300,
-          "transformation":
-          {
-            "rotation":
-            {
-              "angle": 90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            }
-          }
-        },
-        {
-          "time": 1500,
-          "transformation":
-          {
-            "rotation":
-            {
-              "angle": 90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            }
-          }
-        },
-        {
-          "time": 1600,
-          "transformation":
-          {
-            "rotation":
-            {
-              "angle": 90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
+              "vector": [0.0, 1.0, 0.0]
             }
           }
         }

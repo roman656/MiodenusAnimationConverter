@@ -19,6 +19,7 @@ namespace MiodenusAnimationConverter.Animation
         public AnimationController(Animation animation, Scene.Scene scene)
         {
             _animation = animation;
+            Logger.Trace(_animation);
             _scene = scene;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
             Initialize();
@@ -48,26 +49,25 @@ namespace MiodenusAnimationConverter.Animation
             model.Scale(transformation.Scale.X, transformation.Scale.Y, transformation.Scale.Z);
         }
 
-        private static void CheckWasTransformationParametersChanged(ActionState prevState, ActionState nextState,
+        private static void CheckWasTransformationParametersChanged(ActionState state,
                 out bool wasLocationChanged, out bool wasRotationChanged, out bool wasScaleChanged)
         {
-            wasLocationChanged = prevState.Transformation.Location != nextState.Transformation.Location;
-            wasRotationChanged = prevState.Transformation.Rotation != nextState.Transformation.Rotation;
-            wasScaleChanged = prevState.Transformation.Scale != nextState.Transformation.Scale;
+            wasLocationChanged = state.Transformation.Location != Vector3.Zero;
+            wasRotationChanged = state.Transformation.Rotation != Quaternion.Identity;
+            wasScaleChanged = state.Transformation.Scale != Vector3.One;
         }
         
-        private static Transformation GetStepTransformation(ActionState prevState, ActionState nextState,
-                int stepsAmount)
+        private static Transformation GetStepTransformation(ActionState state, int stepsAmount)
         {
             var result = new Transformation(Vector3.Zero, Quaternion.Identity, Vector3.One);
 
-            CheckWasTransformationParametersChanged(prevState, nextState, out var wasLocationChanged,
-                    out var wasRotationChanged, out var wasScaleChanged);
-            nextState.Transformation.Rotation.ToAxisAngle(out var axis, out var angle);
+            CheckWasTransformationParametersChanged(state, out var wasLocationChanged, out var wasRotationChanged,
+                    out var wasScaleChanged);
+            state.Transformation.Rotation.ToAxisAngle(out var axis, out var angle);
 
             if (wasLocationChanged)
             {
-                result.Location = nextState.Transformation.Location / stepsAmount;
+                result.Location = state.Transformation.Location / stepsAmount;
             }
             
             if (wasRotationChanged)
@@ -77,7 +77,7 @@ namespace MiodenusAnimationConverter.Animation
             
             if (wasScaleChanged)
             {
-                result.Scale = nextState.Transformation.Scale / stepsAmount;
+                result.Scale = state.Transformation.Scale / stepsAmount;
             }
             
             return result;
@@ -110,8 +110,12 @@ namespace MiodenusAnimationConverter.Animation
                                         && !wasModelTransformed)
                                 {   
                                         var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
-                                        
-                                        TransformModel(model, GetStepTransformation(prevState, nextState, stepsAmount));
+
+                                        if (stepsAmount > 0)
+                                        {
+                                            TransformModel(model, GetStepTransformation(nextState, stepsAmount));
+                                        }
+
                                         wasModelTransformed = true;
                                 }
                             }
