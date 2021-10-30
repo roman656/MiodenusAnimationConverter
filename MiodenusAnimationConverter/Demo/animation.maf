@@ -55,42 +55,62 @@
       "states":
       [
         {
-          "time": 0,
-          "isModelVisible": true,
-          "color": [0.0, 1.0, 0.0],
+          "time": 500,
           "transformation":
           {
-            "location": [0.0, 0.0, 0.0],
             "rotation":
             {
-              "angle": 10.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "scale": [1.0, 1.0, 1.0]
-          }
-        },
-        {
-          "time": 1500,
-          "transformation":
-          {
-            "location": [0.0, 0.0, -20.0],
-            "rotation":
-            {
-              "angle": 180.0,
+              "angle": 90.0,
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
             }
           }
         },
         {
-          "time": 3000,
+          "time": 1000,
           "transformation":
           {
             "rotation":
             {
-              "angle": -7.0,
-              "vector": [0.0, 1.0, 0.0]
+              "angle": 90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            }
+          }
+        },
+        {
+          "time": 1300,
+          "transformation":
+          {
+            "rotation":
+            {
+              "angle": 90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            }
+          }
+        },
+        {
+          "time": 1500,
+          "transformation":
+          {
+            "rotation":
+            {
+              "angle": 90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            }
+          }
+        },
+        {
+          "time": 1600,
+          "transformation":
+          {
+            "rotation":
+            {
+              "angle": 90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
             }
           }
         }
@@ -111,7 +131,7 @@
       "actionName": "nut rotation",
       "startTime": 2000,
       "timeLength": 100,
-      "useInterpolation": false
+      "useInterpolation": true
     }
   ]
 }
