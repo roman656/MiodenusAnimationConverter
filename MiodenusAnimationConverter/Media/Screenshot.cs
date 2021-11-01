@@ -2,7 +2,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Windowing.Desktop;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 namespace MiodenusAnimationConverter.Media
@@ -24,7 +23,8 @@ namespace MiodenusAnimationConverter.Media
 
                 Marshal.Copy(PixelsData, 0, bitmapData.Scan0, PixelsData.Length);
                 bitmap.UnlockBits(bitmapData);
-
+                bitmap.RotateFlip(RotateFlipType.Rotate180FlipX);
+                
                 return bitmap;
             }
         }

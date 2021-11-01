@@ -8,6 +8,7 @@ namespace MiodenusAnimationConverter.Animation
 {
     public class ModelInfo
     {
+        private static int _index;
         public string Name { get; set; }
         public string Type { get; set; }
         public string Filename { get; set; }
@@ -18,7 +19,7 @@ namespace MiodenusAnimationConverter.Animation
 
         public ModelInfo(MAFStructure.ModelInfo modelInfo, List<ActionBinding> actionBindings)
         {
-            Name = (modelInfo.Name == string.Empty) ? "UnnamedModel" : modelInfo.Name;
+            Name = (modelInfo.Name == string.Empty) ? $"UnnamedModel_{_index++}" : modelInfo.Name;
             Type = (modelInfo.Type == string.Empty) ? "stl" : modelInfo.Type;
             Filename = modelInfo.Filename;
             UseCalculatedNormals = modelInfo.UseCalculatedNormals;
