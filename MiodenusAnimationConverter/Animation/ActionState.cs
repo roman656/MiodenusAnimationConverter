@@ -41,7 +41,7 @@ namespace MiodenusAnimationConverter.Animation
         
         private static Vector3 ConvertScale(float[] scale)
         {
-            return CheckScale(scale) ? new Vector3(scale[0], scale[1], scale[2]) : new Vector3(1.0f);
+            return CheckScale(scale) ? new Vector3(scale[0], scale[1], scale[2]) : Vector3.One;
         }
 
         private static bool CheckScale(float[] scale)

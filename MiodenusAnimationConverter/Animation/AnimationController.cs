@@ -19,7 +19,6 @@ namespace MiodenusAnimationConverter.Animation
         public AnimationController(Animation animation, Scene.Scene scene)
         {
             _animation = animation;
-            Logger.Trace(_animation);
             _scene = scene;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
             Initialize();
@@ -28,16 +27,16 @@ namespace MiodenusAnimationConverter.Animation
         private void Initialize()
         {
             var j = 0;
-            
-            for (var i = 0; i < _scene.ModelGroups.Count; i++)
+
+            foreach (var modelGroup in _scene.ModelGroups)
             {
-                while (_scene.ModelGroups[i].Models[0].Name != _animation.ModelsInfo[j].Name)
+                while (modelGroup.Models[0].Name != _animation.ModelsInfo[j].Name)
                 {
                     j++;
                 }
 
-                _modelsInfo[_scene.ModelGroups[i].Models[0]] = _animation.ModelsInfo[j];
-                TransformModel(_scene.ModelGroups[i].Models[0], _animation.ModelsInfo[j].BaseTransformation);
+                _modelsInfo[modelGroup.Models[0]] = _animation.ModelsInfo[j];
+                TransformModel(modelGroup.Models[0], _animation.ModelsInfo[j].BaseTransformation);
             }
         }
 
@@ -87,6 +86,8 @@ namespace MiodenusAnimationConverter.Animation
         {
             foreach (var (model, info) in _modelsInfo)
             {
+                if (info.ActionBindings == null) { continue; }
+                
                 foreach (var actionBinding in info.ActionBindings)
                 {
                     foreach (var action in _animation.Actions)
