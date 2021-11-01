@@ -238,6 +238,7 @@ namespace MiodenusAnimationConverter
         {
             base.OnRenderFrame(e);
             
+            _animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
             
             GL.ClearColor(_backgroundColor);
@@ -280,7 +281,7 @@ namespace MiodenusAnimationConverter
             }
 
             Context.SwapBuffers();
-            
+
             //frames.Add(_video.CreateVideoFrame());
             //TakeScreenshot(_screenshotId++);
         }
@@ -325,7 +326,7 @@ namespace MiodenusAnimationConverter
             };
             
             _video.CreateVideo(videoFramesSource);
-*/            
+*/          
             for (var i = 0; i < _scene.ModelGroups.Count; i++)
             {
                 _scene.ModelGroups[i].Delete();

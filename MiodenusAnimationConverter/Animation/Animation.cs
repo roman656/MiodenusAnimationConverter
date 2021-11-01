@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -35,7 +36,14 @@ namespace MiodenusAnimationConverter.Animation
             
             foreach (var modelInfo in animation.ModelsInfo)
             {
-                ModelsInfo.Add(new ModelInfo(modelInfo, bindings[modelInfo.Name]));
+                try
+                {
+                    ModelsInfo.Add(new ModelInfo(modelInfo, bindings[modelInfo.Name]));
+                }
+                catch (Exception e)
+                {
+                    ModelsInfo.Add(new ModelInfo(modelInfo, null));
+                }
             }
         }
         

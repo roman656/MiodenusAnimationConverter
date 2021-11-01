@@ -98,11 +98,14 @@ namespace MiodenusAnimationConverter.Animation
         {
             var bindings = "Action bindings:\n";
 
-            foreach (var actionBinding in ActionBindings)
+            if (ActionBindings != null)
             {
-                bindings += $"\t{actionBinding}";
+                foreach (var actionBinding in ActionBindings)
+                {
+                    bindings += $"\t{actionBinding}";
+                }
             }
-            
+
             return string.Format(CultureInfo.InvariantCulture,
                     $"Model info:\n\tName: {Name}\n\tType: {Type}\n\tFilename: {Filename}\n\t"
                     + $"Use calculated normals: {UseCalculatedNormals}\n\tColor: ({Color.R}; {Color.G}; {Color.B};"
