@@ -101,6 +101,13 @@ namespace MiodenusAnimationConverter
         {
             _scene.Initialize();
 
+            var pivot = new Pivot(new Vector3());
+            Logger.Trace(pivot);
+            pivot.LocalRotate(MathHelper.DegreesToRadians(-45f), Vector3.UnitY);
+            Logger.Trace(pivot);
+            pivot.LocalMove(5, 0, 0);
+            Logger.Trace(pivot);
+
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
@@ -236,8 +243,13 @@ namespace MiodenusAnimationConverter
         
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            base.OnRenderFrame(e);
+            /*if (_animationController.CurrentFrameIndex > 181)
+            {
+                Close();
+            }*/
             
+            base.OnRenderFrame(e);
+
             _animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
             
@@ -281,7 +293,7 @@ namespace MiodenusAnimationConverter
             }
 
             Context.SwapBuffers();
-
+            
             //frames.Add(_video.CreateVideoFrame());
             //TakeScreenshot(_screenshotId++);
         }
@@ -338,7 +350,7 @@ namespace MiodenusAnimationConverter
             }
             
             _scene.CamerasController.Delete();
-            
+
             base.OnClosed();
         }
     }
