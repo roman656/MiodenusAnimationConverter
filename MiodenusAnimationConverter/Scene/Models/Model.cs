@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models
 {
-    public class Model : IMovable, IRotatable, IScalable 
+    public class Model 
     {
         private const int ColorChannelsAmount = 4;
         public string Name;

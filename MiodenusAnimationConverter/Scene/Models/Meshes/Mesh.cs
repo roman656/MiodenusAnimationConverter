@@ -5,7 +5,7 @@ using OpenTK.Mathematics;
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
     /// <summary>Класс, представляющий собой полигональную сетку.</summary>
-    public class Mesh : IMovable, IRotatable, IScalable
+    public class Mesh
     {
         /// <summary>Массив <see cref="Triangle">полигонов</see>, образующих полигональную сетку.</summary>
         public readonly Triangle[] Triangles;

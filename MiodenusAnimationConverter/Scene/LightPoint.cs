@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
 {
-    public class LightPoint : IMovable, IRotatable
+    public class LightPoint
     {
         private static int _lightPointsAmount;
         private readonly int _index;

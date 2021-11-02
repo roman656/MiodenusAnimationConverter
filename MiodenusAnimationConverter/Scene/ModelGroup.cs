@@ -7,7 +7,7 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
 {
-    public class ModelGroup : IMovable, IRotatable, IScalable
+    public class ModelGroup
     {
         public readonly List<Model> Models = new ();
 
