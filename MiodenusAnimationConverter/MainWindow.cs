@@ -101,13 +101,6 @@ namespace MiodenusAnimationConverter
         {
             _scene.Initialize();
 
-            var pivot = new Pivot(new Vector3());
-            Logger.Trace(pivot);
-            pivot.LocalRotate(MathHelper.DegreesToRadians(-45f), Vector3.UnitY);
-            Logger.Trace(pivot);
-            pivot.LocalMove(5, 0, 0);
-            Logger.Trace(pivot);
-
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
@@ -180,13 +173,6 @@ namespace MiodenusAnimationConverter
                 case Keys.U:
                 {
                     _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 1, 0));
-                    break;
-                }
-                case Keys.T:
-                {
-                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 0, 1));
-                    _scene.ModelGroups[1].Rotate(-(float)Math.PI / 8, new Vector3(0, 0, 1));
-                    _scene.ModelGroups[1].Move(0.0f, 0.0f, -0.2f);
                     break;
                 }
                 case Keys.M:

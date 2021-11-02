@@ -3,50 +3,41 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
 {
-    /// <summary>
-    /// Камера общего назначения.
-    /// </summary>
-    public class Camera : IMovable, IRotatable
+    public class Camera
     {
         private const float FovMinValue = 1.0f;
         private const float FovMaxValue = 180.0f;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private int _viewportWidth = 1;
-        private int _viewportHeight = 1;
+        private readonly Pivot _pivot;
+        private int _viewportWidth;
+        private int _viewportHeight;
         private float _viewportAspectRatio;
         private float _fov = MathHelper.PiOver3;    // Угол поля зрения в направлении оси OY (в радианах).
         private float _distanceToTheNearClipPlane = 0.01f;
         private float _distanceToTheFarClipPlane = 100.0f;
-        private Vector3 _front = -Vector3.UnitZ;
-        private Vector3 _up = Vector3.UnitY;
-        private Vector3 _right = Vector3.UnitX;
         private Matrix4 _view;
         private Matrix4 _projection;
-        public Vector3 Position;
 
-        public Camera(Vector3 position, int viewportWidth, int viewportHeight)
+        public Camera(Vector3 position, int viewportWidth = 1, int viewportHeight = 1)
         {
-            Position = position;
+            _pivot = new Pivot(position);
             ViewportWidth = viewportWidth;
             ViewportHeight = viewportHeight;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
-            _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
-                    _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+            UpdateViewMatrix();
+            UpdateProjectionMatrix();
         }
 
-        /// <summary>Метод, устанавливающий параметры камеры в значения по умолчанию.</summary>
-        /// <remarks>положение камеры и размеры окна остаются прежними.</remarks>
+        public Camera(int viewportWidth = 1, int viewportHeight = 1) :
+                this(Vector3.Zero, viewportWidth, viewportHeight) {}
+        
         public void Reset()
         {
-            _front = -Vector3.UnitZ;
-            _up = Vector3.UnitY;
-            _right = Vector3.UnitX;
+            _pivot.ResetLocalRotation();
             _fov = MathHelper.PiOver3;
             _distanceToTheNearClipPlane = 0.01f;
             _distanceToTheFarClipPlane = 100.0f;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
-            _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, 
-                    _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+            UpdateViewMatrix();
+            UpdateProjectionMatrix();
         }
         
         public int ViewportWidth
@@ -57,9 +48,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 if (value > 0)
                 {
                     _viewportWidth = value;
-                    _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
-                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
-                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                    UpdateViewportAspectRatio();
+                    UpdateProjectionMatrix();
                 }
                 else
                 {
@@ -77,9 +67,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 if (value > 0)
                 {
                     _viewportHeight = value;
-                    _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
-                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
-                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                    UpdateViewportAspectRatio();
+                    UpdateProjectionMatrix();
                 }
                 else
                 {
@@ -97,8 +86,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 if ((value >= FovMinValue) && (value <= FovMaxValue))
                 {
                     _fov = MathHelper.DegreesToRadians(value);
-                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
-                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                    UpdateProjectionMatrix();
                 }
                 else
                 {
@@ -116,8 +104,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 if ((value > 0.0f) && (value < _distanceToTheFarClipPlane))
                 {
                     _distanceToTheNearClipPlane = value;
-                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
-                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                    UpdateProjectionMatrix();
                 }
                 else
                 {
@@ -136,8 +123,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 if (value > _distanceToTheNearClipPlane)
                 {
                     _distanceToTheFarClipPlane = value;
-                    _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio,
-                            _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+                    UpdateProjectionMatrix();
                 }
                 else
                 {
@@ -147,66 +133,77 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
         }
-        
+
+        private void UpdateViewMatrix()
+        {
+            _view = Matrix4.LookAt(_pivot.Position, _pivot.Position + _pivot.ZAxisPositiveDirection * -1,
+                    _pivot.YAxisPositiveDirection);
+        }
+
+        private void UpdateProjectionMatrix()
+        {
+            _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, 
+                    _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+        }
+
+        private void UpdateViewportAspectRatio()
+        {
+            _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
+        }
+
         public Matrix4 ViewMatrix => _view;
         public Matrix4 ProjectionMatrix => _projection;
-        public Vector3 Front => _front;
-        public Vector3 Right => _right;
-        public Vector3 Up => _up;
+        public Vector3 ViewDirection => _pivot.ZAxisPositiveDirection * -1;
+        public Vector3 RightDirection => _pivot.XAxisPositiveDirection;
+        public Vector3 UpDirection => _pivot.YAxisPositiveDirection;
+        
+        public Vector3 Position
+        {
+            get => _pivot.Position;
+            set => _pivot.Position = value;
+        }
         
         public void LookAt(Vector3 target)
         {
-            var rotationAxis = Vector3.Normalize(target - Position) + _front;
+            var rotationAxis = Vector3.Normalize(target - Position) + ViewDirection;
             RotateViewDirection(MathHelper.Pi, rotationAxis);
-            RotateViewDirection(MathHelper.Pi, _front);
+            RotateViewDirection(MathHelper.Pi, ViewDirection);
         }
 
-        public void Move(float deltaX, float deltaY, float deltaZ)
+        public void Move(float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
-            Position.X += deltaX;
-            Position.Y += deltaY;
-            Position.Z += deltaZ;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _pivot.GlobalMove(deltaX, deltaY, deltaZ);
+            UpdateViewMatrix();
         }
 
         public void MoveInViewDirection(float delta)
         {
-            Position.X += _front.X * delta;
-            Position.Y += _front.Y * delta;
-            Position.Z += _front.Z * delta;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _pivot.LocalMove(deltaZ: -delta);
+            UpdateViewMatrix();
         }
         
         public void MoveInRightDirection(float delta)
         {
-            Position.X += _right.X * delta;
-            Position.Y += _right.Y * delta;
-            Position.Z += _right.Z * delta;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _pivot.LocalMove(delta);
+            UpdateViewMatrix();
         }
         
         public void MoveInUpDirection(float delta)
         {
-            Position.X += _up.X * delta;
-            Position.Y += _up.Y * delta;
-            Position.Z += _up.Z * delta;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _pivot.LocalMove(deltaY: delta);
+            UpdateViewMatrix();
         }
 
         public void Rotate(float angle, Vector3 vector)
         {
-            Position = Quaternion.FromAxisAngle(vector, angle) * Position;
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _pivot.GlobalRotate(angle, vector);
+            UpdateViewMatrix();
         }
         
         public void RotateViewDirection(float angle, Vector3 vector)
         {
-            var rotation = Quaternion.FromAxisAngle(vector, angle);
-
-            _front = Vector3.Normalize(rotation * _front);
-            _right = Vector3.Normalize(rotation * _right);
-            _up = Vector3.Normalize(Vector3.Cross(_right, _front));
-            _view = Matrix4.LookAt(Position, Position + _front, _up);
+            _pivot.LocalRotate(angle, vector);
+            UpdateViewMatrix();
         }
     }
 }

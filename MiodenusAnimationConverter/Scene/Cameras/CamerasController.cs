@@ -134,9 +134,9 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 fov[i] = camera.Fov;
                 distanceToTheNearClipPlane[i] = camera.DistanceToTheNearClipPlane;
                 distanceToTheFarClipPlane[i] = camera.DistanceToTheFarClipPlane;
-                (front[j], front[j + 1], front[j + 2]) = camera.Front;
-                (right[j], right[j + 1], right[j + 2]) = camera.Right;
-                (up[j], up[j + 1], up[j + 2]) = camera.Up;
+                (front[j], front[j + 1], front[j + 2]) = camera.ViewDirection;
+                (right[j], right[j + 1], right[j + 2]) = camera.RightDirection;
+                (up[j], up[j + 1], up[j + 2]) = camera.UpDirection;
                 (position[j], position[j + 1], position[j + 2]) = camera.Position;
             }
 
@@ -146,9 +146,9 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 fov[i] = camera.Fov;
                 distanceToTheNearClipPlane[i] = camera.DistanceToTheNearClipPlane;
                 distanceToTheFarClipPlane[i] = camera.DistanceToTheFarClipPlane;
-                (front[j], front[j + 1], front[j + 2]) = camera.Front;
-                (right[j], right[j + 1], right[j + 2]) = camera.Right;
-                (up[j], up[j + 1], up[j + 2]) = camera.Up;
+                (front[j], front[j + 1], front[j + 2]) = camera.ViewDirection;
+                (right[j], right[j + 1], right[j + 2]) = camera.RightDirection;
+                (up[j], up[j + 1], up[j + 2]) = camera.UpDirection;
                 (position[j], position[j + 1], position[j + 2]) = camera.Position;
             }
             
