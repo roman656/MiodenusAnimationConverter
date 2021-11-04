@@ -1,4 +1,6 @@
+using MiodenusAnimationConverter.Shaders;
 using NLog;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Cameras
@@ -17,6 +19,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private float _distanceToTheFarClipPlane = 100.0f;
         private Matrix4 _view;
         private Matrix4 _projection;
+        private VertexArrayObject _vao;
+        public bool IsVisibleInDebug = true;
 
         public Camera(Vector3 position, int viewportWidth = 1, int viewportHeight = 1)
         {
@@ -204,6 +208,42 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         {
             _pivot.LocalRotate(angle, vector);
             UpdateViewMatrix();
+        }
+        
+        public void Initialize()
+        {
+            var fov = new[] { Fov };
+            var distanceToTheNearClipPlane = new[] { DistanceToTheNearClipPlane };
+            var distanceToTheFarClipPlane = new[] { DistanceToTheFarClipPlane };
+            var viewDirection = new[] { ViewDirection.X, ViewDirection.Y, ViewDirection.Z };
+            var rightDirection = new[] { RightDirection.X, RightDirection.Y, RightDirection.Z };
+            var upDirection = new[] { UpDirection.X, UpDirection.Y, UpDirection.Z };
+            var position = new[] { Position.X, Position.Y, Position.Z };
+
+            _vao = new VertexArrayObject();
+            _vao.AddVertexBufferObject(fov, 1, BufferUsageHint.DynamicDraw);
+            _vao.AddVertexBufferObject(distanceToTheNearClipPlane, 1, BufferUsageHint.DynamicDraw);
+            _vao.AddVertexBufferObject(distanceToTheFarClipPlane, 1, BufferUsageHint.DynamicDraw);
+            _vao.AddVertexBufferObject(viewDirection, 3, BufferUsageHint.StreamDraw);
+            _vao.AddVertexBufferObject(rightDirection, 3, BufferUsageHint.StreamDraw);
+            _vao.AddVertexBufferObject(upDirection, 3, BufferUsageHint.StreamDraw);
+            _vao.AddVertexBufferObject(position, 3, BufferUsageHint.StreamDraw);
+        }
+        
+        public void Draw(ShaderProgram shaderProgram, Camera currentCamera)
+        {
+            if (IsVisibleInDebug)
+            {
+                shaderProgram.SetMatrix4("view", currentCamera.ViewMatrix, false);
+                shaderProgram.SetMatrix4("projection", currentCamera.ProjectionMatrix, false);
+
+                _vao.Draw(1, PrimitiveType.Points);
+            }
+        }
+        
+        public void Delete()
+        {
+            _vao.Delete();
         }
     }
 }

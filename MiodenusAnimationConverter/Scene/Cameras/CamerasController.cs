@@ -15,7 +15,6 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private readonly int _debugCamerasAmount;
         private int _currentCameraIndex;
         private int _currentDebugCameraIndex;
-        private VertexArrayObject _vao;
         private ShaderProgram _shaderProgram;
 
         public CamerasController(List<Camera> cameras, List<DebugCamera> debugCameras = null)
@@ -106,42 +105,12 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 
         public void Initialize()
         {
-            InitializeVao();
-            InitializeShaderProgram();
-        }
-
-        private void InitializeVao()
-        {
-            var fov = new float[AllCamerasAmount];
-            var distanceToTheNearClipPlane = new float[AllCamerasAmount];
-            var distanceToTheFarClipPlane = new float[AllCamerasAmount];
-            var viewDirection = new float[AllCamerasAmount * 3];
-            var rightDirection = new float[AllCamerasAmount * 3];
-            var upDirection = new float[AllCamerasAmount * 3];
-            var position = new float[AllCamerasAmount * 3];
-            int i = 0, j = 0;
-
-            foreach (var camera in _cameras)
+            for (var i = 0; i < _cameras.Count; i++)
             {
-                fov[i] = camera.Fov;
-                distanceToTheNearClipPlane[i] = camera.DistanceToTheNearClipPlane;
-                distanceToTheFarClipPlane[i] = camera.DistanceToTheFarClipPlane;
-                (viewDirection[j], viewDirection[j + 1], viewDirection[j + 2]) = camera.ViewDirection;
-                (rightDirection[j], rightDirection[j + 1], rightDirection[j + 2]) = camera.RightDirection;
-                (upDirection[j], upDirection[j + 1], upDirection[j + 2]) = camera.UpDirection;
-                (position[j], position[j + 1], position[j + 2]) = camera.Position;
-                i++;
-                j += 3;
+                _cameras[i].Initialize();
             }
-
-            _vao = new VertexArrayObject();
-            _vao.AddVertexBufferObject(fov, 1);
-            _vao.AddVertexBufferObject(distanceToTheNearClipPlane, 1);
-            _vao.AddVertexBufferObject(distanceToTheFarClipPlane, 1);
-            _vao.AddVertexBufferObject(viewDirection, 3);
-            _vao.AddVertexBufferObject(rightDirection, 3);
-            _vao.AddVertexBufferObject(upDirection, 3);
-            _vao.AddVertexBufferObject(position, 3);
+            
+            InitializeShaderProgram();
         }
 
         private void InitializeShaderProgram()
@@ -167,15 +136,19 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 
         public void DrawCameras(Camera currentCamera)
         {
-            _shaderProgram.SetMatrix4("view", currentCamera.ViewMatrix, false);
-            _shaderProgram.SetMatrix4("projection", currentCamera.ProjectionMatrix, false);
-
-            _vao.Draw(AllCamerasAmount);
+            for (var i = 0; i < _cameras.Count; i++)
+            {
+                _cameras[i].Draw(_shaderProgram, currentCamera);
+            }
         }
 
         public void Delete()
         {
-            _vao.Delete();
+            for (var i = 0; i < _cameras.Count; i++)
+            {
+                _cameras[i].Delete();
+            }
+            
             _shaderProgram.Delete();
         }
     }

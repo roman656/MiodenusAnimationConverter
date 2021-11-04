@@ -27,5 +27,15 @@ namespace MiodenusAnimationConverter.Scene
                 ModelGroups[i].Initialize();
             }
         }
+        
+        public void Delete()
+        {
+            CamerasController.Delete();
+            
+            for (var i = 0; i < ModelGroups.Count; i++)
+            {
+                ModelGroups[i].Delete();
+            }
+        }
     }
 }

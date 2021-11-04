@@ -324,18 +324,13 @@ namespace MiodenusAnimationConverter
             };
             
             _video.CreateVideo(videoFramesSource);
-*/          
-            for (var i = 0; i < _scene.ModelGroups.Count; i++)
-            {
-                _scene.ModelGroups[i].Delete();
-            }
+*/
+            _scene.Delete();
 
-            foreach (var shaderProgram in _shaderPrograms)
+            for (var i = 0; i < _shaderPrograms.Count; i++)
             {
-                shaderProgram.Delete();
+                _shaderPrograms[i].Delete();
             }
-            
-            _scene.CamerasController.Delete();
 
             base.OnClosed();
         }
