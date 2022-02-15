@@ -3,13 +3,20 @@
   {
     "type": "maf",
     "version": "1.0",
-    "name": "AnimationDemo",
-    "videoType": "mp4",
+    "name": "Demo assembling",
+    "videoFormat": "mp4",
+    "videoCodec": "h264",
+    "videoBitrate": 4000,
     "videoName": "ResultVideo",
-    "timeLength": 3600,
+    "timeLength": 20000,
     "fps": 60,
-    "frameWidth": 600,
-    "frameHeight": 600
+    "frameWidth": 800,
+    "frameHeight": 800,
+    "backgroundColor": [0.3, 0.3, 0.4],
+    "include":
+    [
+      "Demo/Includes/header.maf"
+    ]
   },
   "modelsInfo":
   [
@@ -17,7 +24,7 @@
       "name": "bolt_25x8",
       "type": "stl",
       "filename": "Demo/Models/bolt_25x8.stl",
-      "color": [0.8, 0.8, 0.8],
+      "color": [0.45, 0.52, 0.58],
       "baseTransformation":
       {
         "location": [0.0, 0.0, 0.0],
@@ -25,7 +32,8 @@
         {
           "angle": 90.0,
           "unit": "deg",
-          "vector": [1.0, 0.0, 0.0]
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
         },
         "scale": [0.025, 0.025, 0.025]
       }
@@ -34,15 +42,16 @@
       "name": "nut_6x9",
       "type": "stl",
       "filename": "Demo/Models/nut_6x9.stl",
-      "color": [0.8, 0.8, 0.8],
+      "color": [0.45, 0.52, 0.58],
       "baseTransformation":
       {
-        "location": [0.0, 0.0, 25.0],
+        "location": [0.0, 0.0, -31.0],
         "rotation":
         {
-          "angle": 90.0,
+          "angle": -90.0,
           "unit": "deg",
-          "vector": [1.0, 0.0, 0.0]
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
         },
         "scale": [0.025, 0.025, 0.025]
       }
@@ -51,7 +60,7 @@
   "actions":
   [
     {
-      "name": "nut rotation",
+      "name": "Nut rotation",
       "states":
       [
         {
@@ -61,12 +70,13 @@
           "time": 4000,
           "transformation":
           {
-            "location": [0.0, 0.0, -10.0],
+            "location": [0.0, 0.0, 10.0],
             "rotation":
             {
               "angle": 359.0,
               "unit": "deg",
-              "vector": [0.0, 0.0, 1.0]
+              "vector": [0.0, 0.0, 1.0],
+              "basePoint": [0.0, 0.0, 0.0]
             }
           }
         },
@@ -74,12 +84,13 @@
           "time": 6000,
           "transformation":
           {
-            "location": [0.0, 0.0, -10.0],
+            "location": [0.0, 0.0, 10.0],
             "rotation":
             {
               "angle": 359.0,
               "unit": "deg",
-              "vector": [0.0, 0.0, 1.0]
+              "vector": [0.0, 0.0, 1.0],
+              "basePoint": [0.0, 0.0, 0.0]
             }
           }
         }
@@ -90,8 +101,8 @@
   [
     {
       "modelName": "nut_6x9",
-      "actionName": "nut rotation",
-      "startTime": 10,
+      "actionName": "Nut rotation",
+      "startTime": 100,
       "timeLength": 3500,
       "useInterpolation": true
     }

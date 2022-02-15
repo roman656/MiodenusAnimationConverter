@@ -1,0 +1,21 @@
+{
+  "actions":
+  [
+    {
+      "name": "Move up",
+      "states":
+      [
+        {
+          "time": 0
+        },
+        {
+          "time": 5000,
+          "transformation":
+          {
+            "location": [0.0, 0.0, 50.0]
+          }
+        }
+      ]
+    }
+  ]
+}
