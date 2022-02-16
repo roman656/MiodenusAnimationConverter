@@ -29,7 +29,7 @@ namespace MiodenusAnimationConverter
         private const string VideoPath = "videos";
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
-        private readonly Color4 _backgroundColor = new (0.3f, 0.3f, 0.4f, 1.0f);
+        private readonly Color4 _backgroundColor;
         private int _screenshotId;
         private float _angle;
         private double _deltaTime;
@@ -54,6 +54,7 @@ namespace MiodenusAnimationConverter
             _scene = scene;
             _video = new VideoRecorder(this,$"{VideoPath}/animation", "mp4", animation.Info.Fps);
             _animationController = new AnimationController(animation, _scene);
+            _backgroundColor = animation.Info.BackgroundColor;
         }
 
         private static void CheckPath(in string path)

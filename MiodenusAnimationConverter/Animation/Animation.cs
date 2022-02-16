@@ -6,9 +6,9 @@ namespace MiodenusAnimationConverter.Animation
 {
     public class Animation
     {
-        public AnimationInfo Info;
-        public List<ModelInfo> ModelsInfo;
-        public List<Action> Actions;
+        public readonly AnimationInfo Info;
+        public readonly List<ModelInfo> ModelsInfo;
+        public readonly List<Action> Actions;
 
         public Animation(MAFStructure.Animation animation)
         {
