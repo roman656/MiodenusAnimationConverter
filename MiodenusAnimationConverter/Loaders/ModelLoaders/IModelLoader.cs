@@ -5,6 +5,6 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
 {
     public interface IModelLoader
     {
-        public Model Load(in string filename, Color4 modelColor, bool useCalculatedNormals);
+        public Model Load(string filename, in Color4 modelColor, bool useCalculatedNormals);
     }
 }

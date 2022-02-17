@@ -25,8 +25,6 @@ namespace MiodenusAnimationConverter
     public class MainWindow : GameWindow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string ScreenshotsPath = "screenshots";
-        private const string VideoPath = "videos";
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
         private readonly Color4 _backgroundColor;
@@ -37,7 +35,7 @@ namespace MiodenusAnimationConverter
         private bool _isCursorGrabbed = true;
         private Scene.Scene _scene;
         private VideoRecorder _video;
-        private PrimitiveType _drawMode = PrimitiveType.Triangles;
+        private readonly PrimitiveType _drawMode = Config.DefaultDrawMode;
         private bool _isCursorModeActive;
         private float _rotationRate = 2.0f;
         private LightPoint _lightPoint1;
@@ -49,10 +47,10 @@ namespace MiodenusAnimationConverter
         public MainWindow(Animation.Animation animation, Scene.Scene scene, GameWindowSettings gameWindowSettings,
                 NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
-            CheckPath(ScreenshotsPath);
-            CheckPath(VideoPath);
+            CheckPath(Config.ScreenshotDirectory);
+            CheckPath(Config.VideoDirectory);
             _scene = scene;
-            _video = new VideoRecorder(this,$"{VideoPath}/animation", "mp4", animation.Info.Fps);
+            _video = new VideoRecorder(this,$"{Config.VideoDirectory}/animation", "mp4", animation.Info.Fps);
             _animationController = new AnimationController(animation, _scene);
             _backgroundColor = animation.Info.BackgroundColor;
         }
@@ -304,7 +302,7 @@ namespace MiodenusAnimationConverter
 
         private void TakeScreenshot(int screenshotNumber)
         {
-            new Screenshot(this).Save($"{ScreenshotsPath}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
+            new Screenshot(this).Save($"{Config.ScreenshotDirectory}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
                     ImageFormat.Png);
         }
         

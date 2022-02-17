@@ -32,7 +32,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                                                               "endfacet",
                                                               "endsolid " };
 
-        public Model Load(in string filename, Color4 modelColor, bool useCalculatedNormals)
+        public Model Load(string filename, in Color4 modelColor, bool useCalculatedNormals)
         {
             Model model;
             

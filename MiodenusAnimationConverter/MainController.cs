@@ -22,7 +22,6 @@ namespace MiodenusAnimationConverter
         }
         
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string MainWindowTitle = "Miodenus Animation Converter";
 
         public MainController(CommandLineOptions options)
         {
@@ -115,17 +114,37 @@ namespace MiodenusAnimationConverter
                 RenderFrequency = animation.Info.Fps,
                 UpdateFrequency = animation.Info.Fps
             };
-
+            
             NativeWindowSettings nativeWindowSettings = new()
             {
                 Size = new Vector2i(animation.Info.FrameWidth, animation.Info.FrameHeight),
-                Title = MainWindowTitle,
+                Title = Config.MainWindowTitle,
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
-                StartVisible = workMode == WorkMode.FrameView
+                StartVisible = workMode == WorkMode.FrameView,
+                Location = CalculateCenteredWindowLocation(animation.Info.FrameWidth, animation.Info.FrameHeight)
             };
 
             return new MainWindow(animation, scene, mainWindowSettings, nativeWindowSettings);
+        }
+
+        private static Vector2i? CalculateCenteredWindowLocation(int frameWidth, int frameHeight)
+        {
+            Vector2i? windowLocation;
+            
+            if (Monitors.TryGetMonitorInfo(0, out var monitorInfo))
+            {
+                /* Окно будет выровнено по центру экрана. */
+                windowLocation = new Vector2i((monitorInfo.HorizontalResolution - frameWidth) / 2, 
+                        (monitorInfo.VerticalResolution - frameHeight) / 2);
+            }
+            else
+            {
+                /* Положение окна определит ОС. */
+                windowLocation = null;
+            }
+
+            return windowLocation;
         }
     }
 }

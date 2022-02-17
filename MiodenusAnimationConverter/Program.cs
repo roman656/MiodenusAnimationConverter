@@ -8,8 +8,6 @@ namespace MiodenusAnimationConverter
 {
     public static class Program
     {
-        public const string Version = "1.0";
-        public const string Year = "2021";
         public static int ExitCode;
 
         public static int Main(string[] args)
@@ -66,8 +64,8 @@ namespace MiodenusAnimationConverter
             {
                 help.AddNewLineBetweenHelpSections = true;
                 help.AdditionalNewLineAfterOption = false;
-                help.Heading = $"MiodenusAnimationConverter {Version}";
-                help.Copyright = $"Copyright (C) {Year} roman656, PoorMercymain";
+                help.Heading = $"MiodenusAnimationConverter {Config.Version}";
+                help.Copyright = $"Copyright (C) {Config.Year} {Config.Authors}";
                 return HelpText.DefaultParsingErrorsHandler(result, help);
             }, example => example);
         }
