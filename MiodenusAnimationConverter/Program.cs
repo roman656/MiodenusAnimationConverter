@@ -8,8 +8,6 @@ namespace MiodenusAnimationConverter
 {
     public static class Program
     {
-        public static int ExitCode;
-
         public static int Main(string[] args)
         {
             var parser = new Parser(with => with.HelpWriter = null);
@@ -18,7 +16,7 @@ namespace MiodenusAnimationConverter
             parserResult.WithParsed(_ => Run(parserResult))
                         .WithNotParsed(errs => DisplayHelp(parserResult, errs));
             
-            return ExitCode;
+            return 0;
         }
         
         private static void Run(ParserResult<CommandLineOptions> result)
@@ -33,7 +31,6 @@ namespace MiodenusAnimationConverter
                 
                 /* TODO: убрать костыль. */
                 helpText.Copyright += "\n\nERROR(S):\n  Incorrect value for some options.\n";
-                ExitCode = 1;
                 Console.Error.WriteLine(helpText);
             }
         }
@@ -53,7 +50,6 @@ namespace MiodenusAnimationConverter
             }
             else
             {
-                ExitCode = 1;
                 Console.Error.WriteLine(helpText);
             }
         }

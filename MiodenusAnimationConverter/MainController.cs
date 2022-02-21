@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Loaders.AnimationLoaders;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
-using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models;
 using NLog;
 using OpenTK.Mathematics;
@@ -23,7 +22,7 @@ namespace MiodenusAnimationConverter
         
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public MainController(CommandLineOptions options)
+        public MainController(in CommandLineOptions options)
         {
             Logger.Trace("<=====Start=====>");
 
@@ -31,28 +30,20 @@ namespace MiodenusAnimationConverter
             {
                 var animation = LoadAnimation(options.AnimationFilePath);
                 var models = LoadModels(animation.ModelsInfo);
-                var scene = new Scene.Scene(animation.Info.FrameWidth, animation.Info.FrameHeight);
-
-                for (var i = 0; i < models.Count; i++)
-                {
-                    var tempGroup = new ModelGroup();
-                    tempGroup.Models.Add(models[i]);
-                    scene.ModelGroups.Add(tempGroup);
-                }
+                var scene = new Scene.Scene(animation.Info, models);
 
                 CreateMainWindow(animation, scene, DetermineWorkMode(options)).Run();
             }
             catch (Exception exception)
             {
                 Logger.Fatal(exception);
-                Program.ExitCode = 2;
             }
 
             Logger.Trace("<======End======>");
             LogManager.Shutdown();
         }
         
-        private static WorkMode DetermineWorkMode(CommandLineOptions options)
+        private static WorkMode DetermineWorkMode(in CommandLineOptions options)
         {
             var result = WorkMode.Default;
 
@@ -80,7 +71,7 @@ namespace MiodenusAnimationConverter
             return animation;
         }
         
-        private static List<Model> LoadModels(List<ModelInfo> modelsInfo)
+        private static List<Model> LoadModels(in List<ModelInfo> modelsInfo)
         {
             Logger.Trace("Loading models started.");
             
@@ -106,7 +97,8 @@ namespace MiodenusAnimationConverter
             return models;
         }
 
-        private static MainWindow CreateMainWindow(Animation.Animation animation, Scene.Scene scene, WorkMode workMode)
+        private static MainWindow CreateMainWindow(in Animation.Animation animation, in Scene.Scene scene, 
+                WorkMode workMode)
         {
             GameWindowSettings mainWindowSettings = new()
             {

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Scene.Cameras;
+using MiodenusAnimationConverter.Scene.Models;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
@@ -10,12 +12,19 @@ namespace MiodenusAnimationConverter.Scene
         public readonly CamerasController CamerasController;
         public readonly List<ModelGroup> ModelGroups = new ();
 
-        public Scene(int windowWidth, int windowHeight)
+        public Scene(in AnimationInfo animationInfo, in List<Model> models)
         {
-            var cameras = new List<Camera> { new (new Vector3(0.0f, 0.5f, 3.0f), windowWidth, windowHeight) };
-            var debugCameras = new List<DebugCamera> { new (new Vector3(0.0f, 0.5f, 3.0f), windowWidth, windowHeight) };
+            var cameras = new List<Camera> { new (new Vector3(0.0f, 0.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
+            var debugCameras = new List<DebugCamera> { new (new Vector3(0.0f, 0.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
 
             CamerasController = new CamerasController(cameras, debugCameras);
+            
+            for (var i = 0; i < models.Count; i++)
+            {
+                var tempGroup = new ModelGroup();
+                tempGroup.Models.Add(models[i]);
+                ModelGroups.Add(tempGroup);
+            }
         }
 
         public void Initialize()
