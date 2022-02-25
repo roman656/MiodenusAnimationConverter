@@ -27,6 +27,17 @@ namespace MiodenusAnimationConverter.Scene
             _yAxisPositiveDirection = Vector3.UnitY;
             _zAxisPositiveDirection = Vector3.UnitZ;
         }
+
+        // Сдвиг данной системы координат, посредством указания напрпавления сдвига в другой СК.
+        public void Move(in Pivot pivot, float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
+        {
+            Position.X += pivot.XAxisPositiveDirection.X * deltaX + pivot.YAxisPositiveDirection.X * deltaY 
+                    + pivot.ZAxisPositiveDirection.X * deltaZ;
+            Position.Y += pivot.XAxisPositiveDirection.Y * deltaX + pivot.YAxisPositiveDirection.Y * deltaY 
+                    + pivot.ZAxisPositiveDirection.Y * deltaZ;
+            Position.Z += pivot.XAxisPositiveDirection.Z * deltaX + pivot.YAxisPositiveDirection.Z * deltaY 
+                    + pivot.ZAxisPositiveDirection.Z * deltaZ;
+        }
         
         public void GlobalMove(float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
@@ -44,13 +55,19 @@ namespace MiodenusAnimationConverter.Scene
             Position.Z += _xAxisPositiveDirection.Z * deltaX + _yAxisPositiveDirection.Z * deltaY
                     + _zAxisPositiveDirection.Z * deltaZ;
         }
+        
+        public void Rotate(float angle, in Vector3 rotationVectorStartPoint, in Vector3 rotationVectorEndPoint)
+        {
+            var rotation = Quaternion.FromAxisAngle(rotationVectorEndPoint - rotationVectorStartPoint, angle);
+            Position = rotation * (Position - rotationVectorStartPoint) + rotationVectorStartPoint;
+        }
 
-        public void GlobalRotate(float angle, Vector3 vector)
+        public void GlobalRotate(float angle, in Vector3 vector)
         {
             Position = Quaternion.FromAxisAngle(vector, angle) * Position;
         }
         
-        public void LocalRotate(float angle, Vector3 vector)
+        public void LocalRotate(float angle, in Vector3 vector)
         {
             var rotation = Quaternion.FromAxisAngle(vector, angle);
             

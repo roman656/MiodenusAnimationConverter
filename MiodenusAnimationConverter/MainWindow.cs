@@ -242,8 +242,8 @@ namespace MiodenusAnimationConverter
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
             _angle = (float)(_deltaTime * _rotationRate);
-            //_scene.CamerasController.CurrentDebugCamera.Rotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
-            //_scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
+            //_scene.CamerasController.CurrentDebugCamera.Rotate(_angle, new Vector3(1.5f, 0.0f, 0.0f), new Vector3(1.5f, 1.0f, 0.0f));
+            //_scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(1.5f, 0.5f, 0.0f));
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
              _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
@@ -267,7 +267,7 @@ namespace MiodenusAnimationConverter
                     _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex + 1],
                             _scene.CamerasController.CurrentDebugCamera);
                 }
-                
+
                 CheckGLErrors();
             }
 

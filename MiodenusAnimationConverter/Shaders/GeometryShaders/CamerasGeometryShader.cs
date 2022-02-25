@@ -27,7 +27,7 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 uniform mat4 view;
                 uniform mat4 projection;
                  
-                const float MAGNITUDE = 0.03f;
+                const float MAGNITUDE = 0.05f;
                                   
                 void create_local_coordinate_system(const in vec3 front, const in vec3 right, const in vec3 up, const in vec3 position);
               
@@ -38,11 +38,11 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
 
                 void create_local_coordinate_system(const in vec3 front, const in vec3 right, const in vec3 up, const in vec3 position)
                 {
-                    vertex_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    vertex_color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
                     gl_Position = projection * view * vec4(position, 1.0f);
                     EmitVertex();
 
-                    vertex_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    vertex_color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
                     gl_Position = projection * view * vec4((position + front * MAGNITUDE), 1.0f);
                     EmitVertex();
 
@@ -50,11 +50,11 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                     gl_Position = projection * view * vec4(position, 1.0f);
                     EmitVertex();
 
-                    vertex_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    vertex_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
                     gl_Position = projection * view * vec4((position + right * MAGNITUDE), 1.0f);
                     EmitVertex();
 
-                    vertex_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    vertex_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
                     gl_Position = projection * view * vec4(position, 1.0f);
                     EmitVertex();
 

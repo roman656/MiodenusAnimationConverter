@@ -203,7 +203,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             _pivot.GlobalRotate(angle, vector);
             UpdateViewMatrix();
         }
-        
+
         public void RotateViewDirection(float angle, Vector3 vector)
         {
             _pivot.LocalRotate(angle, vector);
