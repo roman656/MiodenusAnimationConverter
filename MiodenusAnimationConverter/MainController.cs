@@ -37,6 +37,7 @@ namespace MiodenusAnimationConverter
             catch (Exception exception)
             {
                 Logger.Fatal(exception);
+                Program.ExitCode = ExitCodeEnum.AnimationLoadingError;
             }
 
             Logger.Trace("<======End======>");
