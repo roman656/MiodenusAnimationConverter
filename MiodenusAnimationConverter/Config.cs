@@ -1,5 +1,3 @@
-using OpenTK.Graphics.OpenGL;
-
 namespace MiodenusAnimationConverter
 {
     public static class Config
@@ -10,6 +8,5 @@ namespace MiodenusAnimationConverter
         public const string VideoDirectory = "videos";
         public const string ScreenshotDirectory = "screenshots";
         public const string MainWindowTitle = "Miodenus Animation Converter";
-        public const PrimitiveType DefaultDrawMode = PrimitiveType.Triangles;
     }
 }

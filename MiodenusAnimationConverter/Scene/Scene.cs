@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Scene.Cameras;
@@ -16,7 +17,7 @@ namespace MiodenusAnimationConverter.Scene
         {
             var cameras = new List<Camera> { new (new Vector3(0.0f, 0.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
             var debugCameras = new List<DebugCamera> { new (new Vector3(0.0f, 0.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
-
+            
             CamerasController = new CamerasController(cameras, debugCameras);
             
             for (var i = 0; i < models.Count; i++)

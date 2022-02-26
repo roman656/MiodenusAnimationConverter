@@ -24,6 +24,7 @@ namespace MiodenusAnimationConverter
 {
     public class MainWindow : GameWindow
     {
+        private const PrimitiveType DefaultDrawMode = PrimitiveType.Triangles;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
@@ -35,7 +36,7 @@ namespace MiodenusAnimationConverter
         private bool _isCursorGrabbed = true;
         private Scene.Scene _scene;
         private VideoRecorder _video;
-        private readonly PrimitiveType _drawMode = Config.DefaultDrawMode;
+        private readonly PrimitiveType _drawMode = DefaultDrawMode;
         private bool _isCursorModeActive;
         private float _rotationRate = 2.0f;
         private LightPoint _lightPoint1;
@@ -187,11 +188,6 @@ namespace MiodenusAnimationConverter
                 case Keys.H:
                 {
                     _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
-                    break;
-                }
-                case Keys.L:
-                {
-                    _scene.CamerasController.CurrentDebugCamera.SwitchCoordinateSystem();
                     break;
                 }
                 case Keys.I:

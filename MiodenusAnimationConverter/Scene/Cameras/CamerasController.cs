@@ -107,7 +107,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         {
             for (var i = 0; i < _cameras.Count; i++)
             {
-                _cameras[i].Initialize();
+                _cameras[i].InitializeVao();
             }
             
             InitializeShaderProgram();
@@ -146,7 +146,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         {
             for (var i = 0; i < _cameras.Count; i++)
             {
-                _cameras[i].Delete();
+                _cameras[i].DeleteVao();
             }
             
             _shaderProgram.Delete();

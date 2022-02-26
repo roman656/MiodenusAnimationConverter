@@ -1,3 +1,4 @@
+using System.Globalization;
 using MiodenusAnimationConverter.Shaders;
 using NLog;
 using OpenTK.Graphics.OpenGL;
@@ -43,7 +44,13 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             UpdateViewMatrix();
             UpdateProjectionMatrix();
         }
-        
+
+        public void ResetLocalRotation()
+        {
+            _pivot.ResetLocalRotation();
+            UpdateViewMatrix();
+        }
+
         public int ViewportWidth
         {
             get => _viewportWidth;
@@ -167,14 +174,21 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             set => _pivot.Position = value;
         }
         
-        public void LookAt(Vector3 target)
+        public void LookAt(in Vector3 target)
         {
             var rotationAxis = Vector3.Normalize(target - Position) + ViewDirection;
             RotateViewDirection(MathHelper.Pi, rotationAxis);
             RotateViewDirection(MathHelper.Pi, ViewDirection);
         }
+        
+        // Перемещение камеры, посредством указания напрпавления перемещения в определенной системе координат.
+        public void Move(in Pivot pivot, float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
+        {
+            _pivot.Move(pivot, deltaX, deltaY, deltaZ);
+            UpdateViewMatrix();
+        }
 
-        public void Move(float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
+        public void GlobalMove(float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
             _pivot.GlobalMove(deltaX, deltaY, deltaZ);
             UpdateViewMatrix();
@@ -198,19 +212,25 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             UpdateViewMatrix();
         }
 
-        public void Rotate(float angle, Vector3 vector)
+        public void Rotate(float angle, in Vector3 rotationVectorStartPoint, in Vector3 rotationVectorEndPoint)
+        {
+            _pivot.Rotate(angle, rotationVectorStartPoint, rotationVectorEndPoint);
+            UpdateViewMatrix();
+        }
+
+        public void GlobalRotate(float angle, in Vector3 vector)
         {
             _pivot.GlobalRotate(angle, vector);
             UpdateViewMatrix();
         }
 
-        public void RotateViewDirection(float angle, Vector3 vector)
+        public void RotateViewDirection(float angle, in Vector3 vector)
         {
             _pivot.LocalRotate(angle, vector);
             UpdateViewMatrix();
         }
         
-        public void Initialize()
+        public void InitializeVao()
         {
             var fov = new[] { Fov };
             var distanceToTheNearClipPlane = new[] { DistanceToTheNearClipPlane };
@@ -230,7 +250,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             _vao.AddVertexBufferObject(position, 3, BufferUsageHint.StreamDraw);
         }
         
-        public void Draw(ShaderProgram shaderProgram, Camera currentCamera)
+        public void Draw(in ShaderProgram shaderProgram, in Camera currentCamera)
         {
             if (IsVisibleInDebug)
             {
@@ -241,9 +261,18 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             }
         }
         
-        public void Delete()
+        public void DeleteVao()
         {
             _vao.Delete();
+        }
+        
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, $"Camera:\n\t{_pivot}\n\t"
+                    + $"Viewport width: {_viewportWidth}\n\tViewport height: {_viewportHeight}\n\t"
+                    + $"Viewport aspect ratio: {_viewportAspectRatio}\n\tFOV: {_fov}\n\t"
+                    + $"Distance to the near clip plane: {_distanceToTheNearClipPlane}\n\t"
+                    + $"Distance to the far clip plane: {_distanceToTheFarClipPlane}\n");
         }
     }
 }

@@ -1,9 +1,10 @@
+using System;
 using System.Globalization;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
 {
-    public class Pivot
+    public class Pivot : ICloneable
     {
         public Vector3 Position;
         private Vector3 _xAxisPositiveDirection = Vector3.UnitX;
@@ -16,6 +17,14 @@ namespace MiodenusAnimationConverter.Scene
         }
         
         public Pivot() : this(Vector3.Zero) {}
+
+        public Pivot(Pivot pivot)
+        {
+            Position = pivot.Position;
+            _xAxisPositiveDirection = pivot.XAxisPositiveDirection;
+            _yAxisPositiveDirection = pivot.YAxisPositiveDirection;
+            _zAxisPositiveDirection = pivot.ZAxisPositiveDirection;
+        }
         
         public Vector3 XAxisPositiveDirection => _xAxisPositiveDirection;
         public Vector3 YAxisPositiveDirection => _yAxisPositiveDirection;
@@ -28,7 +37,7 @@ namespace MiodenusAnimationConverter.Scene
             _zAxisPositiveDirection = Vector3.UnitZ;
         }
 
-        // Сдвиг данной системы координат, посредством указания напрпавления сдвига в другой СК.
+        // Перемещение данной системы координат, посредством указания напрпавления перемещения в другой СК.
         public void Move(in Pivot pivot, float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
             Position.X += pivot.XAxisPositiveDirection.X * deltaX + pivot.YAxisPositiveDirection.X * deltaY 
@@ -85,6 +94,11 @@ namespace MiodenusAnimationConverter.Scene
                     + $"({_yAxisPositiveDirection.X}; {_yAxisPositiveDirection.Y}; {_yAxisPositiveDirection.Z}) "
                     + $"| Z axis positive direction: ({_zAxisPositiveDirection.X}; {_zAxisPositiveDirection.Y}; "
                     + $"{_zAxisPositiveDirection.Z}) ]");
+        }
+
+        public object Clone()
+        {
+            return new Pivot(this);
         }
     }
 }
