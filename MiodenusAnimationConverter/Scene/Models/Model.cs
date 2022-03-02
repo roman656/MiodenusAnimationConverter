@@ -42,7 +42,7 @@ namespace MiodenusAnimationConverter.Scene.Models
             }
         }
 
-        public void Initialize()
+        public void InitializeVao()
         {
             var trianglesAmount = Mesh.Triangles.Length;
             var vertexesPositions = new float[_vertexesAmount * 3];
@@ -91,7 +91,7 @@ namespace MiodenusAnimationConverter.Scene.Models
             _wasColorChanged = true;
         }
         
-        public void Delete()
+        public void DeleteVao()
         {
             _vao.Delete();
         }

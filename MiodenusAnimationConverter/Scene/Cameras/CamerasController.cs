@@ -17,7 +17,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private int _currentDebugCameraIndex;
         private ShaderProgram _shaderProgram;
 
-        public CamerasController(List<Camera> cameras, List<DebugCamera> debugCameras = null)
+        public CamerasController(in List<Camera> cameras, in List<DebugCamera> debugCameras = null)
         {
             _camerasAmount = cameras?.Count ?? 0;
             _debugCamerasAmount = debugCameras?.Count ?? 0;
@@ -45,12 +45,9 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public int DebugCamerasAmount => _debugCamerasAmount;
         public int AllCamerasAmount => _cameras.Count;
         public Camera CurrentCamera => _camerasAmount > 0 ? _cameras[_currentCameraIndex] : null;
-        
-        public DebugCamera CurrentDebugCamera
-        {
-            get => _debugCamerasAmount > 0 ? _cameras[_currentDebugCameraIndex] as DebugCamera : null;
-        }
-        
+        public DebugCamera CurrentDebugCamera =>
+                _debugCamerasAmount > 0 ? _cameras[_currentDebugCameraIndex] as DebugCamera : null;
+
         public int CurrentCameraIndex
         {
             get => _currentCameraIndex;
@@ -103,7 +100,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             }
         }
 
-        public void Initialize()
+        public void InitializeVao()
         {
             for (var i = 0; i < _cameras.Count; i++)
             {

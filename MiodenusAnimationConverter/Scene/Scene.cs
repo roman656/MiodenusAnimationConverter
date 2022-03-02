@@ -30,7 +30,7 @@ namespace MiodenusAnimationConverter.Scene
 
         public void Initialize()
         {
-            CamerasController.Initialize();
+            CamerasController.InitializeVao();
             
             for (var i = 0; i < ModelGroups.Count; i++)
             {

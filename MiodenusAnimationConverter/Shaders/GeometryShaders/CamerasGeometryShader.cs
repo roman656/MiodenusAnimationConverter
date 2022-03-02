@@ -27,7 +27,7 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 uniform mat4 view;
                 uniform mat4 projection;
                  
-                const float MAGNITUDE = 0.05f;
+                const float MAGNITUDE = 0.1f;
                                   
                 void create_local_coordinate_system(const in vec3 front, const in vec3 right, const in vec3 up, const in vec3 position);
               

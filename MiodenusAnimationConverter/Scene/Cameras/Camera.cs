@@ -22,6 +22,14 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private Matrix4 _projection;
         private VertexArrayObject _vao;
         public bool IsVisibleInDebug = true;
+        
+        private int _fovVboIndex;
+        private int _distanceToTheNearClipPlaneVboIndex;
+        private int _distanceToTheFarClipPlaneVboIndex;
+        private int _viewDirectionVboIndex;
+        private int _rightDirectionVboIndex;
+        private int _upDirectionVboIndex;
+        private int _positionVboIndex;
 
         public Camera(Vector3 position, int viewportWidth = 1, int viewportHeight = 1)
         {
@@ -145,23 +153,12 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             }
         }
 
-        private void UpdateViewMatrix()
-        {
-            _view = Matrix4.LookAt(_pivot.Position, _pivot.Position + _pivot.ZAxisPositiveDirection * -1,
-                    _pivot.YAxisPositiveDirection);
-        }
-
-        private void UpdateProjectionMatrix()
-        {
-            _projection = Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, 
-                    _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
-        }
-
-        private void UpdateViewportAspectRatio()
-        {
-            _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
-        }
-
+        private void UpdateViewMatrix() => _view = Matrix4.LookAt(_pivot.Position,
+                _pivot.Position + _pivot.ZAxisPositiveDirection * -1, _pivot.YAxisPositiveDirection);
+        private void UpdateProjectionMatrix() => _projection = Matrix4.CreatePerspectiveFieldOfView(_fov,
+                _viewportAspectRatio, _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+        private void UpdateViewportAspectRatio() => _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
+        
         public Matrix4 ViewMatrix => _view;
         public Matrix4 ProjectionMatrix => _projection;
         public Vector3 ViewDirection => _pivot.ZAxisPositiveDirection * -1;
@@ -242,18 +239,45 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 
             _vao = new VertexArrayObject();
             _vao.AddVertexBufferObject(fov, 1, BufferUsageHint.DynamicDraw);
+            _fovVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(distanceToTheNearClipPlane, 1, BufferUsageHint.DynamicDraw);
+            _distanceToTheNearClipPlaneVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(distanceToTheFarClipPlane, 1, BufferUsageHint.DynamicDraw);
+            _distanceToTheFarClipPlaneVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(viewDirection, 3, BufferUsageHint.StreamDraw);
+            _viewDirectionVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(rightDirection, 3, BufferUsageHint.StreamDraw);
+            _rightDirectionVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(upDirection, 3, BufferUsageHint.StreamDraw);
+            _upDirectionVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(position, 3, BufferUsageHint.StreamDraw);
+            _positionVboIndex = _vao.VertexBufferObjectIndexes[^1];
         }
         
+        private void UpdateAllVbo()
+        {
+            var fov = new[] { Fov };
+            var distanceToTheNearClipPlane = new[] { DistanceToTheNearClipPlane };
+            var distanceToTheFarClipPlane = new[] { DistanceToTheFarClipPlane };
+            var viewDirection = new[] { ViewDirection.X, ViewDirection.Y, ViewDirection.Z };
+            var rightDirection = new[] { RightDirection.X, RightDirection.Y, RightDirection.Z };
+            var upDirection = new[] { UpDirection.X, UpDirection.Y, UpDirection.Z };
+            var position = new[] { Position.X, Position.Y, Position.Z };
+            
+            _vao.UpdateVertexBufferObject(_fovVboIndex, fov);
+            _vao.UpdateVertexBufferObject(_distanceToTheNearClipPlaneVboIndex, distanceToTheNearClipPlane);
+            _vao.UpdateVertexBufferObject(_distanceToTheFarClipPlaneVboIndex, distanceToTheFarClipPlane);
+            _vao.UpdateVertexBufferObject(_viewDirectionVboIndex, viewDirection);
+            _vao.UpdateVertexBufferObject(_rightDirectionVboIndex, rightDirection);
+            _vao.UpdateVertexBufferObject(_upDirectionVboIndex, upDirection);
+            _vao.UpdateVertexBufferObject(_positionVboIndex, position);
+        }
+
         public void Draw(in ShaderProgram shaderProgram, in Camera currentCamera)
         {
             if (IsVisibleInDebug)
             {
+                UpdateAllVbo();
                 shaderProgram.SetMatrix4("view", currentCamera.ViewMatrix, false);
                 shaderProgram.SetMatrix4("projection", currentCamera.ProjectionMatrix, false);
 
@@ -261,18 +285,12 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             }
         }
         
-        public void DeleteVao()
-        {
-            _vao.Delete();
-        }
-        
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, $"Camera:\n\t{_pivot}\n\t"
-                    + $"Viewport width: {_viewportWidth}\n\tViewport height: {_viewportHeight}\n\t"
-                    + $"Viewport aspect ratio: {_viewportAspectRatio}\n\tFOV: {_fov}\n\t"
-                    + $"Distance to the near clip plane: {_distanceToTheNearClipPlane}\n\t"
-                    + $"Distance to the far clip plane: {_distanceToTheFarClipPlane}\n");
-        }
+        public void DeleteVao() => _vao.Delete();
+
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture,
+                $"Camera:\n\t{_pivot}\n\tViewport width: {_viewportWidth}\n\tViewport height: {_viewportHeight}\n\t"
+                + $"Viewport aspect ratio: {_viewportAspectRatio}\n\tFOV: {_fov}\n\t"
+                + $"Distance to the near clip plane: {_distanceToTheNearClipPlane}\n\t"
+                + $"Distance to the far clip plane: {_distanceToTheFarClipPlane}\n");
     }
 }

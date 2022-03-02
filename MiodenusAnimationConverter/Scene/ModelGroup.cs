@@ -23,7 +23,7 @@ namespace MiodenusAnimationConverter.Scene
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].Initialize();
+                Models[i].InitializeVao();
             }
         }
         
@@ -31,7 +31,7 @@ namespace MiodenusAnimationConverter.Scene
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].Delete();
+                Models[i].DeleteVao();
             }
         }
 
