@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
-using MiodenusAnimationConverter.Shaders.GeometryShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
 using NLog;
 using OpenTK.Graphics.OpenGL;
@@ -12,12 +11,17 @@ namespace MiodenusAnimationConverter.Scene
 {
     public class Grid
     {
+        private const int ColorChannelsAmount = 4;
+        private static readonly Color4 DefaultGridColor = Color4.DarkGray;
+        private static readonly Color4 XAxisColor = Color4.Red;
+        private static readonly Color4 YAxisColor = Color4.GreenYellow;
+        private static readonly Color4 ZAxisColor = Color4.DeepSkyBlue;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool IsXyPlaneVisible = true;
         public bool IsYzPlaneVisible = true;
         public bool IsXzPlaneVisible = true;
         public bool IsCoordinateSystemVisible = true;
-        public Vector3 Position;
+        private Vector3 _position;
         private float _cellSize;
         private int _xSizeInCells;
         private int _ySizeInCells;
@@ -26,11 +30,25 @@ namespace MiodenusAnimationConverter.Scene
         private Color4 _xyPlaneColor;
         private Color4 _xzPlaneColor;
         private Color4 _yzPlaneColor;
-        private VertexArrayObject _vao;
-        private ShaderProgram _shaderProgram;
+        private float _xAxisSize = 1.0f;
+        private float _yAxisSize = 1.0f;
+        private float _zAxisSize = 1.0f;
+        private VertexArrayObject _gridVao;
+        private ShaderProgram _gridShaderProgram;
+        private VertexArrayObject _coordinateSystemVao;
+        private ShaderProgram _coordinateSystemShaderProgram;
+        private int _coordinateSystemVertexesVboIndex;
         private bool _wasParametersChanged;
-        private float _colorRotationSpeed = 0.03f;
-        private float time = 0.0f;
+        
+        public Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                _wasParametersChanged = true;
+            }
+        }
 
         public float CellSize
         {
@@ -121,9 +139,39 @@ namespace MiodenusAnimationConverter.Scene
                 }
             }
         }
+        
+        public Color4 XzPlaneColor
+        {
+            get => _xzPlaneColor;
+            set
+            {
+                _xzPlaneColor = value;
+                _wasParametersChanged = true;
+            }
+        }
+        
+        public Color4 XyPlaneColor
+        {
+            get => _xyPlaneColor;
+            set
+            {
+                _xyPlaneColor = value;
+                _wasParametersChanged = true;
+            }
+        }
+        
+        public Color4 YzPlaneColor
+        {
+            get => _yzPlaneColor;
+            set
+            {
+                _yzPlaneColor = value;
+                _wasParametersChanged = true;
+            }
+        }
 
         public Grid(int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
-                float lineWidth = 1.0f) : this(Vector3.Zero, Color4.DarkGray, xSizeInCells, ySizeInCells,
+                float lineWidth = 1.0f) : this(Vector3.Zero, DefaultGridColor, xSizeInCells, ySizeInCells,
                 zSizeInCells, cellSize, lineWidth) {}
         
         public Grid(Vector3 position, Color4 color, int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0,
@@ -134,7 +182,7 @@ namespace MiodenusAnimationConverter.Scene
                 int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
                 float lineWidth = 1.0f)
         {
-            Position = position;
+            _position = position;
             _cellSize = cellSize;
             _xSizeInCells = xSizeInCells;
             _ySizeInCells = ySizeInCells;
@@ -145,24 +193,47 @@ namespace MiodenusAnimationConverter.Scene
             _yzPlaneColor = yzPlaneColor;
         }
         
+        private float[] CoordinateSystemVertexes => new []
+        {
+            _position.X, _position.Y, _position.Z,
+            _position.X + _xAxisSize, _position.Y, _position.Z,
+            _position.X, _position.Y, _position.Z,
+            _position.X, _position.Y + _yAxisSize, _position.Z,
+            _position.X, _position.Y, _position.Z,
+            _position.X, _position.Y, _position.Z + _zAxisSize
+        };
+
+        private static float[] CoordinateSystemColors => new []
+        {
+            XAxisColor.R, XAxisColor.G, XAxisColor.B, XAxisColor.A,
+            XAxisColor.R, XAxisColor.G, XAxisColor.B, XAxisColor.A,
+            YAxisColor.R, YAxisColor.G, YAxisColor.B, YAxisColor.A,
+            YAxisColor.R, YAxisColor.G, YAxisColor.B, YAxisColor.A,
+            ZAxisColor.R, ZAxisColor.G, ZAxisColor.B, ZAxisColor.A,
+            ZAxisColor.R, ZAxisColor.G, ZAxisColor.B, ZAxisColor.A
+        };
+
         public void InitializeVao()
         {
-            _vao = new VertexArrayObject();
-            InitializeShaderProgram();
-            UpdateUniform();
-            _shaderProgram.SetVector2("resolution", new Vector2(800, 800));
+            _gridVao = new VertexArrayObject();
+            _coordinateSystemVao = new VertexArrayObject();
+           // InitializeGridShaderProgram();
+            InitializeCoordinateSystemShaderProgram();
+            
+            _coordinateSystemVao.AddVertexBufferObject(CoordinateSystemVertexes, 3, BufferUsageHint.StreamDraw);
+            _coordinateSystemVertexesVboIndex = _coordinateSystemVao.VertexBufferObjectIndexes[^1];
+            _coordinateSystemVao.AddVertexBufferObject(CoordinateSystemColors, ColorChannelsAmount);
         }
         
-        private void InitializeShaderProgram()
+        private void InitializeGridShaderProgram()
         {
             var shaders = new List<Shader>
             {
                 new (GridVertexShader.Code, GridVertexShader.Type),
-                new (GridGeometryShader.Code, GridGeometryShader.Type),
                 new (GridFragmentShader.Code, GridFragmentShader.Type)
             };
 
-            _shaderProgram = new ShaderProgram(shaders);
+            _gridShaderProgram = new ShaderProgram(shaders);
 
             for (var i = 0; i < shaders.Count; i++)
             {
@@ -170,42 +241,69 @@ namespace MiodenusAnimationConverter.Scene
             }
         }
         
-        private void UpdateUniform()
+        private void InitializeCoordinateSystemShaderProgram()
         {
-            _shaderProgram.SetVector3("grid.position", Position);
-            _shaderProgram.SetFloat("grid.cell_size", _cellSize);
-            _shaderProgram.SetInt("grid.x_size_in_cells", IsXyPlaneVisible || IsXzPlaneVisible ? _xSizeInCells : 0);
-            _shaderProgram.SetInt("grid.y_size_in_cells", IsXyPlaneVisible || IsYzPlaneVisible ? _ySizeInCells : 0);
-            _shaderProgram.SetInt("grid.z_size_in_cells", IsXzPlaneVisible || IsYzPlaneVisible ? _zSizeInCells : 0);
-            _shaderProgram.SetColor4("grid.xy_plane_color", _xyPlaneColor);
-            _shaderProgram.SetColor4("grid.xz_plane_color", _xzPlaneColor);
-            _shaderProgram.SetColor4("grid.yz_plane_color", _yzPlaneColor);
-            _shaderProgram.SetBool("use_vertex_color", false);
-            _shaderProgram.SetFloat("color_rotation_speed", _colorRotationSpeed);
+            var shaders = new List<Shader>
+            {
+                new (CoordinateSystemVertexShader.Code, CoordinateSystemVertexShader.Type),
+                new (CoordinateSystemFragmentShader.Code, CoordinateSystemFragmentShader.Type)
+            };
+
+            _coordinateSystemShaderProgram = new ShaderProgram(shaders);
+
+            for (var i = 0; i < shaders.Count; i++)
+            {
+                shaders[i].Delete();
+            }
+        }
+        
+        private void UpdateVbo()
+        {
+            if (_wasParametersChanged)
+            {
+                _coordinateSystemVao.UpdateVertexBufferObject(_coordinateSystemVertexesVboIndex, CoordinateSystemVertexes);
+                _wasParametersChanged = false;
+            }
         }
 
         public void Draw(in Camera camera)
         {
+            if (IsCoordinateSystemVisible)
+            {
+                UpdateVbo();
+                
+                _coordinateSystemShaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
+                _coordinateSystemShaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
+                
+                var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
+                
+                GL.LineWidth(_lineWidth);
+                _coordinateSystemVao.Draw(6, PrimitiveType.Lines);
+                GL.LineWidth(prevLineWidth);
+            }
+            /*
             if (IsXzPlaneVisible || IsXyPlaneVisible || IsYzPlaneVisible)
             {
                 if (_wasParametersChanged)
                 {
-                    UpdateUniform();
+                    //UpdateUniform();
                 }
 
-                _shaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
-                _shaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
-                _shaderProgram.SetFloat("time", time);
-                time += 1.0f;
+                _gridShaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
+                _gridShaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
 
                 var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
                 
                 GL.LineWidth(_lineWidth);
-                _vao.Draw(1, PrimitiveType.Points);
+                _gridVao.Draw(1, PrimitiveType.Points);
                 GL.LineWidth(prevLineWidth);
-            }
+            }*/
         }
         
-        public void DeleteVao() => _vao.Delete();
+        public void DeleteVao()
+        {
+            _gridVao.Delete();
+            _coordinateSystemVao.Delete();
+        }
     }
 }

@@ -8,8 +8,8 @@ namespace MiodenusAnimationConverter.Scene
 {
     public class Scene
     {
-        public readonly Grid Grid = new (xSizeInCells: 60, zSizeInCells: 60, cellSize: 0.1f);
-        public readonly Grid MajorGrid = new (xSizeInCells: 6, zSizeInCells: 6, cellSize: 1.0f, lineWidth: 2.0f);
+        private readonly Grid _grid = new (xSizeInCells: 60, zSizeInCells: 60, cellSize: 0.1f);
+        private readonly Grid _majorGrid = new (xSizeInCells: 6, zSizeInCells: 6, cellSize: 1.0f, lineWidth: 2.0f);
         public readonly LightPointsController LightPointsController = new ();
         public readonly CamerasController CamerasController;
         public readonly List<ModelGroup> ModelGroups = new ();
@@ -32,8 +32,8 @@ namespace MiodenusAnimationConverter.Scene
         public void Initialize()
         {
             CamerasController.InitializeVao();
-            Grid.InitializeVao();
-            MajorGrid.InitializeVao();
+            _grid.InitializeVao();
+            _majorGrid.InitializeVao();
             
             for (var i = 0; i < ModelGroups.Count; i++)
             {
@@ -44,8 +44,8 @@ namespace MiodenusAnimationConverter.Scene
         public void Delete()
         {
             CamerasController.Delete();
-            Grid.DeleteVao();
-            MajorGrid.DeleteVao();
+            _grid.DeleteVao();
+            _majorGrid.DeleteVao();
             
             for (var i = 0; i < ModelGroups.Count; i++)
             {
@@ -55,8 +55,8 @@ namespace MiodenusAnimationConverter.Scene
 
         public void DrawGrid(in Camera camera)
         {
-            Grid.Draw(camera);
-            MajorGrid.Draw(camera);
+            _grid.Draw(camera);
+            _majorGrid.Draw(camera);
         }
     }
 }
