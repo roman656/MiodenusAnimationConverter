@@ -6,13 +6,8 @@ namespace MiodenusAnimationConverter
 {
     public class VertexArrayObject
     {
-        public readonly int VertexArrayObjectIndex;
-        private List<int> _vertexBufferObjectIndexes = new();
-
-        public VertexArrayObject()
-        {
-            VertexArrayObjectIndex = GL.GenVertexArray();
-        }
+        public readonly int VertexArrayObjectIndex = GL.GenVertexArray();
+        private readonly List<int> _vertexBufferObjectIndexes = new();
 
         public List<int> VertexBufferObjectIndexes => new (_vertexBufferObjectIndexes);
 

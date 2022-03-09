@@ -111,6 +111,20 @@
       "startTime": 100,
       "timeLength": 3500,
       "useInterpolation": true
-    }
+    },
+    {
+      "modelName": "bolt_25x8",
+      "actionName": "Nut rotation",
+      "startTime": 100,
+      "timeLength": 3500,
+      "useInterpolation": true
+    },
+        {
+          "modelName": "bolt_25x8",
+          "actionName": "Nut rotation",
+          "startTime": 100,
+          "timeLength": 3500,
+          "useInterpolation": true
+        }
   ]
 }

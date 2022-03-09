@@ -104,7 +104,7 @@ namespace MiodenusAnimationConverter
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
-
+            
             InitializeShaderPrograms();
             
             GL.Enable(EnableCap.DepthTest);
@@ -237,6 +237,8 @@ namespace MiodenusAnimationConverter
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
+            _scene.DrawGrid(_scene.CamerasController.CurrentDebugCamera);
+
             _angle = (float)(_deltaTime * _rotationRate);
             _scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             _scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
@@ -304,7 +306,7 @@ namespace MiodenusAnimationConverter
         
         public IEnumerable<IVideoFrame> GetBitmaps()
         {
-            for (int i = 0; i < frames.Count; i++)
+            for (var i = 0; i < frames.Count; i++)
             {
                 yield return frames[i];
             }
