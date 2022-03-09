@@ -115,6 +115,7 @@ namespace MiodenusAnimationConverter
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
                 StartVisible = workMode == WorkMode.FrameView,
+                NumberOfSamples = 4,
                 Location = CalculateCenteredWindowLocation(animation.Info.FrameWidth, animation.Info.FrameHeight)
             };
 

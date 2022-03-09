@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Timers;
 using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
@@ -17,6 +16,7 @@ namespace MiodenusAnimationConverter.Scene
         public bool IsXyPlaneVisible = true;
         public bool IsYzPlaneVisible = true;
         public bool IsXzPlaneVisible = true;
+        public bool IsCoordinateSystemVisible = true;
         public Vector3 Position;
         private float _cellSize;
         private int _xSizeInCells;
@@ -28,9 +28,99 @@ namespace MiodenusAnimationConverter.Scene
         private Color4 _yzPlaneColor;
         private VertexArrayObject _vao;
         private ShaderProgram _shaderProgram;
-        private bool _wasParametersChanged = false;
+        private bool _wasParametersChanged;
         private float _colorRotationSpeed = 0.03f;
         private float time = 0.0f;
+
+        public float CellSize
+        {
+            get => _cellSize;
+            set
+            {
+                if (value > 0.0f)
+                {
+                    _cellSize = value;
+                    _wasParametersChanged = true;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for CellSize parameter. Expected: value"
+                            + $" greater than 0. Got: {value}. Cell size was not changed.");
+                }
+            }
+        }
+        
+        public int XSizeInCells
+        {
+            get => _xSizeInCells;
+            set
+            {
+                if (value >= 0)
+                {
+                    _xSizeInCells = value;
+                    _wasParametersChanged = true;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for XSizeInCells parameter. Expected: value"
+                                + $" greater than or equal to 0. Got: {value}. X size in cells was not changed.");
+                }
+            }
+        }
+        
+        public int YSizeInCells
+        {
+            get => _ySizeInCells;
+            set
+            {
+                if (value >= 0)
+                {
+                    _ySizeInCells = value;
+                    _wasParametersChanged = true;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for YSizeInCells parameter. Expected: value"
+                                + $" greater than or equal to 0. Got: {value}. Y size in cells was not changed.");
+                }
+            }
+        }
+        
+        public int ZSizeInCells
+        {
+            get => _zSizeInCells;
+            set
+            {
+                if (value >= 0)
+                {
+                    _zSizeInCells = value;
+                    _wasParametersChanged = true;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for ZSizeInCells parameter. Expected: value"
+                                + $" greater than or equal to 0. Got: {value}. Z size in cells was not changed.");
+                }
+            }
+        }
+        
+        public float LineWidth
+        {
+            get => _lineWidth;
+            set
+            {
+                if (value > 0.0f)
+                {
+                    _lineWidth = value;
+                    _wasParametersChanged = true;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for LineWidth parameter. Expected: value"
+                                + $" greater than 0. Got: {value}. Line width was not changed.");
+                }
+            }
+        }
 
         public Grid(int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
                 float lineWidth = 1.0f) : this(Vector3.Zero, Color4.DarkGray, xSizeInCells, ySizeInCells,
