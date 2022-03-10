@@ -4,7 +4,6 @@ using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
 using NLog;
-using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
@@ -13,14 +12,10 @@ namespace MiodenusAnimationConverter.Scene
     {
         private const int ColorChannelsAmount = 4;
         private static readonly Color4 DefaultGridColor = Color4.DarkGray;
-        private static readonly Color4 XAxisColor = Color4.Red;
-        private static readonly Color4 YAxisColor = Color4.GreenYellow;
-        private static readonly Color4 ZAxisColor = Color4.DeepSkyBlue;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool IsXyPlaneVisible = true;
         public bool IsYzPlaneVisible = true;
         public bool IsXzPlaneVisible = true;
-        public bool IsCoordinateSystemVisible = true;
         private Vector3 _position;
         private float _cellSize;
         private int _xSizeInCells;
@@ -30,15 +25,10 @@ namespace MiodenusAnimationConverter.Scene
         private Color4 _xyPlaneColor;
         private Color4 _xzPlaneColor;
         private Color4 _yzPlaneColor;
-        private float _xAxisSize = 1.0f;
-        private float _yAxisSize = 1.0f;
-        private float _zAxisSize = 1.0f;
         private VertexArrayObject _gridVao;
         private ShaderProgram _gridShaderProgram;
-        private VertexArrayObject _coordinateSystemVao;
-        private ShaderProgram _coordinateSystemShaderProgram;
-        private int _coordinateSystemVertexesVboIndex;
         private bool _wasParametersChanged;
+        public Pivot _pivot = new (new Vector3(1,0,0));
         
         public Vector3 Position
         {
@@ -192,37 +182,13 @@ namespace MiodenusAnimationConverter.Scene
             _xzPlaneColor = xzPlaneColor;
             _yzPlaneColor = yzPlaneColor;
         }
-        
-        private float[] CoordinateSystemVertexes => new []
-        {
-            _position.X, _position.Y, _position.Z,
-            _position.X + _xAxisSize, _position.Y, _position.Z,
-            _position.X, _position.Y, _position.Z,
-            _position.X, _position.Y + _yAxisSize, _position.Z,
-            _position.X, _position.Y, _position.Z,
-            _position.X, _position.Y, _position.Z + _zAxisSize
-        };
-
-        private static float[] CoordinateSystemColors => new []
-        {
-            XAxisColor.R, XAxisColor.G, XAxisColor.B, XAxisColor.A,
-            XAxisColor.R, XAxisColor.G, XAxisColor.B, XAxisColor.A,
-            YAxisColor.R, YAxisColor.G, YAxisColor.B, YAxisColor.A,
-            YAxisColor.R, YAxisColor.G, YAxisColor.B, YAxisColor.A,
-            ZAxisColor.R, ZAxisColor.G, ZAxisColor.B, ZAxisColor.A,
-            ZAxisColor.R, ZAxisColor.G, ZAxisColor.B, ZAxisColor.A
-        };
 
         public void InitializeVao()
         {
             _gridVao = new VertexArrayObject();
-            _coordinateSystemVao = new VertexArrayObject();
-           // InitializeGridShaderProgram();
-            InitializeCoordinateSystemShaderProgram();
-            
-            _coordinateSystemVao.AddVertexBufferObject(CoordinateSystemVertexes, 3, BufferUsageHint.StreamDraw);
-            _coordinateSystemVertexesVboIndex = _coordinateSystemVao.VertexBufferObjectIndexes[^1];
-            _coordinateSystemVao.AddVertexBufferObject(CoordinateSystemColors, ColorChannelsAmount);
+            // InitializeGridShaderProgram();
+            //_pivot.Rotate(MathHelper.DegreesToRadians(45.0f), new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 0.0f));
+            _pivot.InitializeVao();
         }
         
         private void InitializeGridShaderProgram()
@@ -240,47 +206,10 @@ namespace MiodenusAnimationConverter.Scene
                 shaders[i].Delete();
             }
         }
-        
-        private void InitializeCoordinateSystemShaderProgram()
-        {
-            var shaders = new List<Shader>
-            {
-                new (CoordinateSystemVertexShader.Code, CoordinateSystemVertexShader.Type),
-                new (CoordinateSystemFragmentShader.Code, CoordinateSystemFragmentShader.Type)
-            };
-
-            _coordinateSystemShaderProgram = new ShaderProgram(shaders);
-
-            for (var i = 0; i < shaders.Count; i++)
-            {
-                shaders[i].Delete();
-            }
-        }
-        
-        private void UpdateVbo()
-        {
-            if (_wasParametersChanged)
-            {
-                _coordinateSystemVao.UpdateVertexBufferObject(_coordinateSystemVertexesVboIndex, CoordinateSystemVertexes);
-                _wasParametersChanged = false;
-            }
-        }
 
         public void Draw(in Camera camera)
         {
-            if (IsCoordinateSystemVisible)
-            {
-                UpdateVbo();
-                
-                _coordinateSystemShaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
-                _coordinateSystemShaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
-                
-                var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
-                
-                GL.LineWidth(_lineWidth);
-                _coordinateSystemVao.Draw(6, PrimitiveType.Lines);
-                GL.LineWidth(prevLineWidth);
-            }
+            _pivot.Draw(camera);
             /*
             if (IsXzPlaneVisible || IsXyPlaneVisible || IsYzPlaneVisible)
             {
@@ -303,7 +232,7 @@ namespace MiodenusAnimationConverter.Scene
         public void DeleteVao()
         {
             _gridVao.Delete();
-            _coordinateSystemVao.Delete();
+            _pivot.DeleteVao();
         }
     }
 }

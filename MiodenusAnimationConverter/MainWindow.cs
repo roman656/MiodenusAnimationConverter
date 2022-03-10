@@ -106,7 +106,7 @@ namespace MiodenusAnimationConverter
             CursorGrabbed = _isCursorGrabbed;
             
             InitializeShaderPrograms();
-            
+
             GL.Enable(EnableCap.DepthTest);
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
@@ -221,30 +221,30 @@ namespace MiodenusAnimationConverter
                 _scene.CamerasController.CurrentDebugCamera.ProcessMouseScroll(args, KeyboardState);
             }
         }
-        
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             /*if (_animationController.CurrentFrameIndex > 181)
             {
                 Close();
             }*/
-            
+
             base.OnRenderFrame(e);
 
             _animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
-            
+
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+
             _scene.DrawGrid(_scene.CamerasController.CurrentDebugCamera);
 
-            _angle = (float)(_deltaTime * _rotationRate);
+            _angle = (float) (_deltaTime * _rotationRate);
             _scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             _scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
             //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
-             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
+            _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
             CheckGLErrors();
 

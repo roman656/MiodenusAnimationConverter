@@ -2,7 +2,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace MiodenusAnimationConverter.Shaders.FragmentShaders
 {
-    public static class CoordinateSystemFragmentShader
+    public static class PivotFragmentShader
     {
         public const ShaderType Type = ShaderType.FragmentShader;
         public const string Code = @"
