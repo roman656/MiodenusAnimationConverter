@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.VertexShaders;
 using NLog;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene
@@ -11,32 +13,227 @@ namespace MiodenusAnimationConverter.Scene
     public class Grid
     {
         private const int ColorChannelsAmount = 4;
-        private static readonly Color4 DefaultGridColor = Color4.DarkGray;
+        private static readonly Color4 DefaultColor = Color4.DarkGray;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public bool IsXyPlaneVisible = true;
-        public bool IsYzPlaneVisible = true;
-        public bool IsXzPlaneVisible = true;
-        private Vector3 _position;
-        private float _cellSize;
+        private float _cellSize = 1.0f;
         private int _xSizeInCells;
         private int _ySizeInCells;
         private int _zSizeInCells;
-        private float _lineWidth;
-        private Color4 _xyPlaneColor;
-        private Color4 _xzPlaneColor;
-        private Color4 _yzPlaneColor;
-        private VertexArrayObject _gridVao;
-        private ShaderProgram _gridShaderProgram;
-        private bool _wasParametersChanged;
-        public Pivot _pivot = new (new Vector3(1,0,0));
+        private float _lineWidth = 1.0f;
+        private Color4 _xyPlaneColor = DefaultColor;
+        private Color4 _xzPlaneColor = DefaultColor;
+        private Color4 _yzPlaneColor = DefaultColor;
+        private int _vertexesVboIndex;
+        private int _colorsVboIndex;
+        private VertexArrayObject _vao;
+        private ShaderProgram _shaderProgram;
+        private bool _isTimeToUpdateVbo;
+        private int _vertexesAmount;
+        public readonly Pivot Pivot;
+        public bool IsVisible = true;
         
-        public Vector3 Position
+        public Grid(int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
+                float lineWidth = 1.0f) : this(Vector3.Zero, DefaultColor, xSizeInCells, ySizeInCells,
+                zSizeInCells, cellSize, lineWidth) {}
+        
+        public Grid(Vector3 position, Color4 color, int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0,
+                float cellSize = 1.0f, float lineWidth = 1.0f) : this(position, color, color,
+                color, xSizeInCells, ySizeInCells, zSizeInCells, cellSize, lineWidth) {}
+        
+        public Grid(Vector3 position, Color4 xyPlaneColor, Color4 xzPlaneColor, Color4 yzPlaneColor,
+                int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
+                float lineWidth = 1.0f) : this(new Pivot(position, lineWidth + 1.0f,
+                xSizeInCells * cellSize / 2.0f, ySizeInCells * cellSize / 2.0f,
+                zSizeInCells * cellSize / 2.0f), xyPlaneColor, xzPlaneColor, yzPlaneColor, xSizeInCells,
+                ySizeInCells, zSizeInCells, cellSize, lineWidth) {}
+        
+        public Grid(in Pivot pivot, Color4 color, int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0,
+                float cellSize = 1.0f, float lineWidth = 1.0f) : this(pivot, color, color,
+                color, xSizeInCells, ySizeInCells, zSizeInCells, cellSize, lineWidth) {}
+
+        public Grid(in Pivot pivot, Color4 xyPlaneColor, Color4 xzPlaneColor, Color4 yzPlaneColor,
+                int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f, 
+                float lineWidth = 1.0f)
         {
-            get => _position;
-            set
+            Pivot = (Pivot)pivot.Clone();
+            CellSize = cellSize;
+            XSizeInCells = xSizeInCells;
+            YSizeInCells = ySizeInCells;
+            ZSizeInCells = zSizeInCells;
+            LineWidth = lineWidth;
+            XyPlaneColor = xyPlaneColor;
+            XzPlaneColor = xzPlaneColor;
+            YzPlaneColor = yzPlaneColor;
+            _isTimeToUpdateVbo = false;
+        }
+
+        private void UpdateVertexesAmount()
+        {
+            var xyPlaneVertexesAmount = _xSizeInCells <= 0 || _ySizeInCells <= 0 ? 0 : 2 * (_xSizeInCells + 1)
+                    + 2 * (_ySizeInCells + 1);
+            var xzPlaneVertexesAmount = _xSizeInCells <= 0 || _zSizeInCells <= 0 ? 0 : 2 * (_xSizeInCells + 1)
+                    + 2 * (_zSizeInCells + 1);
+            var yzPlaneVertexesAmount = _ySizeInCells <= 0 || _zSizeInCells <= 0 ? 0 : 2 * (_ySizeInCells + 1)
+                    + 2 * (_zSizeInCells + 1);
+                
+            _vertexesAmount = xyPlaneVertexesAmount + xzPlaneVertexesAmount + yzPlaneVertexesAmount;
+        }
+
+        private (float[], float[]) VertexesAndColors
+        {
+            get
             {
-                _position = value;
-                _wasParametersChanged = true;
+                UpdateVertexesAmount();
+
+                if (_vertexesAmount == 0)
+                {
+                    return (Array.Empty<float>(), Array.Empty<float>());
+                }
+                
+                var vertexes = new float[_vertexesAmount * 3];
+                var colors = new float[_vertexesAmount * ColorChannelsAmount];
+                var vertexIndex = 0;
+                var colorIndex = 0;
+                var xSize = _xSizeInCells * _cellSize;
+                var ySize = _ySizeInCells * _cellSize;
+                var zSize = _zSizeInCells * _cellSize;
+
+                if (_xSizeInCells > 0 && _zSizeInCells > 0)
+                {
+                    for (var i = 0; i <= _zSizeInCells; i++)
+                    {
+                        vertexes[vertexIndex++] = -xSize / 2.0f;
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = -zSize / 2.0f + _cellSize * i;
+                        
+                        colors[colorIndex++] = _xzPlaneColor.R;
+                        colors[colorIndex++] = _xzPlaneColor.G;
+                        colors[colorIndex++] = _xzPlaneColor.B;
+                        colors[colorIndex++] = _xzPlaneColor.A;
+                        
+                        vertexes[vertexIndex++] = xSize / 2.0f;
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = -zSize / 2.0f + _cellSize * i;
+                        
+                        colors[colorIndex++] = _xzPlaneColor.R;
+                        colors[colorIndex++] = _xzPlaneColor.G;
+                        colors[colorIndex++] = _xzPlaneColor.B;
+                        colors[colorIndex++] = _xzPlaneColor.A;
+                    }
+
+                    for (var i = 0; i <= _xSizeInCells; i++)
+                    {
+                        vertexes[vertexIndex++] = -xSize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = -zSize / 2.0f;
+                        
+                        colors[colorIndex++] = _xzPlaneColor.R;
+                        colors[colorIndex++] = _xzPlaneColor.G;
+                        colors[colorIndex++] = _xzPlaneColor.B;
+                        colors[colorIndex++] = _xzPlaneColor.A;
+                        
+                        vertexes[vertexIndex++] = -xSize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = zSize / 2.0f;
+                        
+                        colors[colorIndex++] = _xzPlaneColor.R;
+                        colors[colorIndex++] = _xzPlaneColor.G;
+                        colors[colorIndex++] = _xzPlaneColor.B;
+                        colors[colorIndex++] = _xzPlaneColor.A;
+                    }
+                }
+
+                if (_xSizeInCells > 0 && _ySizeInCells > 0)
+                {
+                    for (var i = 0; i <= _ySizeInCells; i++)
+                    {
+                        vertexes[vertexIndex++] = -xSize / 2.0f;
+                        vertexes[vertexIndex++] = -ySize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = 0.0f;
+                        
+                        colors[colorIndex++] = _xyPlaneColor.R;
+                        colors[colorIndex++] = _xyPlaneColor.G;
+                        colors[colorIndex++] = _xyPlaneColor.B;
+                        colors[colorIndex++] = _xyPlaneColor.A;
+                        
+                        vertexes[vertexIndex++] = xSize / 2.0f;
+                        vertexes[vertexIndex++] = -ySize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = 0.0f;
+                        
+                        colors[colorIndex++] = _xyPlaneColor.R;
+                        colors[colorIndex++] = _xyPlaneColor.G;
+                        colors[colorIndex++] = _xyPlaneColor.B;
+                        colors[colorIndex++] = _xyPlaneColor.A;
+                    }
+
+                    for (var i = 0; i <= _xSizeInCells; i++)
+                    {
+                        vertexes[vertexIndex++] = -xSize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = -ySize / 2.0f;
+                        vertexes[vertexIndex++] = 0.0f;
+                        
+                        colors[colorIndex++] = _xyPlaneColor.R;
+                        colors[colorIndex++] = _xyPlaneColor.G;
+                        colors[colorIndex++] = _xyPlaneColor.B;
+                        colors[colorIndex++] = _xyPlaneColor.A;
+                        
+                        vertexes[vertexIndex++] = -xSize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = ySize / 2.0f;
+                        vertexes[vertexIndex++] = 0.0f;
+                        
+                        colors[colorIndex++] = _xyPlaneColor.R;
+                        colors[colorIndex++] = _xyPlaneColor.G;
+                        colors[colorIndex++] = _xyPlaneColor.B;
+                        colors[colorIndex++] = _xyPlaneColor.A;
+                    }
+                }
+
+                if (_ySizeInCells > 0 && _zSizeInCells > 0)
+                {
+                    for (var i = 0; i <= _ySizeInCells; i++)
+                    {
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = -ySize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = -zSize / 2.0f;
+                        
+                        colors[colorIndex++] = _yzPlaneColor.R;
+                        colors[colorIndex++] = _yzPlaneColor.G;
+                        colors[colorIndex++] = _yzPlaneColor.B;
+                        colors[colorIndex++] = _yzPlaneColor.A;
+                        
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = -ySize / 2.0f + _cellSize * i;
+                        vertexes[vertexIndex++] = zSize / 2.0f;
+                        
+                        colors[colorIndex++] = _yzPlaneColor.R;
+                        colors[colorIndex++] = _yzPlaneColor.G;
+                        colors[colorIndex++] = _yzPlaneColor.B;
+                        colors[colorIndex++] = _yzPlaneColor.A;
+                    }
+
+                    for (var i = 0; i <= _zSizeInCells; i++)
+                    {
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = -ySize / 2.0f;
+                        vertexes[vertexIndex++] = -zSize / 2.0f + _cellSize * i;
+                        
+                        colors[colorIndex++] = _yzPlaneColor.R;
+                        colors[colorIndex++] = _yzPlaneColor.G;
+                        colors[colorIndex++] = _yzPlaneColor.B;
+                        colors[colorIndex++] = _yzPlaneColor.A;
+                        
+                        vertexes[vertexIndex++] = 0.0f;
+                        vertexes[vertexIndex++] = ySize / 2.0f;
+                        vertexes[vertexIndex++] = -zSize / 2.0f + _cellSize * i;
+                        
+                        colors[colorIndex++] = _yzPlaneColor.R;
+                        colors[colorIndex++] = _yzPlaneColor.G;
+                        colors[colorIndex++] = _yzPlaneColor.B;
+                        colors[colorIndex++] = _yzPlaneColor.A;
+                    }
+                }
+
+                return (vertexes, colors);
             }
         }
 
@@ -48,12 +245,31 @@ namespace MiodenusAnimationConverter.Scene
                 if (value > 0.0f)
                 {
                     _cellSize = value;
-                    _wasParametersChanged = true;
+                    _isTimeToUpdateVbo = true;
                 }
                 else
                 {
                     Logger.Warn("Wrong value for CellSize parameter. Expected: value"
                             + $" greater than 0. Got: {value}. Cell size was not changed.");
+                }
+            }
+        }
+        
+        public int XyzSizeInCells
+        {
+            set
+            {
+                if (value >= 0)
+                {
+                    _xSizeInCells = value;
+                    _ySizeInCells = value;
+                    _zSizeInCells = value;
+                    _isTimeToUpdateVbo = true;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for XyzSizeInCells parameter. Expected: value"
+                            + $" greater than or equal to 0. Got: {value}. Grid size was not changed.");
                 }
             }
         }
@@ -66,12 +282,12 @@ namespace MiodenusAnimationConverter.Scene
                 if (value >= 0)
                 {
                     _xSizeInCells = value;
-                    _wasParametersChanged = true;
+                    _isTimeToUpdateVbo = true;
                 }
                 else
                 {
                     Logger.Warn("Wrong value for XSizeInCells parameter. Expected: value"
-                                + $" greater than or equal to 0. Got: {value}. X size in cells was not changed.");
+                            + $" greater than or equal to 0. Got: {value}. X size in cells was not changed.");
                 }
             }
         }
@@ -84,12 +300,12 @@ namespace MiodenusAnimationConverter.Scene
                 if (value >= 0)
                 {
                     _ySizeInCells = value;
-                    _wasParametersChanged = true;
+                    _isTimeToUpdateVbo = true;
                 }
                 else
                 {
                     Logger.Warn("Wrong value for YSizeInCells parameter. Expected: value"
-                                + $" greater than or equal to 0. Got: {value}. Y size in cells was not changed.");
+                            + $" greater than or equal to 0. Got: {value}. Y size in cells was not changed.");
                 }
             }
         }
@@ -102,12 +318,12 @@ namespace MiodenusAnimationConverter.Scene
                 if (value >= 0)
                 {
                     _zSizeInCells = value;
-                    _wasParametersChanged = true;
+                    _isTimeToUpdateVbo = true;
                 }
                 else
                 {
                     Logger.Warn("Wrong value for ZSizeInCells parameter. Expected: value"
-                                + $" greater than or equal to 0. Got: {value}. Z size in cells was not changed.");
+                            + $" greater than or equal to 0. Got: {value}. Z size in cells was not changed.");
                 }
             }
         }
@@ -120,13 +336,23 @@ namespace MiodenusAnimationConverter.Scene
                 if (value > 0.0f)
                 {
                     _lineWidth = value;
-                    _wasParametersChanged = true;
                 }
                 else
                 {
                     Logger.Warn("Wrong value for LineWidth parameter. Expected: value"
-                                + $" greater than 0. Got: {value}. Line width was not changed.");
+                            + $" greater than 0. Got: {value}. Line width was not changed.");
                 }
+            }
+        }
+        
+        public Color4 Color
+        {
+            set
+            {
+                _xzPlaneColor = value;
+                _xyPlaneColor = value;
+                _yzPlaneColor = value;
+                _isTimeToUpdateVbo = true;
             }
         }
         
@@ -136,7 +362,7 @@ namespace MiodenusAnimationConverter.Scene
             set
             {
                 _xzPlaneColor = value;
-                _wasParametersChanged = true;
+                _isTimeToUpdateVbo = true;
             }
         }
         
@@ -146,7 +372,7 @@ namespace MiodenusAnimationConverter.Scene
             set
             {
                 _xyPlaneColor = value;
-                _wasParametersChanged = true;
+                _isTimeToUpdateVbo = true;
             }
         }
         
@@ -156,41 +382,24 @@ namespace MiodenusAnimationConverter.Scene
             set
             {
                 _yzPlaneColor = value;
-                _wasParametersChanged = true;
+                _isTimeToUpdateVbo = true;
             }
-        }
-
-        public Grid(int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
-                float lineWidth = 1.0f) : this(Vector3.Zero, DefaultGridColor, xSizeInCells, ySizeInCells,
-                zSizeInCells, cellSize, lineWidth) {}
-        
-        public Grid(Vector3 position, Color4 color, int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0,
-                float cellSize = 1.0f, float lineWidth = 1.0f) : this(position, color, color,
-                color, xSizeInCells, ySizeInCells, zSizeInCells, cellSize, lineWidth) {}
-
-        public Grid(Vector3 position, Color4 xyPlaneColor, Color4 xzPlaneColor, Color4 yzPlaneColor,
-                int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
-                float lineWidth = 1.0f)
-        {
-            _position = position;
-            _cellSize = cellSize;
-            _xSizeInCells = xSizeInCells;
-            _ySizeInCells = ySizeInCells;
-            _zSizeInCells = zSizeInCells;
-            _lineWidth = lineWidth;
-            _xyPlaneColor = xyPlaneColor;
-            _xzPlaneColor = xzPlaneColor;
-            _yzPlaneColor = yzPlaneColor;
         }
 
         public void InitializeVao()
         {
-            _gridVao = new VertexArrayObject();
-            // InitializeGridShaderProgram();
-            _pivot.InitializeVao();
+            var (vertexes, colors) = VertexesAndColors;
+            
+            Pivot.InitializeVao();
+            InitializeShaderProgram();
+            _vao = new VertexArrayObject();
+            _vao.AddVertexBufferObject(vertexes, 3, BufferUsageHint.StreamDraw);
+            _vertexesVboIndex = _vao.VertexBufferObjectIndexes[^1];
+            _vao.AddVertexBufferObject(colors, ColorChannelsAmount, BufferUsageHint.StreamDraw);
+            _colorsVboIndex = _vao.VertexBufferObjectIndexes[^1];
         }
         
-        private void InitializeGridShaderProgram()
+        private void InitializeShaderProgram()
         {
             var shaders = new List<Shader>
             {
@@ -198,40 +407,51 @@ namespace MiodenusAnimationConverter.Scene
                 new (GridFragmentShader.Code, GridFragmentShader.Type)
             };
 
-            _gridShaderProgram = new ShaderProgram(shaders);
+            _shaderProgram = new ShaderProgram(shaders);
 
             for (var i = 0; i < shaders.Count; i++)
             {
                 shaders[i].Delete();
             }
         }
+        
+        private void UpdateVbo()
+        {
+            if (_isTimeToUpdateVbo)
+            {
+                var (vertexes, colors) = VertexesAndColors;
+                
+                _vao.UpdateVertexBufferObject(_vertexesVboIndex, vertexes);
+                _vao.UpdateVertexBufferObject(_colorsVboIndex, colors);
+                _isTimeToUpdateVbo = false;
+            }
+        }
 
         public void Draw(in Camera camera)
         {
-            _pivot.Draw(camera);
-            /*
-            if (IsXzPlaneVisible || IsXyPlaneVisible || IsYzPlaneVisible)
+            if (IsVisible)
             {
-                if (_wasParametersChanged)
-                {
-                    //UpdateUniform();
-                }
+                UpdateVbo();
 
-                _gridShaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
-                _gridShaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
+                _shaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
+                _shaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
+                _shaderProgram.SetVector3("pivot.position", Pivot.Position);
+                _shaderProgram.SetVector4("pivot.rotation", new Vector4(Pivot.Rotation.Xyz, Pivot.Rotation.W));
 
                 var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
                 
                 GL.LineWidth(_lineWidth);
-                _gridVao.Draw(1, PrimitiveType.Points);
+                _vao.Draw(_vertexesAmount, PrimitiveType.Lines);
                 GL.LineWidth(prevLineWidth);
-            }*/
+            }
+            
+            Pivot.Draw(camera);
         }
         
         public void DeleteVao()
         {
-            _gridVao.Delete();
-            _pivot.DeleteVao();
+            Pivot.DeleteVao();
+            _vao.Delete();
         }
     }
 }

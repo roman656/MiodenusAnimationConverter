@@ -28,21 +28,22 @@ namespace MiodenusAnimationConverter.Scene
         private bool _isTimeToUpdateVbo;
         private bool _isTimeToUpdateUniform = true;
         private int _vertexesVboIndex;
-        private Vector3 _position;
-        private float _lineWidth;
-        private float _xAxisSize;
-        private float _yAxisSize;
-        private float _zAxisSize;
+        private Vector3 _position = Vector3.Zero;
+        private float _lineWidth = 1.0f;
+        private float _xAxisSize = 1.0f;
+        private float _yAxisSize = 1.0f;
+        private float _zAxisSize = 1.0f;
         public bool IsVisible = true;
 
         public Pivot(Vector3 position, float lineWidth = 1.0f, float xAxisSize = 1.0f, float yAxisSize = 1.0f,
                 float zAxisSize = 1.0f)
         {
-            _position = position;
-            _lineWidth = lineWidth;
-            _xAxisSize = xAxisSize;
-            _yAxisSize = yAxisSize;
-            _zAxisSize = zAxisSize;
+            Position = position;
+            LineWidth = lineWidth;
+            XAxisSize = xAxisSize;
+            YAxisSize = yAxisSize;
+            ZAxisSize = zAxisSize;
+            _isTimeToUpdateVbo = false;
         }
 
         public Pivot(float lineWidth = 1.0f, float xAxisSize = 1.0f, float yAxisSize = 1.0f, float zAxisSize = 1.0f) :

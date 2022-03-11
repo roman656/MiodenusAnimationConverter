@@ -8,24 +8,13 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
         public const string Code = @"
                 #version 330 core
 
-                in VertexShaderOutput
-                {
-                    bool is_visible;
-                    vec4 color;
-                } vertex;
+                in vec4 vertex_color;
 
                 out vec4 color;
 
                 void main(void)
                 {
-                    if (vertex.is_visible)
-                    {
-                        color = vertex.color;
-                    }
-                    else
-                    {
-                        discard;
-                    }
+                    color = vertex_color;
                 }
                 ";
     }
