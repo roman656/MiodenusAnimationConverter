@@ -15,6 +15,9 @@ namespace MiodenusAnimationConverter.Scene
         private const int ColorChannelsAmount = 4;
         private static readonly Color4 DefaultColor = Color4.DarkGray;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private bool _isXyPlaneVisible = true;
+        private bool _isYzPlaneVisible = true;
+        private bool _isXzPlaneVisible = true;
         private float _cellSize = 1.0f;
         private int _xSizeInCells;
         private int _ySizeInCells;
@@ -30,8 +33,7 @@ namespace MiodenusAnimationConverter.Scene
         private bool _isTimeToUpdateVbo;
         private int _vertexesAmount;
         public readonly Pivot Pivot;
-        public bool IsVisible = true;
-        
+
         public Grid(int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
                 float lineWidth = 1.0f) : this(Vector3.Zero, DefaultColor, xSizeInCells, ySizeInCells,
                 zSizeInCells, cellSize, lineWidth) {}
@@ -69,12 +71,12 @@ namespace MiodenusAnimationConverter.Scene
 
         private void UpdateVertexesAmount()
         {
-            var xyPlaneVertexesAmount = _xSizeInCells <= 0 || _ySizeInCells <= 0 ? 0 : 2 * (_xSizeInCells + 1)
-                    + 2 * (_ySizeInCells + 1);
-            var xzPlaneVertexesAmount = _xSizeInCells <= 0 || _zSizeInCells <= 0 ? 0 : 2 * (_xSizeInCells + 1)
-                    + 2 * (_zSizeInCells + 1);
-            var yzPlaneVertexesAmount = _ySizeInCells <= 0 || _zSizeInCells <= 0 ? 0 : 2 * (_ySizeInCells + 1)
-                    + 2 * (_zSizeInCells + 1);
+            var xyPlaneVertexesAmount = !_isXyPlaneVisible || _xSizeInCells <= 0 || _ySizeInCells <= 0 ? 0 : 2
+                    * (_xSizeInCells + 1) + 2 * (_ySizeInCells + 1);
+            var xzPlaneVertexesAmount = !_isXzPlaneVisible || _xSizeInCells <= 0 || _zSizeInCells <= 0 ? 0 : 2
+                    * (_xSizeInCells + 1) + 2 * (_zSizeInCells + 1);
+            var yzPlaneVertexesAmount = !_isYzPlaneVisible || _ySizeInCells <= 0 || _zSizeInCells <= 0 ? 0 : 2
+                    * (_ySizeInCells + 1) + 2 * (_zSizeInCells + 1);
                 
             _vertexesAmount = xyPlaneVertexesAmount + xzPlaneVertexesAmount + yzPlaneVertexesAmount;
         }
@@ -98,7 +100,7 @@ namespace MiodenusAnimationConverter.Scene
                 var ySize = _ySizeInCells * _cellSize;
                 var zSize = _zSizeInCells * _cellSize;
 
-                if (_xSizeInCells > 0 && _zSizeInCells > 0)
+                if (_isXzPlaneVisible && _xSizeInCells > 0 && _zSizeInCells > 0)
                 {
                     for (var i = 0; i <= _zSizeInCells; i++)
                     {
@@ -143,7 +145,7 @@ namespace MiodenusAnimationConverter.Scene
                     }
                 }
 
-                if (_xSizeInCells > 0 && _ySizeInCells > 0)
+                if (_isXyPlaneVisible && _xSizeInCells > 0 && _ySizeInCells > 0)
                 {
                     for (var i = 0; i <= _ySizeInCells; i++)
                     {
@@ -188,7 +190,7 @@ namespace MiodenusAnimationConverter.Scene
                     }
                 }
 
-                if (_ySizeInCells > 0 && _zSizeInCells > 0)
+                if (_isYzPlaneVisible && _ySizeInCells > 0 && _zSizeInCells > 0)
                 {
                     for (var i = 0; i <= _ySizeInCells; i++)
                     {
@@ -234,6 +236,36 @@ namespace MiodenusAnimationConverter.Scene
                 }
 
                 return (vertexes, colors);
+            }
+        }
+
+        public bool IsXyPlaneVisible
+        {
+            get => _isXyPlaneVisible;
+            set
+            {
+                _isXyPlaneVisible = value;
+                _isTimeToUpdateVbo = true;
+            }
+        }
+        
+        public bool IsXzPlaneVisible
+        {
+            get => _isXzPlaneVisible;
+            set
+            {
+                _isXzPlaneVisible = value;
+                _isTimeToUpdateVbo = true;
+            }
+        }
+        
+        public bool IsYzPlaneVisible
+        {
+            get => _isYzPlaneVisible;
+            set
+            {
+                _isYzPlaneVisible = value;
+                _isTimeToUpdateVbo = true;
             }
         }
 
@@ -429,7 +461,7 @@ namespace MiodenusAnimationConverter.Scene
 
         public void Draw(in Camera camera)
         {
-            if (IsVisible)
+            if (_isXzPlaneVisible || _isXyPlaneVisible || _isYzPlaneVisible)
             {
                 UpdateVbo();
 
