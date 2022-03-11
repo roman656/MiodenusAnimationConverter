@@ -200,6 +200,11 @@ namespace MiodenusAnimationConverter
                     _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
                     break;
                 }
+                case Keys.G:
+                {
+                    _scene.IsGridVisible = !_scene.IsGridVisible;
+                    break;
+                }
             }
         }
 
@@ -237,8 +242,6 @@ namespace MiodenusAnimationConverter
             GL.ClearColor(_backgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            _scene.DrawGrid(_scene.CamerasController.CurrentDebugCamera);
-
             _angle = (float) (_deltaTime * _rotationRate);
             _scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             _scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
@@ -247,6 +250,8 @@ namespace MiodenusAnimationConverter
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
             CheckGLErrors();
+            
+            _scene.DrawGrid(_scene.CamerasController.CurrentDebugCamera);
 
             for (var i = 0; i < _scene.ModelGroups.Count; i++)
             {

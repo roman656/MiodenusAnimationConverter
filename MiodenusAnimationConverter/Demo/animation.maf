@@ -47,7 +47,7 @@
       "useCalculatedNormals": false,
       "baseTransformation":
       {
-        "location": [-60.0, -20.0, 0.0],
+        "location": [-1.5, 0.0, 0.3],
         "rotation":
         {
           "angle": -90.0,
@@ -118,13 +118,6 @@
       "startTime": 100,
       "timeLength": 3500,
       "useInterpolation": true
-    },
-        {
-          "modelName": "bolt_25x8",
-          "actionName": "Nut rotation",
-          "startTime": 100,
-          "timeLength": 3500,
-          "useInterpolation": true
-        }
+    }
   ]
 }

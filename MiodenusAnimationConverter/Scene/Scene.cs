@@ -16,9 +16,8 @@ namespace MiodenusAnimationConverter.Scene
 
         public Scene(in AnimationInfo animationInfo, in List<Model> models)
         {
-            var cameras = new List<Camera> { new (new Vector3(0.0f, 1.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
+            var cameras = new List<Camera> { new (new Vector3(0.0f, 0.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
             var debugCameras = new List<DebugCamera> { new (new Vector3(0.0f, 1.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
-            cameras[0].LookAt(Vector3.Zero);
             debugCameras[0].LookAt(Vector3.Zero);
             
             CamerasController = new CamerasController(cameras, debugCameras);
@@ -62,6 +61,21 @@ namespace MiodenusAnimationConverter.Scene
         {
             _grid.Draw(camera);
             _majorGrid.Draw(camera);
+        }
+
+        public bool IsGridVisible
+        {
+            get => _grid.IsXyPlaneVisible || _grid.IsXzPlaneVisible || _grid.IsYzPlaneVisible;
+            set
+            {
+                _grid.IsXyPlaneVisible = value;
+                _grid.IsXzPlaneVisible = value;
+                _grid.IsYzPlaneVisible = value;
+                _majorGrid.IsXyPlaneVisible = value;
+                _majorGrid.IsXzPlaneVisible = value;
+                _majorGrid.IsYzPlaneVisible = value;
+                _majorGrid.Pivot.IsVisible = value;
+            }
         }
     }
 }
