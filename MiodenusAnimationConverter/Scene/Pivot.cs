@@ -13,6 +13,7 @@ namespace MiodenusAnimationConverter.Scene
 {
     public class Pivot : ICloneable
     {
+        private const int VertexesAmount = 6;
         private const int ColorChannelsAmount = 4;
         private static readonly Color4 XAxisColor = Color4.Red;
         private static readonly Color4 YAxisColor = Color4.GreenYellow;
@@ -21,37 +22,118 @@ namespace MiodenusAnimationConverter.Scene
         private Vector3 _xAxisPositiveDirection = Vector3.UnitX;
         private Vector3 _yAxisPositiveDirection = Vector3.UnitY;
         private Vector3 _zAxisPositiveDirection = Vector3.UnitZ;
+        private Quaternion _rotation = Quaternion.Identity;
         private VertexArrayObject _vao;
         private ShaderProgram _shaderProgram;
-        private bool _wasParametersChanged;
+        private bool _isTimeToUpdateVbo;
+        private bool _isTimeToUpdateUniform = true;
         private int _vertexesVboIndex;
-        private Quaternion _rotation = Quaternion.Identity;
-        public Vector3 Position;
-        public float _lineWidth = 3.0f;
-        private float _xAxisSize = 1.0f;
-        private float _yAxisSize = 1.0f;
-        private float _zAxisSize = 1.0f;
+        private Vector3 _position;
+        private float _lineWidth;
+        private float _xAxisSize;
+        private float _yAxisSize;
+        private float _zAxisSize;
         public bool IsVisible = true;
 
-        public Pivot(Vector3 position)
+        public Pivot(Vector3 position, float lineWidth = 1.0f, float xAxisSize = 1.0f, float yAxisSize = 1.0f,
+                float zAxisSize = 1.0f)
         {
-            Position = position;
+            _position = position;
+            _lineWidth = lineWidth;
+            _xAxisSize = xAxisSize;
+            _yAxisSize = yAxisSize;
+            _zAxisSize = zAxisSize;
         }
-        
-        public Pivot() : this(Vector3.Zero) {}
 
-        public Pivot(Pivot pivot)
+        public Pivot(float lineWidth = 1.0f, float xAxisSize = 1.0f, float yAxisSize = 1.0f, float zAxisSize = 1.0f) :
+                this(Vector3.Zero, lineWidth, xAxisSize, yAxisSize, zAxisSize) {}
+        
+        public Pivot(in Pivot pivot)
         {
-            Position = pivot.Position;
+            _position = pivot.Position;
+            _rotation = pivot.Rotation;
             _xAxisPositiveDirection = pivot.XAxisPositiveDirection;
             _yAxisPositiveDirection = pivot.YAxisPositiveDirection;
             _zAxisPositiveDirection = pivot.ZAxisPositiveDirection;
+            _lineWidth = pivot.LineWidth;
+            _xAxisSize = pivot.XAxisSize;
+            _yAxisSize = pivot.YAxisSize;
+            _zAxisSize = pivot.ZAxisSize;
         }
         
         public Vector3 XAxisPositiveDirection => _xAxisPositiveDirection;
         public Vector3 YAxisPositiveDirection => _yAxisPositiveDirection;
         public Vector3 ZAxisPositiveDirection => _zAxisPositiveDirection;
+        public Quaternion Rotation => _rotation;
+        
+        public Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                _isTimeToUpdateUniform = true;
+            }
+        }
+        
+        public float LineWidth
+        {
+            get => _lineWidth;
+            set
+            {
+                if (value > 0.0f)
+                {
+                    _lineWidth = value;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for LineWidth parameter. Expected: value"
+                            + $" greater than 0. Got: {value}. Line width was not changed.");
+                }
+            }
+        }
 
+        public float XAxisSize
+        {
+            get => _xAxisSize;
+            set
+            {
+                _xAxisSize = value;
+                _isTimeToUpdateVbo = true;
+            }
+        }
+        
+        public float YAxisSize
+        {
+            get => _yAxisSize;
+            set
+            {
+                _yAxisSize = value;
+                _isTimeToUpdateVbo = true;
+            }
+        }
+        
+        public float ZAxisSize
+        {
+            get => _zAxisSize;
+            set
+            {
+                _zAxisSize = value;
+                _isTimeToUpdateVbo = true;
+            }
+        }
+        
+        public float AxesSize
+        {
+            set
+            {
+                _xAxisSize = value;
+                _yAxisSize = value;
+                _zAxisSize = value;
+                _isTimeToUpdateVbo = true;
+            }
+        }
+        
         private float[] Vertexes => new []
         {
             0.0f, 0.0f, 0.0f,
@@ -81,6 +163,7 @@ namespace MiodenusAnimationConverter.Scene
             _vertexesVboIndex = _vao.VertexBufferObjectIndexes[^1];
             _vao.AddVertexBufferObject(Colors, ColorChannelsAmount);
         }
+        
         private void InitializeShaderProgram()
         {
             var shaders = new List<Shader>
@@ -99,49 +182,20 @@ namespace MiodenusAnimationConverter.Scene
         
         private void UpdateVbo()
         {
-            if (_wasParametersChanged)
+            if (_isTimeToUpdateVbo)
             {
                 _vao.UpdateVertexBufferObject(_vertexesVboIndex, Vertexes);
-                _wasParametersChanged = false;
+                _isTimeToUpdateVbo = false;
             }
         }
 
-        public Quaternion Rotation
+        private void UpdateUniform()
         {
-            get
+            if (_isTimeToUpdateUniform)
             {
-                Quaternion xRotation, yRotation, zRotation, result;
-                
-                xRotation.Xyz = Vector3.Cross(Vector3.UnitX, _xAxisPositiveDirection);
-                xRotation.W = (float)Math.Sqrt((Vector3.UnitX.Length * Vector3.UnitX.Length) * (_xAxisPositiveDirection.Length * _xAxisPositiveDirection.Length)) + Vector3.Dot(Vector3.UnitX, _xAxisPositiveDirection);
-                xRotation.Normalize();
-                
-                yRotation.Xyz = Vector3.Cross(Vector3.UnitY, _yAxisPositiveDirection);
-                yRotation.W = (float)Math.Sqrt((Vector3.UnitY.Length * Vector3.UnitY.Length) * (_yAxisPositiveDirection.Length * _yAxisPositiveDirection.Length)) + Vector3.Dot(Vector3.UnitY, _yAxisPositiveDirection);
-                yRotation.Normalize();
-                
-                zRotation.Xyz = Vector3.Cross(Vector3.UnitZ, _zAxisPositiveDirection);
-                zRotation.W = (float)Math.Sqrt((Vector3.UnitZ.Length * Vector3.UnitZ.Length) * (_zAxisPositiveDirection.Length * _zAxisPositiveDirection.Length)) + Vector3.Dot(Vector3.UnitZ, _zAxisPositiveDirection);
-                zRotation.Normalize();
-
-                if (xRotation == yRotation && yRotation == zRotation)
-                {
-                    result = xRotation;
-                }
-                else if (xRotation == yRotation)
-                {
-                    result = yRotation * zRotation;
-                }
-                else if (xRotation == zRotation)
-                {
-                    result = xRotation * yRotation;
-                }
-                else
-                {
-                    result = xRotation * yRotation * zRotation;
-                }
-                
-                return result.Normalized();
+                _shaderProgram.SetVector3("pivot.position", _position);
+                _shaderProgram.SetVector4("pivot.rotation", new Vector4(_rotation.Xyz, _rotation.W));
+                _isTimeToUpdateUniform = false;
             }
         }
 
@@ -150,22 +204,15 @@ namespace MiodenusAnimationConverter.Scene
             if (IsVisible)
             {
                 UpdateVbo();
+                UpdateUniform();
                 
                 _shaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
                 _shaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
-                _shaderProgram.SetVector3("pivot.position", Position); //добавить проверку нужно ли обновлять данные
-                /*_shaderProgram.SetVector3("pivot.x_axis_positive_direction", _xAxisPositiveDirection);
-                _shaderProgram.SetVector3("pivot.y_axis_positive_direction", _yAxisPositiveDirection);
-                _shaderProgram.SetVector3("pivot.z_axis_positive_direction", _zAxisPositiveDirection);*/
 
-                var tmp = _rotation;
-                var rotation = new Vector4(tmp.Xyz, tmp.W);
-                _shaderProgram.SetVector4("pivot.rotation", rotation);
-                    
                 var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
                 
                 GL.LineWidth(_lineWidth);
-                _vao.Draw(6, PrimitiveType.Lines);
+                _vao.Draw(VertexesAmount, PrimitiveType.Lines);
                 GL.LineWidth(prevLineWidth);
             }
         }
@@ -177,52 +224,60 @@ namespace MiodenusAnimationConverter.Scene
             _xAxisPositiveDirection = Vector3.UnitX;
             _yAxisPositiveDirection = Vector3.UnitY;
             _zAxisPositiveDirection = Vector3.UnitZ;
+            _rotation = Quaternion.Identity;
+            _isTimeToUpdateUniform = true;
         }
 
         // Перемещение данной системы координат, посредством указания напрпавления перемещения в другой СК.
         public void Move(in Pivot pivot, float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
-            Position.X += pivot.XAxisPositiveDirection.X * deltaX + pivot.YAxisPositiveDirection.X * deltaY 
+            _position.X += pivot.XAxisPositiveDirection.X * deltaX + pivot.YAxisPositiveDirection.X * deltaY 
                     + pivot.ZAxisPositiveDirection.X * deltaZ;
-            Position.Y += pivot.XAxisPositiveDirection.Y * deltaX + pivot.YAxisPositiveDirection.Y * deltaY 
+            _position.Y += pivot.XAxisPositiveDirection.Y * deltaX + pivot.YAxisPositiveDirection.Y * deltaY 
                     + pivot.ZAxisPositiveDirection.Y * deltaZ;
-            Position.Z += pivot.XAxisPositiveDirection.Z * deltaX + pivot.YAxisPositiveDirection.Z * deltaY 
+            _position.Z += pivot.XAxisPositiveDirection.Z * deltaX + pivot.YAxisPositiveDirection.Z * deltaY 
                     + pivot.ZAxisPositiveDirection.Z * deltaZ;
+            _isTimeToUpdateUniform = true;
         }
         
         public void GlobalMove(float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
-            Position.X += deltaX;
-            Position.Y += deltaY;
-            Position.Z += deltaZ;
+            _position.X += deltaX;
+            _position.Y += deltaY;
+            _position.Z += deltaZ;
+            _isTimeToUpdateUniform = true;
         }
 
         public void LocalMove(float deltaX = 0.0f, float deltaY = 0.0f, float deltaZ = 0.0f)
         {
-            Position.X += _xAxisPositiveDirection.X * deltaX + _yAxisPositiveDirection.X * deltaY
+            _position.X += _xAxisPositiveDirection.X * deltaX + _yAxisPositiveDirection.X * deltaY
                     + _zAxisPositiveDirection.X * deltaZ;
-            Position.Y += _xAxisPositiveDirection.Y * deltaX + _yAxisPositiveDirection.Y * deltaY
+            _position.Y += _xAxisPositiveDirection.Y * deltaX + _yAxisPositiveDirection.Y * deltaY
                     + _zAxisPositiveDirection.Y * deltaZ;
-            Position.Z += _xAxisPositiveDirection.Z * deltaX + _yAxisPositiveDirection.Z * deltaY
+            _position.Z += _xAxisPositiveDirection.Z * deltaX + _yAxisPositiveDirection.Z * deltaY 
                     + _zAxisPositiveDirection.Z * deltaZ;
+            _isTimeToUpdateUniform = true;
         }
         
         public void Rotate(float angle, in Vector3 rotationVectorStartPoint, in Vector3 rotationVectorEndPoint)
         {
             var rotation = Quaternion.FromAxisAngle(rotationVectorEndPoint - rotationVectorStartPoint, angle);
-            Position = rotation * (Position - rotationVectorStartPoint) + rotationVectorStartPoint;
+            _position = rotation * (_position - rotationVectorStartPoint) + rotationVectorStartPoint;
+            _isTimeToUpdateUniform = true;
         }
 
         public void GlobalRotate(float angle, in Vector3 vector)
         {
-            Position = Quaternion.FromAxisAngle(vector, angle) * Position;
+            _position = Quaternion.FromAxisAngle(vector, angle) * _position;
+            _isTimeToUpdateUniform = true;
         }
         
         public void LocalRotate(float angle, in Vector3 vector)
         {
             var rotation = Quaternion.FromAxisAngle(vector, angle);
+
             _rotation = rotation * _rotation;
-            
+            _isTimeToUpdateUniform = true;
             _xAxisPositiveDirection = Vector3.Normalize(rotation * _xAxisPositiveDirection);
             _zAxisPositiveDirection = Vector3.Normalize(rotation * _zAxisPositiveDirection);
             _yAxisPositiveDirection = Vector3.Normalize(Vector3.Cross(_zAxisPositiveDirection,
@@ -231,12 +286,14 @@ namespace MiodenusAnimationConverter.Scene
         
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, $"Pivot: [ Position: ({Position.X}; {Position.Y};"
-                    + $" {Position.Z}) | X axis positive direction: ({_xAxisPositiveDirection.X};"
-                    + $" {_xAxisPositiveDirection.Y}; {_xAxisPositiveDirection.Z}) | Y axis positive direction: "
-                    + $"({_yAxisPositiveDirection.X}; {_yAxisPositiveDirection.Y}; {_yAxisPositiveDirection.Z}) "
-                    + $"| Z axis positive direction: ({_zAxisPositiveDirection.X}; {_zAxisPositiveDirection.Y}; "
-                    + $"{_zAxisPositiveDirection.Z}) ]");
+            return string.Format(CultureInfo.InvariantCulture, $"Pivot:\n\tPosition: ({_position.X}; {_position.Y};"
+                    + $" {_position.Z})\n\tX axis positive direction: ({_xAxisPositiveDirection.X};"
+                    + $" {_xAxisPositiveDirection.Y}; {_xAxisPositiveDirection.Z})\n\tY axis positive direction: "
+                    + $"({_yAxisPositiveDirection.X}; {_yAxisPositiveDirection.Y}; {_yAxisPositiveDirection.Z})\n\t"
+                    + $"Z axis positive direction: ({_zAxisPositiveDirection.X}; {_zAxisPositiveDirection.Y}; "
+                    + $"{_zAxisPositiveDirection.Z})\n\tRotation: ({_rotation.X}; {_rotation.Y}; {_rotation.Z};"
+                    + $" {_rotation.W})\n\tLine width: {_lineWidth}\n\tX axis size: {_xAxisSize}\n\tY axis size:"
+                    + $" {_yAxisSize}\n\tZ axis size: {_zAxisSize}\n");
         }
 
         public object Clone()

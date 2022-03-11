@@ -72,13 +72,13 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
                 }
 
                 void transform(inout vec3 vertex_position, inout vec3 vertex_normal)
-                {
-                    vertex_position = move(vertex_position, t_location);
-                    vertex_position = rotate(vertex_position, t_rotation);
+                {                    
                     vertex_position = scale(vertex_position, t_scale);
-
-                    vertex_normal = rotate(vertex_normal, t_rotation);
+                    vertex_position = rotate(vertex_position, t_rotation);
+                    vertex_position = move(vertex_position, t_location);
+                    
                     vertex_normal = scale(vertex_normal, t_scale);
+                    vertex_normal = rotate(vertex_normal, t_rotation);
                     vertex_normal = normalize(vertex_normal);
                 }
                 ";

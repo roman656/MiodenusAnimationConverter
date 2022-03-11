@@ -187,7 +187,6 @@ namespace MiodenusAnimationConverter.Scene
         {
             _gridVao = new VertexArrayObject();
             // InitializeGridShaderProgram();
-            //_pivot.Rotate(MathHelper.DegreesToRadians(45.0f), new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 0.0f));
             _pivot.InitializeVao();
         }
         
