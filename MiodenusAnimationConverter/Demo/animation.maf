@@ -23,7 +23,102 @@
     {
       "name": "bolt_25x8",
       "type": "stl",
-      "filename": "DebugAssets/Jagdtiger.stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false,
+      "baseTransformation":
+      {
+        "location": [-0.42, 0.7, 0.0],
+        "rotation":
+        {
+          "angle": 90.0,
+          "unit": "deg",
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
+        },
+        "scale": [0.025, 0.025, 0.025]
+      }
+    },
+    {
+      "name": "bolt_25x8_2",
+      "type": "stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false,
+      "baseTransformation":
+      {
+        "location": [-0.13, 0.7, -0.4],
+        "rotation":
+        {
+          "angle": 90.0,
+          "unit": "deg",
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
+        },
+        "scale": [0.025, 0.025, 0.025]
+      }
+    },
+    {
+      "name": "bolt_25x8_3",
+      "type": "stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false,
+      "baseTransformation":
+      {
+        "location": [-0.13, 0.7, 0.4],
+        "rotation":
+        {
+          "angle": 90.0,
+          "unit": "deg",
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
+        },
+        "scale": [0.025, 0.025, 0.025]
+      }
+    },
+    {
+      "name": "bolt_25x8_4",
+      "type": "stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false,
+      "baseTransformation":
+      {
+        "location": [0.34, 0.7, -0.25],
+        "rotation":
+        {
+          "angle": 90.0,
+          "unit": "deg",
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
+        },
+        "scale": [0.025, 0.025, 0.025]
+      }
+    },
+    {
+      "name": "bolt_25x8_5",
+      "type": "stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false,
+      "baseTransformation":
+      {
+        "location": [0.34, 0.7, 0.25],
+        "rotation":
+        {
+          "angle": 90.0,
+          "unit": "deg",
+          "vector": [1.0, 0.0, 0.0],
+          "basePoint": [0.0, 0.0, 0.0]
+        },
+        "scale": [0.025, 0.025, 0.025]
+      }
+    },
+    {
+      "name": "nut_6x9",
+      "type": "stl",
+      "filename": "DebugAssets/Det1.stl",
       "color": [0.45, 0.52, 0.58],
       "useCalculatedNormals": false,
       "baseTransformation":
@@ -31,26 +126,7 @@
         "location": [0.0, 0.0, 0.0],
         "rotation":
         {
-          "angle": -90.0,
-          "unit": "deg",
-          "vector": [1.0, 0.0, 0.0],
-          "basePoint": [0.0, 0.0, 0.0]
-        },
-        "scale": [0.015, 0.015, 0.015]
-      }
-    },
-    {
-      "name": "nut_6x9",
-      "type": "stl",
-      "filename": "DebugAssets/IS-6.stl",
-      "color": [0.45, 0.52, 0.58],
-      "useCalculatedNormals": false,
-      "baseTransformation":
-      {
-        "location": [-1.5, 0.0, 0.3],
-        "rotation":
-        {
-          "angle": -90.0,
+          "angle": 90.0,
           "unit": "deg",
           "vector": [1.0, 0.0, 0.0],
           "basePoint": [0.0, 0.0, 0.0]
@@ -69,12 +145,12 @@
           "time": 2000
         },
         {
-          "time": 11000,
+          "time": 3000,
           "isModelVisible": true,
           "color": [0.45, 0.52, 0.58],
           "transformation":
           {
-            "location": [0.0, 0.0, 0.0],
+            "location": [0.0, -0.137, 0.0],
             "rotation":
             {
               "angle": 359.0,
@@ -85,12 +161,12 @@
           }
         },
         {
-          "time": 20000,
+          "time": 4000,
           "isModelVisible": true,
           "color": [0.45, 0.52, 0.58],
           "transformation":
           {
-            "location": [0.0, 0.0, 0.0],
+            "location": [0.0, -0.138, 0.0],
             "rotation":
             {
               "angle": 359.0,
@@ -106,14 +182,35 @@
   "bindings":
   [
     {
-      "modelName": "nut_6x9",
+      "modelName": "bolt_25x8",
       "actionName": "Nut rotation",
       "startTime": 100,
       "timeLength": 3500,
       "useInterpolation": true
     },
     {
-      "modelName": "bolt_25x8",
+      "modelName": "bolt_25x8_2",
+      "actionName": "Nut rotation",
+      "startTime": 100,
+      "timeLength": 3500,
+      "useInterpolation": true
+    },
+    {
+      "modelName": "bolt_25x8_3",
+      "actionName": "Nut rotation",
+      "startTime": 100,
+      "timeLength": 3500,
+      "useInterpolation": true
+    },
+    {
+      "modelName": "bolt_25x8_4",
+      "actionName": "Nut rotation",
+      "startTime": 100,
+      "timeLength": 3500,
+      "useInterpolation": true
+    },
+    {
+      "modelName": "bolt_25x8_5",
       "actionName": "Nut rotation",
       "startTime": 100,
       "timeLength": 3500,

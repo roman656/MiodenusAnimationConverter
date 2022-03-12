@@ -51,6 +51,9 @@
       <None Update="Demo\Models\bolt_25x8.stl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="DebugAssets\Det1.stl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

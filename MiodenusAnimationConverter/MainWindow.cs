@@ -202,7 +202,9 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.G:
                 {
-                    _scene.IsGridVisible = !_scene.IsGridVisible;
+                    _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
+                    _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
+                    _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
                     break;
                 }
             }
@@ -251,7 +253,8 @@ namespace MiodenusAnimationConverter
 
             CheckGLErrors();
             
-            _scene.DrawGrid(_scene.CamerasController.CurrentDebugCamera);
+            _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
+            _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
 
             for (var i = 0; i < _scene.ModelGroups.Count; i++)
             {

@@ -9,9 +9,10 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
     {
         /// <summary>Массив <see cref="Triangle">полигонов</see>, образующих полигональную сетку.</summary>
         public readonly Triangle[] Triangles;
-        /// <summary>Трансформация полигональной сетки.</summary>
-        /// <remarks>Используется для перевода полигональной сетки в глобальную систему координат.</remarks>
+        public readonly Pivot Pivot;
+
         private Transformation _transformation;
+       // public Vector3 Scale;
 
         /// <summary>Конструктор полигональной сетки.</summary>
         /// <param name="triangles">массив <see cref="Triangle">полигонов</see>.</param>
