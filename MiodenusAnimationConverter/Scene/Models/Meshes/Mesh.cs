@@ -1,113 +1,209 @@
 using System;
 using System.Globalization;
+using MiodenusAnimationConverter.Scene.Cameras;
+using MiodenusAnimationConverter.Shaders;
+using NLog;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
-    /// <summary>Класс, представляющий собой полигональную сетку.</summary>
-    public class Mesh
+    public class Mesh : ICloneable
     {
-        /// <summary>Массив <see cref="Triangle">полигонов</see>, образующих полигональную сетку.</summary>
-        public readonly Triangle[] Triangles;
-        public readonly Pivot Pivot;
-
-        private Transformation _transformation;
-       // public Vector3 Scale;
-
-        /// <summary>Конструктор полигональной сетки.</summary>
-        /// <param name="triangles">массив <see cref="Triangle">полигонов</see>.</param>
-        public Mesh(in Triangle[] triangles)
+        private const int ColorChannelsAmount = 4;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly float[] _vertexColorsBuffer;
+        private readonly Triangle[] _triangles;
+        private Vector3 _scale = Vector3.One;
+        private VertexArrayObject _vao;
+        public readonly int VertexesAmount;
+        public readonly Pivot Pivot = new ();
+        public bool WasColorChanged;
+        private int _vertexesVboIndex;
+        private int _colorsVboIndex;
+        private bool _isTimeToUpdateVbo;
+        private bool _isTimeToUpdateUniform = true;
+        public bool IsVisible = true;
+        
+        public void InitializeVao()
         {
-            Triangles = new Triangle[triangles.Length];
-            Array.Copy(triangles, Triangles, triangles.Length);
-            _transformation = new Transformation(Vector3.Zero, Quaternion.Identity, Vector3.One);
+            UpdateVertexesColorsBuffer();
+
+            var (positions, normals) = Meshes["name"].VertexPositionsAndNormals;
+            var colors = Meshes["name"].VertexColorsBuffer;
+            
+            _vao = new VertexArrayObject();
+            _vao.AddVertexBufferObject(positions, 3);
+            _vao.AddVertexBufferObject(normals, 3);
+            _vao.AddVertexBufferObject(colors, ColorChannelsAmount,
+                BufferUsageHint.StreamDraw);
+
+            _colorsVboIndex = _vao.VertexBufferObjectIndexes[^1];
         }
-
-        /// <summary>Конструктор полигональной сетки.</summary>
-        /// <param name="triangles">массив <see cref="Triangle">полигонов</see>.</param>
-        /// <param name="transformation"><see cref="Transformation">трансформация</see> полигональной сетки.</param>
-        public Mesh(in Triangle[] triangles, Transformation transformation) : this(triangles)
+        
+        private void UpdateVertexesColorsVbo()
         {
-            _transformation = transformation;
-        }
-
-        /// <inheritdoc cref="_transformation"/>
-        public Transformation Transformation => _transformation;
-
-        /// <summary>
-        /// Устанавливает новый цвет всем <see cref="Triangle">полигонам</see>, входящим в состав сетки.
-        /// </summary>
-        public Color4 Color
-        {
-            set
+            if (_wasColorChanged)
             {
-                var trianglesAmount = Triangles.Length;
+                UpdateVertexesColorsBuffer();
+                _vao.UpdateVertexBufferObject(_colorsVboIndex, _vertexesColorsBuffer);
+                _wasColorChanged = false;
+            }
+        }
+        
+        public void Draw(in ShaderProgram shaderProgram, in Camera camera, PrimitiveType mode = PrimitiveType.Triangles)
+        {
+            if (IsVisible)
+            {
+                UpdateVertexesColorsVbo();
+
+                var rotation = new Vector4(Meshes.Transformation.Rotation.Xyz, Meshes.Transformation.Rotation.W);
                 
+                shaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
+                shaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
+                shaderProgram.SetVector3("pivot.position", Pivot.Position);
+                shaderProgram.SetVector4("pivot.rotation", new Vector4(Pivot.Rotation.Xyz, Pivot.Rotation.W));
+                shaderProgram.SetVector3("scale", Meshes.Transformation.Scale);
+
+                _vao.Draw(_vertexesAmount, mode);
+            }
+        }
+
+        
+        public void DeleteVao() => _vao.Delete();
+
+        public Mesh(in Triangle[] triangles) => Triangles = triangles;
+        public Mesh(in Triangle[] triangles, in Pivot pivot) : this(triangles, pivot, Vector3.One) {}
+        
+        public Mesh(in Triangle[] triangles, in Pivot pivot, Vector3 scale)
+        {
+            Triangles = triangles;
+            Pivot = (Pivot)pivot.Clone();
+            Scale = scale;
+        }
+        
+        public Mesh(in Mesh mesh)
+        {
+            Triangles = mesh._triangles;
+            Pivot = (Pivot)mesh.Pivot.Clone();
+            _scale = mesh._scale;
+        }
+
+        public Triangle[] Triangles
+        {
+            get => _triangles;
+            private init
+            {
+                _triangles = new Triangle[value.Length];
+                Array.Copy(value, _triangles, value.Length);
+                VertexesAmount = _triangles.Length * Triangle.VertexesAmount;
+                _vertexColorsBuffer = new float[VertexesAmount * ColorChannelsAmount];
+                UpdateVertexColorsBuffer();
+            }
+        }
+
+        public (float[], float[]) VertexPositionsAndNormals
+        {
+            get
+            {
+                var trianglesAmount = _triangles.Length;
+                var positions = new float[VertexesAmount * 3];
+                var normals = new float[VertexesAmount * 3];
+                var positionsIndex = 0;
+                var normalsIndex = 0;
+
                 for (var i = 0; i < trianglesAmount; i++)
                 {
-                    Triangles[i].Color = value;
+                    for (var j = 0; j < Triangle.VertexesAmount; j++)
+                    {
+                        positions[positionsIndex++] = _triangles[i].Vertexes[j].Position.X;
+                        positions[positionsIndex++] = _triangles[i].Vertexes[j].Position.Y;
+                        positions[positionsIndex++] = _triangles[i].Vertexes[j].Position.Z;
+                    
+                        normals[normalsIndex++] = _triangles[i].Vertexes[j].Normal.X;
+                        normals[normalsIndex++] = _triangles[i].Vertexes[j].Normal.Y;
+                        normals[normalsIndex++] = _triangles[i].Vertexes[j].Normal.Z;
+                    }
+                }
+
+                return (positions, normals);
+            }
+        }
+
+        public float[] VertexColorsBuffer
+        {
+            get
+            {
+                if (WasColorChanged)
+                {
+                    UpdateVertexColorsBuffer();
+                    WasColorChanged = false;
+                }
+
+                return _vertexColorsBuffer;
+            }
+        }
+
+        private void UpdateVertexColorsBuffer()
+        {
+            var trianglesAmount = _triangles.Length;
+            var index = 0;
+            
+            for (var i = 0; i < trianglesAmount; i++)
+            {
+                for (var j = 0; j < Triangle.VertexesAmount; j++)
+                {
+                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.R;
+                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.G;
+                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.B;
+                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.A;
+                }
+            }
+        }
+        
+        public void ResetScale() => _scale = Vector3.One;
+
+        public Vector3 Scale
+        {
+            get => _scale;
+            set
+            {
+                if (value.X > 0.0f && value.Y > 0.0f && value.Z > 0.0f)
+                {
+                    _scale = value;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for Scale parameter. Expected: value"
+                            + $" greater than 0 for X, Y and Z components. Got: {value}. Scale was not changed.");
                 }
             }
         }
 
-        /// <summary>Метод, сдвигающий полигональную сетку в трехмерном пространстве.</summary>
-        /// <remarks>
-        /// Сдвиг "применяется" к <see cref="Transformation">трансформации</see>.
-        /// <see cref="Triangles">Полигоны</see> сетки не изменяются.
-        /// </remarks>
-        /// <param name="deltaX">значение сдвига по оси OX.</param>
-        /// <param name="deltaY">значение сдвига по оси OY.</param>
-        /// <param name="deltaZ">значение сдвига по оси OZ.</param>
-        public void Move(float deltaX, float deltaY, float deltaZ)
+        public Color4 Color
         {
-            _transformation.Location.X += deltaX;
-            _transformation.Location.Y += deltaY;
-            _transformation.Location.Z += deltaZ;
+            set
+            {
+                var trianglesAmount = _triangles.Length;
+                
+                for (var i = 0; i < trianglesAmount; i++)
+                {
+                    _triangles[i].Color = value;
+                }
+
+                WasColorChanged = true;
+            }
+        }
+        
+        public object Clone()
+        {
+            return new Mesh(this);
         }
 
-        /// <summary>
-        /// Метод, поворачивающий полигональную сетку в трехмерном пространстве на угол <c>angle</c>
-        /// вокруг вектора <c>vector</c>.
-        /// </summary>
-        /// <remarks>
-        /// Поворот "применяется" к <see cref="Transformation">трансформации</see>.
-        /// <see cref="Triangles">Полигоны</see> сетки не изменяются. Поворот осуществляется против часовой
-        /// стрелки, если смотреть в направлении противоположном вектору, вокруг которого происходит вращение.
-        /// </remarks>
-        /// <param name="angle">значение угла поворота (в радианах).</param>
-        /// <param name="vector">вектор, вокруг которого будет осуществлен поворот.</param>
-        public void Rotate(float angle, Vector3 vector)
-        {
-            _transformation.Rotation *= Quaternion.FromAxisAngle(vector, angle);
-        }
-
-        /// <summary>Метод, выполняющий масштабирование полигональной сетки.</summary>
-        /// <remarks>
-        /// Масштабирование "применяется" к <see cref="Transformation">трансформации</see>.
-        /// <see cref="Triangles">Полигоны</see> сетки не изменяются.
-        /// </remarks>
-        /// <param name="scaleX">значение масштаба по оси OX.</param>
-        /// <param name="scaleY">значение масштаба по оси OY.</param>
-        /// <param name="scaleZ">значение масштаба по оси OZ.</param>
-        public void Scale(float scaleX, float scaleY, float scaleZ)
-        {
-            _transformation.Scale.X *= scaleX;
-            _transformation.Scale.Y *= scaleY;
-            _transformation.Scale.Z *= scaleZ;
-        }
-
-        /// <summary>Метод, переводящий параметры полигональной сетки в строку.</summary>
-        /// <remarks>
-        /// Так как число <see cref="Triangles">полигонов</see> сетки может быть достаточно большим - было
-        /// принято решение выводить только их количество. В случае необходимости получения подробной информации
-        /// о любом полигоне, находящемся в составе сетки, можно обратиться к соответствующему
-        /// <see cref="Triangles">полю</see> класса.
-        /// </remarks>
-        /// <returns>Строка, содержащая информацию о сетке.</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, $"Mesh:\n\tTriangles amount: {Triangles.Length}\n\t"
-                    + Transformation);
+            return string.Format(CultureInfo.InvariantCulture, $"Mesh:\n\tTriangles amount: {_triangles.Length}\n\t"
+                    + $"Scale: ({_scale.X}; {_scale.Y}; {_scale.Z})\n\t" + Pivot);
         }
     }
 }
