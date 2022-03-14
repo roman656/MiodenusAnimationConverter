@@ -8,6 +8,12 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
         public const string Code = @"
                 #version 330 core
 
+                struct Pivot
+                {
+                    vec3 position;
+                    vec4 rotation;
+                };
+
                 layout (location = 0) in vec3 position;
                 layout (location = 1) in vec3 normal;
                 layout (location = 2) in vec4 color;
@@ -18,12 +24,13 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
                     vec3 normal;
                     vec4 color;
                 } transformed_vertex;
-
-                uniform vec3 t_location;
-                uniform vec4 t_rotation;
-                uniform vec3 t_scale;
+              
                 uniform mat4 view;
                 uniform mat4 projection;
+                uniform Pivot mesh_pivot;
+                uniform vec3 mesh_scale;
+                uniform Pivot model_pivot;
+                uniform vec3 model_scale;
 
                 vec3 move(const in vec3 vector, const in vec3 delta);
                 vec3 rotate(const in vec3 vector, const in vec4 quaternion);
@@ -46,13 +53,7 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
 
                 vec3 move(const in vec3 vector, const in vec3 delta)
                 {
-                    vec3 result = vec3(vector);
-
-                    result.x += delta.x;
-                    result.y += delta.y;
-                    result.z += delta.z;
-
-                    return result;
+                    return (vector + delta);
                 }
 
                 vec3 rotate(const in vec3 vector, const in vec4 quaternion)
@@ -73,12 +74,17 @@ namespace MiodenusAnimationConverter.Shaders.VertexShaders
 
                 void transform(inout vec3 vertex_position, inout vec3 vertex_normal)
                 {                    
-                    vertex_position = scale(vertex_position, t_scale);
-                    vertex_position = rotate(vertex_position, t_rotation);
-                    vertex_position = move(vertex_position, t_location);
+                    vertex_position = scale(vertex_position, mesh_scale);
+                    vertex_position = rotate(vertex_position, mesh_pivot.rotation);
+                    vertex_position = move(vertex_position, mesh_pivot.position);
+                    vertex_position = scale(vertex_position, model_scale);
+                    vertex_position = rotate(vertex_position, model_pivot.rotation);
+                    vertex_position = move(vertex_position, model_pivot.position);
                     
-                    vertex_normal = scale(vertex_normal, t_scale);
-                    vertex_normal = rotate(vertex_normal, t_rotation);
+                    vertex_normal = scale(vertex_normal, mesh_scale);
+                    vertex_normal = rotate(vertex_normal, mesh_pivot.rotation);
+                    vertex_normal = scale(vertex_normal, model_scale);
+                    vertex_normal = rotate(vertex_normal, model_pivot.rotation);
                     vertex_normal = normalize(vertex_normal);
                 }
                 ";

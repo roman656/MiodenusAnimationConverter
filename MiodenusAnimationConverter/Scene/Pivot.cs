@@ -297,9 +297,6 @@ namespace MiodenusAnimationConverter.Scene
                     + $" {_yAxisSize}\n\tZ axis size: {_zAxisSize}\n");
         }
 
-        public object Clone()
-        {
-            return new Pivot(this);
-        }
+        public object Clone() => new Pivot(this);
     }
 }

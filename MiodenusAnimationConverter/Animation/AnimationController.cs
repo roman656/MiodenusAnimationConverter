@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using MiodenusAnimationConverter.Scene.Models;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using NLog;
@@ -21,16 +22,16 @@ namespace MiodenusAnimationConverter.Animation
             _animation = animation;
             _scene = scene;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
-            Initialize();
+            //Initialize();
         }
-
+/*
         private void Initialize()
         {
             var j = 0;
 
             foreach (var modelGroup in _scene.ModelGroups)
             {
-                while (modelGroup.Models[0].Name != _animation.ModelsInfo[j].Name)
+                while (modelGroup.Models.Keys.ElementAt(0) != _animation.ModelsInfo[j].Name)
                 {
                     j++;
                 }
@@ -105,7 +106,7 @@ namespace MiodenusAnimationConverter.Animation
 
                                 if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
                                 {
-                                    TransformModel(model, nextState.Transformation);
+                                    //TransformModel(model, nextState.Transformation);
                                 }
                                 else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex 
                                         && !wasModelTransformed)
@@ -126,7 +127,7 @@ namespace MiodenusAnimationConverter.Animation
             }
             
             _currentFrameIndex++;
-        }
+        }*/
 
         public int CurrentFrameIndex => _currentFrameIndex;
     }

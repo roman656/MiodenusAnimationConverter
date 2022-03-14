@@ -14,7 +14,7 @@ namespace MiodenusAnimationConverter.Animation
         public string Filename { get; set; }
         public bool UseCalculatedNormals { get; set; }
         public Color4 Color { get; set; }
-        public Transformation BaseTransformation { get; set; }
+        //public Transformation BaseTransformation { get; set; }
         public List<ActionBinding> ActionBindings { get; set; }
 
         public ModelInfo(MAFStructure.ModelInfo modelInfo, List<ActionBinding> actionBindings)
@@ -24,10 +24,10 @@ namespace MiodenusAnimationConverter.Animation
             Filename = modelInfo.Filename;
             UseCalculatedNormals = modelInfo.UseCalculatedNormals;
             Color = ConvertColor(modelInfo.Color);
-            BaseTransformation = ConvertTransformation(modelInfo.BaseTransformation);
+            //BaseTransformation = ConvertTransformation(modelInfo.BaseTransformation);
             ActionBindings = actionBindings;
         }
-
+/*
         private static Transformation ConvertTransformation(MAFStructure.Transformation transformation)
         {
             var location = new Vector3(transformation.Location[0],
@@ -37,7 +37,7 @@ namespace MiodenusAnimationConverter.Animation
             var scale = ConvertScale(transformation.Scale);
             
             return new Transformation(location, rotation, scale);
-        }
+        }*/
         
         private static Quaternion ConvertRotation(MAFStructure.Rotation rotation)
         {
@@ -94,7 +94,7 @@ namespace MiodenusAnimationConverter.Animation
             var random = new Random();
             return new Color4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1.0f);
         }
-
+/*
         public override string ToString()
         {
             var bindings = "Action bindings:\n";
@@ -111,6 +111,6 @@ namespace MiodenusAnimationConverter.Animation
                     $"Model info:\n\tName: {Name}\n\tType: {Type}\n\tFilename: {Filename}\n\t"
                     + $"Use calculated normals: {UseCalculatedNormals}\n\tColor: ({Color.R}; {Color.G}; {Color.B};"
                     + $" {Color.A})\n\tBase transformation -> {BaseTransformation}\n\t{bindings}\n");
-        }
+        }*/
     }
 }

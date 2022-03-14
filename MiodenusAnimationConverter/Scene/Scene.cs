@@ -26,7 +26,7 @@ namespace MiodenusAnimationConverter.Scene
             for (var i = 0; i < models.Count; i++)
             {
                 var tempGroup = new ModelGroup();
-                tempGroup.Models.Add(models[i]);
+                tempGroup.Models[$"{i}"] = models[i];
                 ModelGroups.Add(tempGroup);
             }
 
@@ -42,7 +42,7 @@ namespace MiodenusAnimationConverter.Scene
             
             for (var i = 0; i < ModelGroups.Count; i++)
             {
-                ModelGroups[i].Initialize();
+                ModelGroups[i].InitializeVao();
             }
         }
         
@@ -54,7 +54,7 @@ namespace MiodenusAnimationConverter.Scene
             
             for (var i = 0; i < ModelGroups.Count; i++)
             {
-                ModelGroups[i].Delete();
+                ModelGroups[i].DeleteVao();
             }
         }
     }

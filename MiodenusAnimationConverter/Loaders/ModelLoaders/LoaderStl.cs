@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Exceptions;
 using MiodenusAnimationConverter.Scene.Models;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
@@ -32,26 +33,26 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                                                               "endfacet",
                                                               "endsolid " };
 
-        public Model Load(string filename, in Color4 modelColor, bool useCalculatedNormals)
+        public Model Load(in ModelInfo modelInfo)
         {
             Model model;
             
-            Logger.Trace($"Loading model from {filename} started.");
+            Logger.Trace($"Loading model from {modelInfo.Filename} started.");
 
-            CheckModelFile(filename);
+            CheckModelFile(modelInfo.Filename);
 
-            var fileData = File.ReadAllBytes(filename);
+            var fileData = File.ReadAllBytes(modelInfo.Filename);
             
             if (RecogniseStlFormat(fileData) == StlFormat.Ascii)
             {
-                model = LoadAsciiStl(fileData, modelColor, useCalculatedNormals);
+                model = LoadAsciiStl(fileData, modelInfo.Color, modelInfo.UseCalculatedNormals, modelInfo.Name);
             }
             else
             {
-                model = LoadBinaryStl(fileData, modelColor, useCalculatedNormals);
+                model = LoadBinaryStl(fileData, modelInfo.Color, modelInfo.UseCalculatedNormals, modelInfo.Name);
             }
             
-            Logger.Trace($"Loading model from {filename} finished.");
+            Logger.Trace($"Loading model from {modelInfo.Filename} finished.");
             
             return model;
         }
@@ -113,7 +114,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             return result;
         }
         
-        private static Model LoadAsciiStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals)
+        private static Model LoadAsciiStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals, in string name)
         {
             var triangles = new List<Triangle>();
             var fileLines = System.Text.Encoding.ASCII.GetString(fileData).ToLower().Split('\n');
@@ -221,11 +222,11 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             {
                 Logger.Warn("Warning: there are no triangles in the model file.");
             }
-            
-            return new Model(new Mesh(triangles.ToArray()));
+
+            return new Model(new Dictionary<string, Mesh> { [name] = new (triangles.ToArray()) });
         }
         
-        private static Model LoadBinaryStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals)
+        private static Model LoadBinaryStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals, in string name)
         {
             CheckBinaryStlFileContent(fileData);
             
@@ -272,7 +273,7 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
                 Logger.Warn("Warning: there are no triangles in the model file.");
             }
 
-            return new Model(new Mesh(triangles));
+            return new Model(new Dictionary<string, Mesh> { [name] = new (triangles) });
         }
 
         private static void CheckBinaryStlFileContent(in byte[] fileData)

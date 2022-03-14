@@ -104,7 +104,14 @@ namespace MiodenusAnimationConverter
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
-            
+
+            _scene.ModelGroups[0].Models["0"].Scale = new Vector3(0.015f);
+            _scene.ModelGroups[1].Models["1"].Scale = new Vector3(0.015f);
+            _scene.ModelGroups[2].Models["2"].Scale = new Vector3(0.015f);
+            _scene.ModelGroups[3].Models["3"].Scale = new Vector3(0.015f);
+            _scene.ModelGroups[4].Models["4"].Scale = new Vector3(0.015f);
+            _scene.ModelGroups[5].Models["5"].Scale = new Vector3(0.015f);
+
             InitializeShaderPrograms();
 
             GL.Enable(EnableCap.DepthTest);
@@ -238,7 +245,7 @@ namespace MiodenusAnimationConverter
 
             base.OnRenderFrame(e);
 
-            _animationController.PrepareSceneToNextFrame();
+            //_animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
 
             GL.ClearColor(_backgroundColor);

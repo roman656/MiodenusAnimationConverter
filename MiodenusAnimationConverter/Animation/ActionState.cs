@@ -10,16 +10,16 @@ namespace MiodenusAnimationConverter.Animation
         public int Time { get; set; }
         public bool IsModelVisible { get; set; }
         public Color4 Color { get; set; }
-        public Transformation Transformation { get; set; }
+       // public Transformation Transformation { get; set; }
 
         public ActionState(MAFStructure.ActionState actionState)
         {
             Time = (actionState.Time < 0) ? 0 : actionState.Time;
             IsModelVisible = actionState.IsModelVisible;
             Color = ConvertColor(actionState.Color);    // TODO: Если цвет не будет задан явно будет рандомный. Надо исправить.
-            Transformation = ConvertTransformation(actionState.Transformation);
+           // Transformation = ConvertTransformation(actionState.Transformation);
         }
-        
+      /*  
         private static Transformation ConvertTransformation(MAFStructure.Transformation transformation)
         {
             var location = new Vector3(transformation.Location[0],
@@ -29,7 +29,7 @@ namespace MiodenusAnimationConverter.Animation
             var scale = ConvertScale(transformation.Scale);
             
             return new Transformation(location, rotation, scale);
-        }
+        }*/
         
         private static Quaternion ConvertRotation(MAFStructure.Rotation rotation)
         {
@@ -86,12 +86,12 @@ namespace MiodenusAnimationConverter.Animation
             var random = new Random();
             return new Color4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1.0f);
         }
-        
+ /*       
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture,
                     $"Action state:\n\tTime: {Time}\n\tIs model visible: {IsModelVisible}\n\tColor: ({Color.R};"
                     + $" {Color.G}; {Color.B}; {Color.A})\n\t{Transformation}\n");
-        }
+        }*/
     }
 }

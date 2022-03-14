@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Scene.Models;
 using MiodenusAnimationConverter.Shaders;
@@ -9,29 +10,29 @@ namespace MiodenusAnimationConverter.Scene
 {
     public class ModelGroup
     {
-        public readonly List<Model> Models = new ();
+        public readonly Dictionary<string, Model> Models = new ();
 
         public void Draw(in ShaderProgram shaderProgram, in Camera camera, PrimitiveType mode = PrimitiveType.Triangles)
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].Draw(shaderProgram, camera, mode);
+                Models.Values.ElementAt(i).Draw(shaderProgram, camera, mode);
             }
         }
 
-        public void Initialize()
+        public void InitializeVao()
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].InitializeVao();
+                Models.Values.ElementAt(i).InitializeVao();
             }
         }
         
-        public void Delete()
+        public void DeleteVao()
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].DeleteVao();
+                Models.Values.ElementAt(i).DeleteVao();
             }
         }
 
@@ -39,7 +40,7 @@ namespace MiodenusAnimationConverter.Scene
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].Move(deltaX, deltaY, deltaZ);
+                Models.Values.ElementAt(i).Pivot.GlobalMove(deltaX, deltaY, deltaZ);
             }
         }
 
@@ -47,7 +48,7 @@ namespace MiodenusAnimationConverter.Scene
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].Rotate(angle, vector);
+                Models.Values.ElementAt(i).Pivot.GlobalRotate(angle, vector);
             }
         }
 
@@ -55,7 +56,7 @@ namespace MiodenusAnimationConverter.Scene
         {
             for (var i = 0; i < Models.Count; i++)
             {
-                Models[i].Scale(scaleX, scaleY, scaleZ);
+                Models.Values.ElementAt(i).Scale = new Vector3(scaleX, scaleY, scaleZ);
             }
         }
     }
