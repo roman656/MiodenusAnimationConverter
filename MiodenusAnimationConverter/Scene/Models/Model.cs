@@ -21,11 +21,8 @@ namespace MiodenusAnimationConverter.Scene.Models
          * На каждую модель должен быть отдельный набор мешей (входной словарь не использовать больше 1 раза для
          * создания моделей).
          */
-        public Model(in Dictionary<string, Mesh> meshes)
-        {
-            Meshes = meshes.ToDictionary(entry => entry.Key, entry => entry.Value);
-        }
-        
+        public Model(in Dictionary<string, Mesh> meshes) => Meshes = meshes;
+
         public void Scale(float scaleX = 1.0f, float scaleY = 1.0f, float scaleZ = 1.0f)
         {
             if (scaleX > 0.0f && scaleY > 0.0f && scaleZ > 0.0f)

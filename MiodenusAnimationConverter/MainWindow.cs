@@ -102,14 +102,17 @@ namespace MiodenusAnimationConverter
         {
             _scene.Initialize();
 
-            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
+            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 5.0f, 3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
 
-            for (var i = 0; i < 6; i++)
+            for (var i = 0; i < _scene.Models.Count; i++)
             {
                 _scene.Models.Values.ElementAt(i).Scale(0.015f, 0.015f, 0.015f);
+                _scene.Models.Values.ElementAt(i).Pivot.LocalRotate(MathHelper.DegreesToRadians(-90.0f), Vector3.UnitX);
             }
+            
+            _scene.Models.Values.ElementAt(1).Pivot.Position = new Vector3(1.0f, 0.0f, 0.3f);
 
             InitializeShaderPrograms();
 
@@ -153,44 +156,34 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.Up:
                 {
-                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, -2.0f, 0.0f);
+                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, -0.0075f, 0.0f);
                     break;
                 }
                 case Keys.Down:
                 {
-                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, 20.0f, 0.0f);
+                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, 0.0075f, 0.0f);
                     break;
-                }/*
+                }
                 case Keys.Left:
                 {
-                    _scene.ModelGroups[0].Move(-20.0f, 0.0f, 0.0f);
+                    _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(0.45f), Vector3.UnitY);
                     break;
                 }
                 case Keys.Right:
                 {
-                    _scene.ModelGroups[0].Move(20.0f, 0.0f, 0.0f);
-                    break;
-                }
-                case Keys.Y:
-                {
-                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(1, 0, 0));
-                    break;
-                }
-                case Keys.U:
-                {
-                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 1, 0));
+                    _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-0.45f), Vector3.UnitY);
                     break;
                 }
                 case Keys.M:
                 {
-                    _scene.ModelGroups[0].ModelsScale = new Vector3(0.99f, 0.99f, 0.99f);
+                    _scene.Models.Values.ElementAt(0).Scale(0.99f, 0.99f, 0.99f);
                     break;
                 }
                 case Keys.N:
                 {
-                    _scene.ModelGroups[0].ModelsScale = new Vector3(1.01f, 1.01f, 1.01f);
+                    _scene.Models.Values.ElementAt(0).Scale(1.01f, 1.01f, 1.01f);
                     break;
-                }*/
+                }
                 case Keys.H:
                 {
                     _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
@@ -253,7 +246,6 @@ namespace MiodenusAnimationConverter
             _angle = (float) (_deltaTime * _rotationRate);
             _scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             _scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
-            //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
