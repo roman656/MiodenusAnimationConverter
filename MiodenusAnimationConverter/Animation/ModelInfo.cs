@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using OpenTK.Mathematics;
 
@@ -14,7 +15,7 @@ namespace MiodenusAnimationConverter.Animation
         public string Filename { get; set; }
         public bool UseCalculatedNormals { get; set; }
         public Color4 Color { get; set; }
-        //public Transformation BaseTransformation { get; set; }
+        public Pivot BaseTransformation { get; set; }
         public List<ActionBinding> ActionBindings { get; set; }
 
         public ModelInfo(MAFStructure.ModelInfo modelInfo, List<ActionBinding> actionBindings)
@@ -24,11 +25,11 @@ namespace MiodenusAnimationConverter.Animation
             Filename = modelInfo.Filename;
             UseCalculatedNormals = modelInfo.UseCalculatedNormals;
             Color = ConvertColor(modelInfo.Color);
-            //BaseTransformation = ConvertTransformation(modelInfo.BaseTransformation);
+            BaseTransformation = ConvertTransformation(modelInfo.BaseTransformation);
             ActionBindings = actionBindings;
         }
-/*
-        private static Transformation ConvertTransformation(MAFStructure.Transformation transformation)
+
+        private static Pivot ConvertTransformation(MAFStructure.Transformation transformation)
         {
             var location = new Vector3(transformation.Location[0],
                                        transformation.Location[1], 
@@ -36,9 +37,17 @@ namespace MiodenusAnimationConverter.Animation
             var rotation = ConvertRotation(transformation.Rotation);
             var scale = ConvertScale(transformation.Scale);
             
-            return new Transformation(location, rotation, scale);
-        }*/
-        
+            var temp = new Pivot(location);
+            var angle = (transformation.Rotation.Unit == "deg")
+                ? MathHelper.DegreesToRadians(transformation.Rotation.Angle)
+                : transformation.Rotation.Angle;
+            var axis1 = new Vector3(transformation.Rotation.Vector[0], transformation.Rotation.Vector[1], transformation.Rotation.Vector[2]);
+            var axis2 = new Vector3(transformation.Rotation.BasePoint[0], transformation.Rotation.BasePoint[1], transformation.Rotation.BasePoint[2]);
+            temp.Rotate(angle, axis1, axis2);
+            //scale
+            return temp;
+        }
+
         private static Quaternion ConvertRotation(MAFStructure.Rotation rotation)
         {
             var axis = new Vector3(rotation.Vector[0], rotation.Vector[1], rotation.Vector[2]);

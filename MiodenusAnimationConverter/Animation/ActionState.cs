@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Scene.Models.Meshes;
 using OpenTK.Mathematics;
 
@@ -10,17 +11,17 @@ namespace MiodenusAnimationConverter.Animation
         public int Time { get; set; }
         public bool IsModelVisible { get; set; }
         public Color4 Color { get; set; }
-       // public Transformation Transformation { get; set; }
+        public Pivot Transformation { get; set; }
 
         public ActionState(MAFStructure.ActionState actionState)
         {
             Time = (actionState.Time < 0) ? 0 : actionState.Time;
             IsModelVisible = actionState.IsModelVisible;
             Color = ConvertColor(actionState.Color);    // TODO: Если цвет не будет задан явно будет рандомный. Надо исправить.
-           // Transformation = ConvertTransformation(actionState.Transformation);
+            Transformation = ConvertTransformation(actionState.Transformation);
         }
-      /*  
-        private static Transformation ConvertTransformation(MAFStructure.Transformation transformation)
+       
+        private static Pivot ConvertTransformation(MAFStructure.Transformation transformation)
         {
             var location = new Vector3(transformation.Location[0],
                 transformation.Location[1], 
@@ -28,8 +29,16 @@ namespace MiodenusAnimationConverter.Animation
             var rotation = ConvertRotation(transformation.Rotation);
             var scale = ConvertScale(transformation.Scale);
             
-            return new Transformation(location, rotation, scale);
-        }*/
+            var temp = new Pivot(location);
+            var angle = (transformation.Rotation.Unit == "deg")
+                ? MathHelper.DegreesToRadians(transformation.Rotation.Angle)
+                : transformation.Rotation.Angle;
+            var axis1 = new Vector3(transformation.Rotation.Vector[0], transformation.Rotation.Vector[1], transformation.Rotation.Vector[2]);
+            var axis2 = new Vector3(transformation.Rotation.BasePoint[0], transformation.Rotation.BasePoint[1], transformation.Rotation.BasePoint[2]);
+            temp.Rotate(angle, axis1, axis2);
+            //scale
+            return temp;
+        }
         
         private static Quaternion ConvertRotation(MAFStructure.Rotation rotation)
         {
@@ -86,7 +95,7 @@ namespace MiodenusAnimationConverter.Animation
             var random = new Random();
             return new Color4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1.0f);
         }
- /*       
+       /*
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture,

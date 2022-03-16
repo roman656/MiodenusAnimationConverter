@@ -72,19 +72,18 @@ namespace MiodenusAnimationConverter
             return animation;
         }
         
-        private static List<Model> LoadModels(in List<ModelInfo> modelsInfo)
+        private static Dictionary<string, Model> LoadModels(in List<ModelInfo> modelsInfo)
         {
             Logger.Trace("Loading models started.");
             
-            var models = new List<Model>();
+            var models = new Dictionary<string, Model>();
             IModelLoader loader = new LoaderStl();
 
             foreach (var modelInfo in modelsInfo)
             {
                 try
                 {
-                    var model = loader.Load(modelInfo);
-                    models.Add(model);
+                    models[modelInfo.Name] = loader.Load(modelInfo);
                 }
                 catch (Exception exception)
                 {

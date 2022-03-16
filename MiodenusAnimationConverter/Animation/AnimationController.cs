@@ -17,7 +17,7 @@ namespace MiodenusAnimationConverter.Animation
         private readonly float _framesPerMillisecond;
         private int _currentFrameIndex;
 
-        public AnimationController(Animation animation, Scene.Scene scene)
+        public AnimationController(in Animation animation, in Scene.Scene scene)
         {
             _animation = animation;
             _scene = scene;
@@ -106,7 +106,7 @@ namespace MiodenusAnimationConverter.Animation
 
                                 if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
                                 {
-                                    //TransformModel(model, nextState.Transformation);
+                                    TransformModel(model, nextState.Transformation);
                                 }
                                 else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex 
                                         && !wasModelTransformed)

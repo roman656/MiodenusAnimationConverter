@@ -114,7 +114,8 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             return result;
         }
         
-        private static Model LoadAsciiStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals, in string name)
+        private static Model LoadAsciiStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals,
+                in string name)
         {
             var triangles = new List<Triangle>();
             var fileLines = System.Text.Encoding.ASCII.GetString(fileData).ToLower().Split('\n');
@@ -226,17 +227,18 @@ namespace MiodenusAnimationConverter.Loaders.ModelLoaders
             return new Model(new Dictionary<string, Mesh> { [name] = new (triangles.ToArray()) });
         }
         
-        private static Model LoadBinaryStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals, in string name)
+        private static Model LoadBinaryStl(in byte[] fileData, Color4 modelColor, bool useCalculatedNormals,
+                in string name)
         {
             CheckBinaryStlFileContent(fileData);
             
             var trianglesAmount = BitConverter.ToInt32(fileData, HeaderSizeInBytes);
             var triangles = new Triangle[trianglesAmount];
+            var vertexes = new Vertex[Triangle.VertexesAmount];
 
             for (var i = 0; i < trianglesAmount; i++)
             {
                 var currentRecordPosition = TriangleRecordsStartPositionInBytes + (i * TriangleRecordSizeInBytes);
-                var vertexes = new Vertex[Triangle.VertexesAmount];
 
                 for (var j = 1; j <= Triangle.VertexesAmount; j++)
                 {

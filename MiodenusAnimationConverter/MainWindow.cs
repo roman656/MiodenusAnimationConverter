@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
@@ -105,12 +106,10 @@ namespace MiodenusAnimationConverter
 
             CursorGrabbed = _isCursorGrabbed;
 
-            _scene.ModelGroups[0].Models["0"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[1].Models["1"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[2].Models["2"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[3].Models["3"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[4].Models["4"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[5].Models["5"].Scale = new Vector3(0.015f);
+            for (var i = 0; i < 6; i++)
+            {
+                _scene.Models.Values.ElementAt(i).Scale(0.015f, 0.015f, 0.015f);
+            }
 
             InitializeShaderPrograms();
 
@@ -154,14 +153,14 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.Up:
                 {
-                    _scene.ModelGroups[0].Move(0.0f, -20.0f, 0.0f);
+                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, -2.0f, 0.0f);
                     break;
                 }
                 case Keys.Down:
                 {
-                    _scene.ModelGroups[0].Move(0.0f, 20.0f, 0.0f);
+                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, 20.0f, 0.0f);
                     break;
-                }
+                }/*
                 case Keys.Left:
                 {
                     _scene.ModelGroups[0].Move(-20.0f, 0.0f, 0.0f);
@@ -184,14 +183,14 @@ namespace MiodenusAnimationConverter
                 }
                 case Keys.M:
                 {
-                    _scene.ModelGroups[0].Scale(0.99f, 0.99f, 0.99f);
+                    _scene.ModelGroups[0].ModelsScale = new Vector3(0.99f, 0.99f, 0.99f);
                     break;
                 }
                 case Keys.N:
                 {
-                    _scene.ModelGroups[0].Scale(1.01f, 1.01f, 1.01f);
+                    _scene.ModelGroups[0].ModelsScale = new Vector3(1.01f, 1.01f, 1.01f);
                     break;
-                }
+                }*/
                 case Keys.H:
                 {
                     _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
@@ -263,9 +262,9 @@ namespace MiodenusAnimationConverter
             _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
             _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
 
-            for (var i = 0; i < _scene.ModelGroups.Count; i++)
+            for (var i = 0; i < _scene.Models.Count; i++)
             {
-                _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex],
+                _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex],
                         _scene.CamerasController.CurrentDebugCamera, _drawMode);
             }
 
@@ -275,9 +274,9 @@ namespace MiodenusAnimationConverter
             {
                 CheckGLErrors();
                 
-                for (var i = 0; i < _scene.ModelGroups.Count; i++)
+                for (var i = 0; i < _scene.Models.Count; i++)
                 {
-                    _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex + 1],
+                    _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex + 1],
                             _scene.CamerasController.CurrentDebugCamera);
                 }
 
