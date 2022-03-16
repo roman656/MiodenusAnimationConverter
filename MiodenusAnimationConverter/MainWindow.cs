@@ -112,7 +112,7 @@ namespace MiodenusAnimationConverter
                 _scene.Models.Values.ElementAt(i).Pivot.LocalRotate(MathHelper.DegreesToRadians(-90.0f), Vector3.UnitX);
             }
             
-            _scene.Models.Values.ElementAt(1).Pivot.Position = new Vector3(1.0f, 0.0f, 0.3f);
+            _scene.Models.Values.ElementAt(1).Pivot.Position = new Vector3(1.0f, 0.0f, 0.2f);
 
             InitializeShaderPrograms();
 
@@ -140,6 +140,43 @@ namespace MiodenusAnimationConverter
                 _isCursorModeActive = false;
                 CursorGrabbed = true;
                 _scene.CamerasController.CurrentDebugCamera.ProcessKeyboard(KeyboardState, _deltaTime);
+                ProcessKeyboard(KeyboardState, _deltaTime);
+            }
+        }
+
+        private void ProcessKeyboard(KeyboardState keyboardState, double deltaTime)
+        {
+            const float movementSpeed = 0.5f;
+            var velocity = (float)(movementSpeed * deltaTime);
+            
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalMove(deltaY: -velocity);
+                _scene.CamerasController.CurrentDebugCamera.Move(_scene.Models.Values.ElementAt(0).Pivot, deltaY: -velocity);
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalMove(deltaY: velocity);
+                _scene.CamerasController.CurrentDebugCamera.Move(_scene.Models.Values.ElementAt(0).Pivot, deltaY: velocity);
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.Left) && keyboardState.IsKeyDown(Keys.Down))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-velocity * 80.0f), Vector3.UnitY);
+            }
+            else if (keyboardState.IsKeyDown(Keys.Left))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(velocity * 80.0f), Vector3.UnitY);
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.Right) && keyboardState.IsKeyDown(Keys.Down))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(velocity * 80.0f), Vector3.UnitY);
+            }
+            else if (keyboardState.IsKeyDown(Keys.Right))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-velocity * 80.0f), Vector3.UnitY);
             }
         }
 
@@ -147,65 +184,41 @@ namespace MiodenusAnimationConverter
         {
             base.OnKeyDown(args);
 
-            switch (args.Key)
+            if (args.Key == Keys.B)
             {
-                case Keys.B:
-                {
-                    _isDebugMode = !_isDebugMode;
-                    break;
-                }
-                case Keys.Up:
-                {
-                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, -0.0075f, 0.0f);
-                    break;
-                }
-                case Keys.Down:
-                {
-                    _scene.Models.Values.ElementAt(0).Pivot.LocalMove(0.0f, 0.0075f, 0.0f);
-                    break;
-                }
-                case Keys.Left:
-                {
-                    _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(0.45f), Vector3.UnitY);
-                    break;
-                }
-                case Keys.Right:
-                {
-                    _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-0.45f), Vector3.UnitY);
-                    break;
-                }
-                case Keys.M:
-                {
-                    _scene.Models.Values.ElementAt(0).Scale(0.99f, 0.99f, 0.99f);
-                    break;
-                }
-                case Keys.N:
-                {
-                    _scene.Models.Values.ElementAt(0).Scale(1.01f, 1.01f, 1.01f);
-                    break;
-                }
-                case Keys.H:
-                {
-                    _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
-                    break;
-                }
-                case Keys.I:
-                {
-                    _scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f));
-                    break;
-                }
-                case Keys.V:
-                {
-                    _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
-                    break;
-                }
-                case Keys.G:
-                {
-                    _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
-                    _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
-                    _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
-                    break;
-                }
+                _isDebugMode = !_isDebugMode;
+            }
+
+            if (args.Key == Keys.M)
+            {
+                _scene.Models.Values.ElementAt(0).Scale(0.99f, 0.99f, 0.99f);
+            }
+            
+            if (args.Key == Keys.N)
+            {
+                _scene.Models.Values.ElementAt(0).Scale(1.01f, 1.01f, 1.01f);
+            }
+            
+            if (args.Key == Keys.H)
+            {
+                _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
+            }
+            
+            if (args.Key == Keys.I)
+            {
+                _scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f));
+            }
+            
+            if (args.Key == Keys.V)
+            {
+                _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
+            }
+            
+            if (args.Key == Keys.G)
+            {
+                _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
+                _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
+                _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
             }
         }
 
