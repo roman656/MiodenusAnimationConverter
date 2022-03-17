@@ -10,6 +10,7 @@
     "videoName": "ResultVideo",
     "timeLength": 20000,
     "fps": 60,
+    "enableMultisampling": true,
     "frameWidth": 800,
     "frameHeight": 800,
     "backgroundColor": [0.3, 0.3, 0.4],
@@ -25,38 +26,14 @@
       "type": "stl",
       "filename": "DebugAssets/Jagdtiger.stl",
       "color": [0.45, 0.52, 0.58],
-      "useCalculatedNormals": false,
-      "baseTransformation":
-      {
-        "location": [0.0, 0.0, 0.0],
-        "rotation":
-        {
-          "angle": -90.0,
-          "unit": "deg",
-          "vector": [1.0, 0.0, 0.0],
-          "basePoint": [0.0, 0.0, 0.0]
-        },
-        "scale": [0.015, 0.015, 0.015]
-      }
+      "useCalculatedNormals": false
     },
     {
       "name": "nut_6x9",
       "type": "stl",
       "filename": "DebugAssets/IS-6.stl",
       "color": [0.45, 0.52, 0.58],
-      "useCalculatedNormals": false,
-      "baseTransformation":
-      {
-        "location": [-1.5, 0.0, 0.3],
-        "rotation":
-        {
-          "angle": -90.0,
-          "unit": "deg",
-          "vector": [1.0, 0.0, 0.0],
-          "basePoint": [0.0, 0.0, 0.0]
-        },
-        "scale": [0.015, 0.015, 0.015]
-      }
+      "useCalculatedNormals": false
     }
   ],
   "actions":
@@ -74,13 +51,24 @@
           "color": [0.45, 0.52, 0.58],
           "transformation":
           {
-            "location": [0.0, 0.0, 0.0],
-            "rotation":
+            "resetScale": false,
+            "scale": [0.015, 0.015, 0.015],
+            "resetLocalRotation": false,
+            "localRotate":
             {
-              "angle": 359.0,
+              "angle": 0.0,
               "unit": "deg",
-              "vector": [0.0, 0.0, 1.0],
-              "basePoint": [0.0, 0.0, 0.0]
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "resetPosition": false,
+            "globalMove": [0.0, 0.0, 0.0],
+            "localMove": [0.0, 0.0, 0.0],
+            "rotate":
+            {
+              "angle": -90.0,
+              "unit": "deg",
+              "rotationVectorStartPoint": [0.0, 0.0, 0.0],
+              "rotationVectorEndPoint": [1.0, 0.0, 0.0]
             }
           }
         },
@@ -90,13 +78,24 @@
           "color": [0.45, 0.52, 0.58],
           "transformation":
           {
-            "location": [0.0, 0.0, 0.0],
-            "rotation":
+            "resetScale": false,
+            "scale": [0.015, 0.015, 0.015],
+            "resetLocalRotation": false,
+            "localRotate":
             {
-              "angle": 359.0,
+              "angle": 0.0,
               "unit": "deg",
-              "vector": [0.0, 0.0, 1.0],
-              "basePoint": [0.0, 0.0, 0.0]
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "resetPosition": false,
+            "globalMove": [0.0, 0.0, 0.0],
+            "localMove": [0.0, 0.0, 0.0],
+            "rotate":
+            {
+              "angle": -90.0,
+              "unit": "deg",
+              "rotationVectorStartPoint": [0.0, 0.0, 0.0],
+              "rotationVectorEndPoint": [1.0, 0.0, 0.0]
             }
           }
         }
