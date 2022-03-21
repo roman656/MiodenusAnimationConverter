@@ -320,7 +320,7 @@ namespace MiodenusAnimationConverter
         private void TakeScreenshot(int screenshotNumber)
         {
             new Screenshot(this).Save($"{Config.ScreenshotDirectory}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
-                    ImageFormat.Png);
+                    ImageFormat.Jpeg);
         }
         
         public IEnumerable<IVideoFrame> GetBitmaps()

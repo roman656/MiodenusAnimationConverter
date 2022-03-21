@@ -31,6 +31,8 @@ namespace MiodenusAnimationConverter
                 var animation = LoadAnimation(options.AnimationFilePath);
                 var models = LoadModels(animation.ModelsInfo);
                 var scene = new Scene.Scene(animation.Info, models);
+                
+                Logger.Trace(animation);
 
                 CreateMainWindow(animation, scene, DetermineWorkMode(options)).Run();
             }

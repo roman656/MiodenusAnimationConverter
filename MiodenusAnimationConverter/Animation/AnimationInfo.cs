@@ -1,5 +1,5 @@
-using System;
 using System.Globalization;
+using System.Linq;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Animation
@@ -15,33 +15,58 @@ namespace MiodenusAnimationConverter.Animation
         public string VideoName { get; set; }
         public int TimeLength { get; set; }
         public int Fps { get; set; }
+        public bool EnableMultisampling { get; set; }
         public int FrameWidth { get; set; }
         public int FrameHeight { get; set; }
         public Color4 BackgroundColor { get; set; }
         public string[] Include { get; set; }
 
-        public AnimationInfo(MAFStructure.AnimationInfo animationInfo)
+        public AnimationInfo(in MafStructure.AnimationInfo animationInfo)
         {
-            Type = (animationInfo.Type == string.Empty) ? "maf" : animationInfo.Type.ToLower();
-            Version = (animationInfo.Version == string.Empty) ? "1.0" : animationInfo.Version;
-            Name = (animationInfo.Name == string.Empty) ? "UnnamedAnimation" : animationInfo.Name;
-            VideoFormat = (animationInfo.VideoFormat == string.Empty) ? "mp4" : animationInfo.VideoFormat.ToLower();
-            VideoCodec = (animationInfo.VideoCodec == string.Empty) ? "h264" : animationInfo.VideoCodec;
-            VideoBitrate = (animationInfo.VideoBitrate == 0) ? 4000 : animationInfo.VideoBitrate;
-            VideoName = (animationInfo.VideoName == string.Empty) ? "UnnamedVideo" : animationInfo.VideoName;
-            TimeLength = (animationInfo.TimeLength == 0) ? -1 : animationInfo.TimeLength;
-            Fps = (animationInfo.Fps <= 0) ? 60 : animationInfo.Fps;
-            FrameWidth = (animationInfo.FrameWidth <= 0) ? 600 : animationInfo.FrameWidth;
-            FrameHeight = (animationInfo.FrameHeight <= 0) ? 600 : animationInfo.FrameHeight;
-            BackgroundColor = ConvertColor(animationInfo.BackgroundColor);
+            Type = string.IsNullOrEmpty(animationInfo.Type.Trim())
+                    ? DefaultAnimationParameters.AnimationInfo.Type
+                    : animationInfo.Type.Trim().ToLower();
+            Version = string.IsNullOrEmpty(animationInfo.Version.Trim())
+                    ? DefaultAnimationParameters.AnimationInfo.Version
+                    : animationInfo.Version.Trim().ToLower();
+            Name = string.IsNullOrEmpty(animationInfo.Name.Trim())
+                    ? DefaultAnimationParameters.AnimationInfo.Name
+                    : animationInfo.Name.Trim();
+            VideoFormat = string.IsNullOrEmpty(animationInfo.VideoFormat.Trim())
+                    ? DefaultAnimationParameters.AnimationInfo.VideoFormat
+                    : animationInfo.VideoFormat.Trim().ToLower();
+            VideoCodec = string.IsNullOrEmpty(animationInfo.VideoCodec.Trim())
+                    ? DefaultAnimationParameters.AnimationInfo.VideoCodec
+                    : animationInfo.VideoCodec.Trim().ToLower();
+            VideoBitrate = animationInfo.VideoBitrate < 0
+                    ? DefaultAnimationParameters.AnimationInfo.VideoBitrate
+                    : animationInfo.VideoBitrate;
+            VideoName = string.IsNullOrEmpty(animationInfo.VideoName.Trim())
+                    ? DefaultAnimationParameters.AnimationInfo.VideoName
+                    : animationInfo.VideoName.Trim();
+            TimeLength = animationInfo.TimeLength < 0
+                    ? DefaultAnimationParameters.AnimationInfo.TimeLength
+                    : animationInfo.TimeLength;
+            Fps = animationInfo.Fps <= 0
+                    ? DefaultAnimationParameters.AnimationInfo.Fps
+                    : animationInfo.Fps;
+            EnableMultisampling = animationInfo.EnableMultisampling;
+            FrameWidth = animationInfo.FrameWidth <= 0
+                    ? DefaultAnimationParameters.AnimationInfo.FrameWidth
+                    : animationInfo.FrameWidth;
+            FrameHeight = animationInfo.FrameHeight <= 0
+                    ? DefaultAnimationParameters.AnimationInfo.FrameHeight
+                    : animationInfo.FrameHeight;
+            BackgroundColor = CheckColor(animationInfo.BackgroundColor)
+                    ? new Color4(animationInfo.BackgroundColor[0],
+                                 animationInfo.BackgroundColor[1],
+                                 animationInfo.BackgroundColor[2],
+                                 1.0f)
+                    : DefaultAnimationParameters.AnimationInfo.BackgroundColor;
+            Include = animationInfo.Include;
         }
-        
-        private static Color4 ConvertColor(float[] color)
-        {
-            return CheckColor(color) ? new Color4(color[0], color[1], color[2], 1.0f) : new Color4(0.3f, 0.3f, 0.4f, 1.0f);
-        }
-        
-        private static bool CheckColor(float[] color)
+
+        private static bool CheckColor(in float[] color)
         {
             var result = true;
 
@@ -58,11 +83,18 @@ namespace MiodenusAnimationConverter.Animation
         }
 
         public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                    $"Animation info:\n\tType: {Type}\n\tVersion: {Version}\n\tName: {Name}\n\tVideo type: {VideoFormat}\n\t"
-                    + $"Video name: {VideoName}\n\tTime length: {TimeLength}\n\tFPS: {Fps}\n\tFrame width: {FrameWidth}\n\t"
-                    + $"Frame height: {FrameHeight}\n");
+        { 
+            var result = string.Format(CultureInfo.InvariantCulture, 
+                    $"Animation info:\n\tType: {Type}\n\tVersion: {Version}\n\tName: {Name}\n\t"
+                    + $"Video format: {VideoFormat}\n\tVideo codec: {VideoCodec}\n\tVideo bitrate: {VideoBitrate}"
+                    + $"\n\tVideo name: {VideoName}\n\tTime length: {TimeLength}\n\tFPS: {Fps}\n\tIs multisampling"
+                    + $" enabled: {EnableMultisampling}\n\tFrame width: {FrameWidth}\n\tFrame height: {FrameHeight}"
+                    + $"\n\tBackground color: ({BackgroundColor.R}; {BackgroundColor.G}; {BackgroundColor.B};"
+                    + $" {BackgroundColor.A})\n\tIncludes:");
+
+            result = Include.Aggregate(result, (current, path) => current + $"\n\t{path}");
+
+            return result + "\n";
         }
     }
 }

@@ -1,7 +1,4 @@
-using System;
 using System.Globalization;
-using MiodenusAnimationConverter.Scene;
-using MiodenusAnimationConverter.Scene.Models.Meshes;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Animation
@@ -11,70 +8,30 @@ namespace MiodenusAnimationConverter.Animation
         public int Time { get; set; }
         public bool IsModelVisible { get; set; }
         public Color4 Color { get; set; }
-        public Pivot Transformation { get; set; }
+        public Transformation Transformation { get; set; }
+        public bool WasColorChanged { get; set; }
 
-        public ActionState(MAFStructure.ActionState actionState)
+        public ActionState(in MafStructure.ActionState actionState)
         {
-            Time = (actionState.Time < 0) ? 0 : actionState.Time;
+            Time = actionState.Time < 0
+                    ? DefaultAnimationParameters.ActionState.Time
+                    : actionState.Time;
             IsModelVisible = actionState.IsModelVisible;
-            Color = ConvertColor(actionState.Color);    // TODO: Если цвет не будет задан явно будет рандомный. Надо исправить.
-            Transformation = ConvertTransformation(actionState.Transformation);
-        }
-       
-        private static Pivot ConvertTransformation(MAFStructure.Transformation transformation)
-        {
-            var location = new Vector3(transformation.Location[0],
-                transformation.Location[1], 
-                transformation.Location[2]);
-            var rotation = ConvertRotation(transformation.Rotation);
-            var scale = ConvertScale(transformation.Scale);
             
-            var temp = new Pivot(location);
-            var angle = (transformation.Rotation.Unit == "deg")
-                ? MathHelper.DegreesToRadians(transformation.Rotation.Angle)
-                : transformation.Rotation.Angle;
-            var axis1 = new Vector3(transformation.Rotation.Vector[0], transformation.Rotation.Vector[1], transformation.Rotation.Vector[2]);
-            var axis2 = new Vector3(transformation.Rotation.BasePoint[0], transformation.Rotation.BasePoint[1], transformation.Rotation.BasePoint[2]);
-            temp.Rotate(angle, axis1, axis2);
-            //scale
-            return temp;
-        }
-        
-        private static Quaternion ConvertRotation(MAFStructure.Rotation rotation)
-        {
-            var axis = new Vector3(rotation.Vector[0], rotation.Vector[1], rotation.Vector[2]);
-            var angle = (rotation.Unit == "deg") ? MathHelper.DegreesToRadians(rotation.Angle) : rotation.Angle;
-
-            return Quaternion.FromAxisAngle(axis, angle);
-        }
-        
-        private static Vector3 ConvertScale(float[] scale)
-        {
-            return CheckScale(scale) ? new Vector3(scale[0], scale[1], scale[2]) : Vector3.One;
-        }
-
-        private static bool CheckScale(float[] scale)
-        {
-            var result = true;
-
-            for (var i = 0; i < 3; i++)
+            if (CheckColor(actionState.Color))
             {
-                if (scale[i] <= 0.0f)
-                {
-                    result = false;
-                    break;
-                }
+                Color = new Color4(actionState.Color[0], actionState.Color[1], actionState.Color[2], 1.0f);
+                WasColorChanged = true;
+            }
+            else
+            {
+                Color = DefaultAnimationParameters.ActionState.Color;
             }
 
-            return result;
+            Transformation = new Transformation(actionState.Transformation);
         }
-        
-        private static Color4 ConvertColor(float[] color)
-        {
-            return CheckColor(color) ? new Color4(color[0], color[1], color[2], 1.0f) : GetRandomColor();
-        }
-        
-        private static bool CheckColor(float[] color)
+
+        private static bool CheckColor(in float[] color)
         {
             var result = true;
 
@@ -89,18 +46,22 @@ namespace MiodenusAnimationConverter.Animation
 
             return result;
         }
-        
-        private static Color4 GetRandomColor()
-        {
-            var random = new Random();
-            return new Color4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1.0f);
-        }
-       /*
+
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture,
-                    $"Action state:\n\tTime: {Time}\n\tIs model visible: {IsModelVisible}\n\tColor: ({Color.R};"
-                    + $" {Color.G}; {Color.B}; {Color.A})\n\t{Transformation}\n");
-        }*/
+            var result = string.Format(CultureInfo.InvariantCulture, 
+                    $"Action state:\n\tTime: {Time}\n\tIs model visible: {IsModelVisible}\n\t");
+            
+            if (WasColorChanged)
+            {
+                result += $"Color: ({Color.R}; {Color.G}; {Color.B}; {Color.A})\n\t";
+            }
+            else
+            {
+                result += "Color was not changed.\n\t";
+            }
+
+            return result + $"{Transformation}";
+        }
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MiodenusAnimationConverter.Animation.MAFStructure
+namespace MiodenusAnimationConverter.Animation.MafStructure
 {
     public class Animation
     {

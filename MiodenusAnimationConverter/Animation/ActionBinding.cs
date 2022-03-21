@@ -10,20 +10,29 @@ namespace MiodenusAnimationConverter.Animation
         public int TimeLength { get; set; }
         public bool UseInterpolation { get; set; }
 
-        public ActionBinding(MAFStructure.Binding binding)
+        public ActionBinding(in MafStructure.Binding binding)
         {
-            ModelName = (binding.ModelName == string.Empty) ? "UnnamedModel" : binding.ModelName;
-            ActionName = (binding.ActionName == string.Empty) ? "UnnamedAction" : binding.ActionName;
-            StartTime = (binding.StartTime < 0) ? 0 : binding.StartTime;
-            TimeLength = (binding.TimeLength == 0) ? -1 : binding.TimeLength;
+            ModelName = string.IsNullOrEmpty(binding.ModelName.Trim())
+                    ? DefaultAnimationParameters.ActionBinding.ModelName
+                    : binding.ModelName.Trim();
+            ActionName = string.IsNullOrEmpty(binding.ActionName.Trim())
+                    ? DefaultAnimationParameters.ActionBinding.ActionName
+                    : binding.ActionName.Trim();
+            StartTime = binding.StartTime < 0
+                    ? DefaultAnimationParameters.ActionBinding.StartTime 
+                    : binding.StartTime;
+            TimeLength = binding.TimeLength < 0
+                    ? DefaultAnimationParameters.ActionBinding.TimeLength 
+                    : binding.TimeLength;
             UseInterpolation = binding.UseInterpolation;
         }
         
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture,
-                    $"Action binding:\n\tModel name: {ModelName}\n\tAction name: {ActionName}\n\tStart time: {StartTime}\n\t"
-                    + $"Time length: {TimeLength}\n\tUse interpolation: {UseInterpolation}\n");
+                    $"Action binding:\n\tAction name: {ActionName}\n\tModel name: {ModelName}\n\t"
+                    + $"Start time: {StartTime}\n\tTime length: {TimeLength}\n\t"
+                    + $"Use interpolation: {UseInterpolation}\n");
         }
     }
 }
