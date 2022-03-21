@@ -1,9 +1,10 @@
+using System;
 using System.Globalization;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Animation
 {
-    public class Rotation
+    public class Rotation : ICloneable
     {
         public float Angle { get; set; }
         public Vector3 RotationVectorStartPoint { get; set; }
@@ -23,6 +24,13 @@ namespace MiodenusAnimationConverter.Animation
                     ? MathHelper.DegreesToRadians(rotation.Angle)
                     : rotation.Angle;
         }
+
+        private Rotation(in Rotation rotation)
+        {
+            RotationVectorStartPoint = rotation.RotationVectorStartPoint;
+            RotationVectorEndPoint = rotation.RotationVectorEndPoint;
+            Angle = rotation.Angle;
+        }
         
         public override string ToString()
         {
@@ -30,6 +38,11 @@ namespace MiodenusAnimationConverter.Animation
                     $"Rotation:\n\tAngle: {Angle}\n\tRotation vector start point: ({RotationVectorStartPoint.X};"
                     + $" {RotationVectorStartPoint.Y}; {RotationVectorStartPoint.Z})\n\tRotation vector end point: "
                     + $"({RotationVectorEndPoint.X}; {RotationVectorEndPoint.Y}; {RotationVectorEndPoint.Z})\n");
+        }
+
+        public object Clone()
+        {
+            return new Rotation(this);
         }
     }
 }

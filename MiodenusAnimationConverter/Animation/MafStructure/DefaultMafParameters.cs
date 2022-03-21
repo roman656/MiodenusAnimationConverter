@@ -55,7 +55,7 @@ namespace MiodenusAnimationConverter.Animation.MafStructure
         public static class Transformation
         {
             public const bool ResetScale = false;
-            public static readonly float[] Scale = { -1.0f, -1.0f, -1.0f };
+            public static readonly float[] Scale = { 1.0f, 1.0f, 1.0f };
             public const bool ResetLocalRotation = false;
             public const bool ResetPosition = false;
             public static readonly float[] GlobalMove = { 0.0f, 0.0f, 0.0f };

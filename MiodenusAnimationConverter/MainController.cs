@@ -31,8 +31,6 @@ namespace MiodenusAnimationConverter
                 var animation = LoadAnimation(options.AnimationFilePath);
                 var models = LoadModels(animation.ModelsInfo);
                 var scene = new Scene.Scene(animation.Info, models);
-                
-                Logger.Trace(animation);
 
                 CreateMainWindow(animation, scene, DetermineWorkMode(options)).Run();
             }
@@ -114,7 +112,7 @@ namespace MiodenusAnimationConverter
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
                 StartVisible = workMode == WorkMode.FrameView,
-                NumberOfSamples = 4,
+                NumberOfSamples = animation.Info.EnableMultisampling ? 4 : 0,
                 Location = CalculateCenteredWindowLocation(animation.Info.FrameWidth, animation.Info.FrameHeight)
             };
 

@@ -105,15 +105,7 @@ namespace MiodenusAnimationConverter
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 5.0f, 3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
-
-            for (var i = 0; i < _scene.Models.Count; i++)
-            {
-                _scene.Models.Values.ElementAt(i).Scale(0.015f, 0.015f, 0.015f);
-                _scene.Models.Values.ElementAt(i).Pivot.LocalRotate(MathHelper.DegreesToRadians(-90.0f), Vector3.UnitX);
-            }
             
-            _scene.Models.Values.ElementAt(1).Pivot.Position = new Vector3(1.0f, 0.0f, 0.2f);
-
             InitializeShaderPrograms();
 
             GL.Enable(EnableCap.DepthTest);
@@ -250,7 +242,7 @@ namespace MiodenusAnimationConverter
 
             base.OnRenderFrame(e);
 
-            //_animationController.PrepareSceneToNextFrame();
+            _animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
 
             GL.ClearColor(_backgroundColor);

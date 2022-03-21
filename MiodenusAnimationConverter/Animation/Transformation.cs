@@ -1,9 +1,10 @@
+using System;
 using System.Globalization;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Animation
 {
-    public class Transformation
+    public class Transformation : ICloneable
     {
         public bool ResetScale { get; set; }
         public bool ResetLocalRotation { get; set; }
@@ -27,6 +28,18 @@ namespace MiodenusAnimationConverter.Animation
             Rotate = new Rotation(transformation.Rotate);
             LocalRotate = new LocalRotation(transformation.LocalRotate);
         }
+
+        private Transformation(in Transformation transformation)
+        {
+            ResetScale = transformation.ResetScale;
+            ResetLocalRotation = transformation.ResetLocalRotation;
+            ResetPosition = transformation.ResetPosition;
+            Scale = transformation.Scale;
+            GlobalMove = transformation.GlobalMove;
+            LocalMove = transformation.LocalMove;
+            Rotate = (Rotation)transformation.Rotate.Clone();
+            LocalRotate = (LocalRotation)transformation.LocalRotate.Clone();
+        }
         
         public override string ToString()
         {
@@ -35,6 +48,11 @@ namespace MiodenusAnimationConverter.Animation
                     + $"Reset position: {ResetPosition}\n\tScale: ({Scale.X}; {Scale.Y}; {Scale.Z})\n\t"
                     + $"Global move: ({GlobalMove.X}; {GlobalMove.Y}; {GlobalMove.Z})\n\t"
                     + $"Local move: ({LocalMove.X}; {LocalMove.Y}; {LocalMove.Z})\n\t{Rotate}\t{LocalRotate}");
+        }
+
+        public object Clone()
+        {
+            return new Transformation(this);
         }
     }
 }

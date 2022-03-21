@@ -1,7 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using MiodenusAnimationConverter.Scene.Models;
-using MiodenusAnimationConverter.Scene.Models.Meshes;
 using NLog;
 using OpenTK.Mathematics;
 
@@ -11,73 +10,89 @@ namespace MiodenusAnimationConverter.Animation
     {
         private const float MillisecondsInSecond = 1000.0f;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly Dictionary<Model, ModelInfo> _modelsInfo = new ();
+        private readonly Dictionary<ModelInfo, Model> _modelsInfo = new ();
         private readonly Animation _animation;
-        private readonly Scene.Scene _scene;
         private readonly float _framesPerMillisecond;
         private int _currentFrameIndex;
 
         public AnimationController(in Animation animation, in Scene.Scene scene)
         {
             _animation = animation;
-            _scene = scene;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
-            //Initialize();
-        }
-/*
-        private void Initialize()
-        {
-            var j = 0;
-
-            foreach (var modelGroup in _scene.ModelGroups)
+            
+            foreach (var modelInfo in _animation.ModelsInfo)
             {
-                while (modelGroup.Models.Keys.ElementAt(0) != _animation.ModelsInfo[j].Name)
+                try
                 {
-                    j++;
+                    _modelsInfo[modelInfo] = scene.Models[modelInfo.Name];
                 }
-
-                _modelsInfo[modelGroup.Models[0]] = _animation.ModelsInfo[j];
-                TransformModel(modelGroup.Models[0], _animation.ModelsInfo[j].BaseTransformation);
+                catch (Exception exception)
+                {
+                    Logger.Warn($"There is no model with name: {modelInfo.Name}");
+                }
             }
-        }
-
-        private static void TransformModel(Model model, Transformation transformation)
-        {
-            transformation.Rotation.ToAxisAngle(out var axis, out var angle);
-            model.Move(transformation.Location.X, transformation.Location.Y, transformation.Location.Z);
-            model.Rotate(angle, axis);
-            model.Scale(transformation.Scale.X, transformation.Scale.Y, transformation.Scale.Z);
-        }
-
-        private static void CheckWasTransformationParametersChanged(ActionState state,
-                out bool wasLocationChanged, out bool wasRotationChanged, out bool wasScaleChanged)
-        {
-            wasLocationChanged = state.Transformation.Location != Vector3.Zero;
-            wasRotationChanged = state.Transformation.Rotation != Quaternion.Identity;
-            wasScaleChanged = state.Transformation.Scale != Vector3.One;
         }
         
-        private static Transformation GetStepTransformation(ActionState state, int stepsAmount)
+        public int CurrentFrameIndex => _currentFrameIndex;
+
+        private static void TransformModel(in Model model, in Transformation transformation)
         {
-            var result = new Transformation(Vector3.Zero, Quaternion.Identity, Vector3.One);
-
-            CheckWasTransformationParametersChanged(state, out var wasLocationChanged, out var wasRotationChanged,
-                    out var wasScaleChanged);
-            state.Transformation.Rotation.ToAxisAngle(out var axis, out var angle);
-
-            if (wasLocationChanged)
+            if (transformation.ResetScale)
             {
-                result.Location = state.Transformation.Location / stepsAmount;
+                model.ResetScale();
+            }
+
+            model.Scale(transformation.Scale.X, transformation.Scale.Y, transformation.Scale.Z);
+
+            if (transformation.ResetLocalRotation)
+            {
+                model.Pivot.ResetLocalRotation();
             }
             
-            if (wasRotationChanged)
+            model.Pivot.LocalRotate(transformation.LocalRotate.Angle, transformation.LocalRotate.Vector);
+
+            if (transformation.ResetPosition)
             {
-                result.Rotation = Quaternion.FromAxisAngle(axis, angle / stepsAmount);
+                model.Pivot.Position = Vector3.Zero;
             }
             
-            if (wasScaleChanged)
+            model.Pivot.GlobalMove(transformation.GlobalMove.X, transformation.GlobalMove.Y,
+                    transformation.GlobalMove.Z);
+            
+            model.Pivot.LocalMove(transformation.LocalMove.X, transformation.LocalMove.Y,
+                    transformation.LocalMove.Z);
+            
+            model.Pivot.Rotate(transformation.Rotate.Angle, transformation.Rotate.RotationVectorStartPoint,
+                    transformation.Rotate.RotationVectorEndPoint);
+        }
+
+        private static Transformation GetStepTransformation(in ActionState state, int stepsAmount)
+        {
+            var result = (Transformation)state.Transformation.Clone();
+
+            if (result.GlobalMove != Vector3.Zero)
             {
-                result.Scale = state.Transformation.Scale / stepsAmount;
+                result.GlobalMove /= stepsAmount;
+            }
+            
+            if (result.LocalMove != Vector3.Zero)
+            {
+                result.LocalMove /= stepsAmount;
+            }
+            
+            if (result.Rotate.Angle != 0.0f)
+            {
+                result.Rotate.Angle /= stepsAmount;
+            }
+
+            if (result.LocalRotate.Angle != 0.0f)
+            {
+                result.LocalRotate.Angle /= stepsAmount;
+            }
+
+            if (result.Scale != Vector3.One)
+            {
+                result.Scale /= stepsAmount;
             }
             
             return result;
@@ -85,7 +100,7 @@ namespace MiodenusAnimationConverter.Animation
 
         public void PrepareSceneToNextFrame()
         {
-            foreach (var (model, info) in _modelsInfo)
+            foreach (var (info, model) in _modelsInfo)
             {
                 if (info.ActionBindings == null) { continue; }
                 
@@ -99,6 +114,7 @@ namespace MiodenusAnimationConverter.Animation
 
                             for (var i = 0; i < action.States.Count; i++)
                             {
+                                /* TODO: отсортировать состояния по времени. */
                                 var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
                                 var nextState = action.States[i];
                                 var nextStateFrameIndex = (int)(_framesPerMillisecond * nextState.Time);
@@ -111,14 +127,14 @@ namespace MiodenusAnimationConverter.Animation
                                 else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex 
                                         && !wasModelTransformed)
                                 {   
-                                        var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
+                                    var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
 
-                                        if (stepsAmount > 0)
-                                        {
-                                            TransformModel(model, GetStepTransformation(nextState, stepsAmount));
-                                        }
+                                    if (stepsAmount > 0)
+                                    {
+                                        TransformModel(model, GetStepTransformation(nextState, stepsAmount));
+                                    }
 
-                                        wasModelTransformed = true;
+                                    wasModelTransformed = true;
                                 }
                             }
                         }
@@ -127,8 +143,6 @@ namespace MiodenusAnimationConverter.Animation
             }
             
             _currentFrameIndex++;
-        }*/
-
-        public int CurrentFrameIndex => _currentFrameIndex;
+        }
     }
 }

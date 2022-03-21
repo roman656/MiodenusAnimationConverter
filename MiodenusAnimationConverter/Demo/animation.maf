@@ -39,6 +39,47 @@
   "actions":
   [
     {
+      "name": "Init 1",
+      "states":
+      [
+        {
+          "time": 0,
+          "color": [0.45, 0.52, 0.58],
+          "transformation":
+          {
+            "scale": [0.015, 0.015, 0.015],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 2",
+      "states":
+      [
+        {
+          "time": 0,
+          "color": [0.45, 0.52, 0.58],
+          "transformation":
+          {
+            "scale": [0.015, 0.015, 0.015],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [1.0, 0.0, 0.2]
+          }
+        }
+      ]
+    },
+    {
       "name": "Nut rotation",
       "states":
       [
@@ -56,7 +97,7 @@
             "resetLocalRotation": false,
             "localRotate":
             {
-              "angle": 0.0,
+              "angle": 50.0,
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
             },
@@ -65,7 +106,7 @@
             "localMove": [0.0, 0.0, 0.0],
             "rotate":
             {
-              "angle": -90.0,
+              "angle": 0.0,
               "unit": "deg",
               "rotationVectorStartPoint": [0.0, 0.0, 0.0],
               "rotationVectorEndPoint": [1.0, 0.0, 0.0]
@@ -79,7 +120,6 @@
           "transformation":
           {
             "resetScale": false,
-            "scale": [0.015, 0.015, 0.015],
             "resetLocalRotation": false,
             "localRotate":
             {
@@ -92,7 +132,7 @@
             "localMove": [0.0, 0.0, 0.0],
             "rotate":
             {
-              "angle": -90.0,
+              "angle": 0.0,
               "unit": "deg",
               "rotationVectorStartPoint": [0.0, 0.0, 0.0],
               "rotationVectorEndPoint": [1.0, 0.0, 0.0]
@@ -106,17 +146,31 @@
   [
     {
       "modelName": "nut_6x9",
+      "actionName": "Init 2",
+      "startTime": 0,
+      "timeLength": 0,
+      "useInterpolation": false
+    },
+    {
+      "modelName": "bolt_25x8",
+      "actionName": "Init 1",
+      "startTime": 0,
+      "timeLength": 0,
+      "useInterpolation": false
+    },
+    {
+      "modelName": "nut_6x9",
       "actionName": "Nut rotation",
-      "startTime": 100,
+      "startTime": 0,
       "timeLength": 3500,
-      "useInterpolation": true
+      "useInterpolation": false
     },
     {
       "modelName": "bolt_25x8",
       "actionName": "Nut rotation",
-      "startTime": 100,
+      "startTime": 0,
       "timeLength": 3500,
-      "useInterpolation": true
+      "useInterpolation": false
     }
   ]
 }

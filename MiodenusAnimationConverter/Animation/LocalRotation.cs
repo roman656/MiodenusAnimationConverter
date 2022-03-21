@@ -1,9 +1,10 @@
+using System;
 using System.Globalization;
 using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Animation
 {
-    public class LocalRotation
+    public class LocalRotation : ICloneable
     {
         public float Angle { get; set; }
         public Vector3 Vector { get; set; }
@@ -19,10 +20,21 @@ namespace MiodenusAnimationConverter.Animation
                     : localRotation.Angle;
         }
         
+        private LocalRotation(in LocalRotation localRotation)
+        {
+            Vector = localRotation.Vector;
+            Angle = localRotation.Angle;
+        }
+        
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
                     $"Local rotation:\n\tAngle: {Angle}\n\tVector: ({Vector.X}; {Vector.Y}; {Vector.Z})\n");
+        }
+
+        public object Clone()
+        {
+            return new LocalRotation(this);
         }
     }
 }
