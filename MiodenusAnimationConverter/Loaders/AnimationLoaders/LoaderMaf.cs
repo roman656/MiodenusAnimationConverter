@@ -11,7 +11,7 @@ namespace MiodenusAnimationConverter.Loaders.AnimationLoaders
             CheckAnimationFile(filename);
             
             var content = File.ReadAllText(filename);
-            var animation = JsonConvert.DeserializeObject<Animation.MAFStructure.Animation>(content);
+            var animation = JsonConvert.DeserializeObject<Animation.MafStructure.Animation>(content);
             
             return new Animation.Animation(animation);
         }

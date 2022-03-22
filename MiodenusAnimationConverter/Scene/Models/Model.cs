@@ -13,39 +13,33 @@ namespace MiodenusAnimationConverter.Scene.Models
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public readonly Dictionary<string, Mesh> Meshes;
-        public readonly Pivot Pivot;
+        public readonly Pivot Pivot = new ();
         private Vector3 _scale = Vector3.One;
         public bool IsVisible = true;
-        
-        public Model(in Dictionary<string, Mesh> meshes) : this(meshes, new Pivot()) {}
-        public Model(in Dictionary<string, Mesh> meshes, in Pivot pivot) : this(meshes, pivot, Vector3.One) {}
 
-        public Model(in Dictionary<string, Mesh> meshes, in Pivot pivot, Vector3 scale)
-        {
-            Meshes = meshes.ToDictionary(entry => entry.Key,
-                    entry => (Mesh)entry.Value.Clone());
-            Pivot = (Pivot)pivot.Clone();
-            Scale = scale;
-        }
-        
-        public void ResetScale() => _scale = Vector3.One;
+        /*
+         * На каждую модель должен быть отдельный набор мешей (входной словарь не использовать больше 1 раза для
+         * создания моделей).
+         */
+        public Model(in Dictionary<string, Mesh> meshes) => Meshes = meshes;
 
-        public Vector3 Scale
+        public void Scale(float scaleX = 1.0f, float scaleY = 1.0f, float scaleZ = 1.0f)
         {
-            get => _scale;
-            set
+            if (scaleX > 0.0f && scaleY > 0.0f && scaleZ > 0.0f)
             {
-                if (value.X > 0.0f && value.Y > 0.0f && value.Z > 0.0f)
-                {
-                    _scale = value;
-                }
-                else
-                {
-                    Logger.Warn("Wrong value for Scale parameter. Expected: value"
-                            + $" greater than 0 for X, Y and Z components. Got: {value}. Scale was not changed.");
-                }
+                _scale.X *= scaleX;
+                _scale.Y *= scaleY;
+                _scale.Z *= scaleZ;
+            }
+            else
+            {
+                Logger.Warn("Wrong scale parameters. Expected: values greater than 0 for X, Y and Z"
+                        + $" components. Got: ({scaleX}; {scaleY}; {scaleZ}). Scale was not changed.");
             }
         }
+
+        public void ResetScale() => _scale = Vector3.One;
+        public Vector3 GetScale() => _scale;
 
         public void InitializeVao()
         {

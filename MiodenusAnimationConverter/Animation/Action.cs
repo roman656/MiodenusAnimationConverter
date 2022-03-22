@@ -1,16 +1,20 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace MiodenusAnimationConverter.Animation
 {
     public class Action
     {
+        private static int _index;
         public string Name { get; set; }
         public List<ActionState> States { get; set; }
 
-        public Action(MAFStructure.Action action)
+        public Action(in MafStructure.Action action)
         {
-            Name = (action.Name == string.Empty) ? "UnnamedAction" : action.Name;
+            Name = string.IsNullOrEmpty(action.Name.Trim())
+                    ? DefaultAnimationParameters.Action.Name + _index++
+                    : action.Name.Trim();
             States = new List<ActionState>();
 
             foreach (var actionState in action.States)
@@ -21,14 +25,11 @@ namespace MiodenusAnimationConverter.Animation
         
         public override string ToString()
         {
-            var result = $"Action:\n\tName: {Name}\n\tStates:\n\n";
-            
-            foreach (var state in States)
-            {
-                result += $"\t{state}\n";
-            }
-            
-            return string.Format(CultureInfo.InvariantCulture, result);
+            var result = string.Format(CultureInfo.InvariantCulture, $"Action:\n\tName: {Name}\n\tStates:\n");
+
+            result = States.Aggregate(result, (current, state) => current + $"\n\t{state}");
+
+            return result + "\n";
         }
     }
 }

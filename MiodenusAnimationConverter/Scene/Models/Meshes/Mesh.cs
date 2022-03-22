@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using MiodenusAnimationConverter.Shaders;
 using NLog;
@@ -7,54 +6,36 @@ using OpenTK.Mathematics;
 
 namespace MiodenusAnimationConverter.Scene.Models.Meshes
 {
-    public class Mesh : ICloneable
+    public class Mesh
     {
         private const int ColorChannelsAmount = 4;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly float[] _vertexColorsBuffer;
-        private readonly Triangle[] _triangles;
+        public readonly Triangle[] Triangles;
         private readonly int _vertexesAmount;
         private Vector3 _scale = Vector3.One;
         private VertexArrayObject _vao;
         private int _colorsVboIndex;
         public readonly Pivot Pivot = new ();
         public bool IsVisible = true;
-        public bool WasColorChanged;
+        private bool _wasColorChanged;
 
-        public Mesh(in Triangle[] triangles) => Triangles = triangles;
-        public Mesh(in Triangle[] triangles, in Pivot pivot) : this(triangles, pivot, Vector3.One) {}
-        
-        public Mesh(in Triangle[] triangles, in Pivot pivot, Vector3 scale)
+        /*
+         * Если создать несколько мешей на одном и том же массиве полигонов - цвет вершин будет изменяться одновременно
+         * у всех "связанных" мешей.
+         */
+        public Mesh(in Triangle[] triangles)
         {
             Triangles = triangles;
-            Pivot = (Pivot)pivot.Clone();
-            Scale = scale;
-        }
-        
-        public Mesh(in Mesh mesh)
-        {
-            Triangles = mesh._triangles;
-            Pivot = (Pivot)mesh.Pivot.Clone();
-            _scale = mesh._scale;
-        }
-
-        public Triangle[] Triangles
-        {
-            get => _triangles;
-            private init
-            {
-                _triangles = new Triangle[value.Length];
-                Array.Copy(value, _triangles, value.Length);
-                _vertexesAmount = _triangles.Length * Triangle.VertexesAmount;
-                _vertexColorsBuffer = new float[_vertexesAmount * ColorChannelsAmount];
-            }
+            _vertexesAmount = Triangles.Length * Triangle.VertexesAmount;
+            _vertexColorsBuffer = new float[_vertexesAmount * ColorChannelsAmount];
         }
 
         private (float[], float[]) VertexPositionsAndNormals
         {
             get
             {
-                var trianglesAmount = _triangles.Length;
+                var trianglesAmount = Triangles.Length;
                 var positions = new float[_vertexesAmount * 3];
                 var normals = new float[_vertexesAmount * 3];
                 var positionsIndex = 0;
@@ -64,13 +45,13 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
                 {
                     for (var j = 0; j < Triangle.VertexesAmount; j++)
                     {
-                        positions[positionsIndex++] = _triangles[i].Vertexes[j].Position.X;
-                        positions[positionsIndex++] = _triangles[i].Vertexes[j].Position.Y;
-                        positions[positionsIndex++] = _triangles[i].Vertexes[j].Position.Z;
+                        positions[positionsIndex++] = Triangles[i].Vertexes[j].Position.X;
+                        positions[positionsIndex++] = Triangles[i].Vertexes[j].Position.Y;
+                        positions[positionsIndex++] = Triangles[i].Vertexes[j].Position.Z;
                     
-                        normals[normalsIndex++] = _triangles[i].Vertexes[j].Normal.X;
-                        normals[normalsIndex++] = _triangles[i].Vertexes[j].Normal.Y;
-                        normals[normalsIndex++] = _triangles[i].Vertexes[j].Normal.Z;
+                        normals[normalsIndex++] = Triangles[i].Vertexes[j].Normal.X;
+                        normals[normalsIndex++] = Triangles[i].Vertexes[j].Normal.Y;
+                        normals[normalsIndex++] = Triangles[i].Vertexes[j].Normal.Z;
                     }
                 }
 
@@ -80,52 +61,51 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
 
         private void UpdateVertexColorsBuffer()
         {
-            var trianglesAmount = _triangles.Length;
+            var trianglesAmount = Triangles.Length;
             var index = 0;
             
             for (var i = 0; i < trianglesAmount; i++)
             {
                 for (var j = 0; j < Triangle.VertexesAmount; j++)
                 {
-                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.R;
-                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.G;
-                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.B;
-                    _vertexColorsBuffer[index++] = _triangles[i].Vertexes[j].Color.A;
+                    _vertexColorsBuffer[index++] = Triangles[i].Vertexes[j].Color.R;
+                    _vertexColorsBuffer[index++] = Triangles[i].Vertexes[j].Color.G;
+                    _vertexColorsBuffer[index++] = Triangles[i].Vertexes[j].Color.B;
+                    _vertexColorsBuffer[index++] = Triangles[i].Vertexes[j].Color.A;
                 }
             }
         }
-        
-        public void ResetScale() => _scale = Vector3.One;
 
-        public Vector3 Scale
+        public void Scale(float scaleX = 1.0f, float scaleY = 1.0f, float scaleZ = 1.0f)
         {
-            get => _scale;
-            set
+            if (scaleX > 0.0f && scaleY > 0.0f && scaleZ > 0.0f)
             {
-                if (value.X > 0.0f && value.Y > 0.0f && value.Z > 0.0f)
-                {
-                    _scale = value;
-                }
-                else
-                {
-                    Logger.Warn("Wrong value for Scale parameter. Expected: value"
-                            + $" greater than 0 for X, Y and Z components. Got: {value}. Scale was not changed.");
-                }
+                _scale.X *= scaleX;
+                _scale.Y *= scaleY;
+                _scale.Z *= scaleZ;
+            }
+            else
+            {
+                Logger.Warn("Wrong scale parameters. Expected: values greater than 0 for X, Y and Z"
+                        + $" components. Got: ({scaleX}; {scaleY}; {scaleZ}). Scale was not changed.");
             }
         }
+
+        public void ResetScale() => _scale = Vector3.One;
+        public Vector3 GetScale() => _scale;
 
         public Color4 Color
         {
             set
             {
-                var trianglesAmount = _triangles.Length;
+                var trianglesAmount = Triangles.Length;
                 
                 for (var i = 0; i < trianglesAmount; i++)
                 {
-                    _triangles[i].Color = value;
+                    Triangles[i].Color = value;
                 }
 
-                WasColorChanged = true;
+                _wasColorChanged = true;
             }
         }
         
@@ -143,13 +123,19 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
         
         private void UpdateVertexColorsVbo()
         {
-            if (WasColorChanged)
+            if (_wasColorChanged)
             {
                 UpdateVertexColorsBuffer();
                 _vao.UpdateVertexBufferObject(_colorsVboIndex, _vertexColorsBuffer);
-                WasColorChanged = false;
+                _wasColorChanged = false;
             }
         }
+
+        /*
+         * Если цвет был изменен не через свойство Color, а напрямую у каких-либо вершин
+         * (через Triangles) - необходимо вручную сообщить о необходимости обновления цвета.
+         */
+        public void UpdateColors() => _wasColorChanged = true;
         
         /* Не может быть вызван самостоятельно (не из Model). */
         public void Draw(in ShaderProgram shaderProgram, PrimitiveType mode = PrimitiveType.Triangles)
@@ -167,11 +153,10 @@ namespace MiodenusAnimationConverter.Scene.Models.Meshes
         }
 
         public void DeleteVao() => _vao.Delete();
-        public object Clone() => new Mesh(this);
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, $"Mesh:\n\tTriangles amount: {_triangles.Length}\n\t"
+            return string.Format(CultureInfo.InvariantCulture, $"Mesh:\n\tTriangles amount: {Triangles.Length}\n\t"
                     + $"Scale: ({_scale.X}; {_scale.Y}; {_scale.Z})\n\t" + Pivot);
         }
     }

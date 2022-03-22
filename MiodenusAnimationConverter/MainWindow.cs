@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
@@ -101,17 +102,10 @@ namespace MiodenusAnimationConverter
         {
             _scene.Initialize();
 
-            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 7.0f, -3.0f), Color4.White);
+            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 5.0f, 3.0f), Color4.White);
 
             CursorGrabbed = _isCursorGrabbed;
-
-            _scene.ModelGroups[0].Models["0"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[1].Models["1"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[2].Models["2"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[3].Models["3"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[4].Models["4"].Scale = new Vector3(0.015f);
-            _scene.ModelGroups[5].Models["5"].Scale = new Vector3(0.015f);
-
+            
             InitializeShaderPrograms();
 
             GL.Enable(EnableCap.DepthTest);
@@ -138,6 +132,43 @@ namespace MiodenusAnimationConverter
                 _isCursorModeActive = false;
                 CursorGrabbed = true;
                 _scene.CamerasController.CurrentDebugCamera.ProcessKeyboard(KeyboardState, _deltaTime);
+                ProcessKeyboard(KeyboardState, _deltaTime);
+            }
+        }
+
+        private void ProcessKeyboard(KeyboardState keyboardState, double deltaTime)
+        {
+            const float movementSpeed = 0.5f;
+            var velocity = (float)(movementSpeed * deltaTime);
+            
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalMove(deltaY: -velocity);
+                _scene.CamerasController.CurrentDebugCamera.Move(_scene.Models.Values.ElementAt(0).Pivot, deltaY: -velocity);
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalMove(deltaY: velocity);
+                _scene.CamerasController.CurrentDebugCamera.Move(_scene.Models.Values.ElementAt(0).Pivot, deltaY: velocity);
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.Left) && keyboardState.IsKeyDown(Keys.Down))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-velocity * 80.0f), Vector3.UnitY);
+            }
+            else if (keyboardState.IsKeyDown(Keys.Left))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(velocity * 80.0f), Vector3.UnitY);
+            }
+            
+            if (keyboardState.IsKeyDown(Keys.Right) && keyboardState.IsKeyDown(Keys.Down))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(velocity * 80.0f), Vector3.UnitY);
+            }
+            else if (keyboardState.IsKeyDown(Keys.Right))
+            {
+                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-velocity * 80.0f), Vector3.UnitY);
             }
         }
 
@@ -145,75 +176,41 @@ namespace MiodenusAnimationConverter
         {
             base.OnKeyDown(args);
 
-            switch (args.Key)
+            if (args.Key == Keys.B)
             {
-                case Keys.B:
-                {
-                    _isDebugMode = !_isDebugMode;
-                    break;
-                }
-                case Keys.Up:
-                {
-                    _scene.ModelGroups[0].Move(0.0f, -20.0f, 0.0f);
-                    break;
-                }
-                case Keys.Down:
-                {
-                    _scene.ModelGroups[0].Move(0.0f, 20.0f, 0.0f);
-                    break;
-                }
-                case Keys.Left:
-                {
-                    _scene.ModelGroups[0].Move(-20.0f, 0.0f, 0.0f);
-                    break;
-                }
-                case Keys.Right:
-                {
-                    _scene.ModelGroups[0].Move(20.0f, 0.0f, 0.0f);
-                    break;
-                }
-                case Keys.Y:
-                {
-                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(1, 0, 0));
-                    break;
-                }
-                case Keys.U:
-                {
-                    _scene.ModelGroups[0].Rotate((float)Math.PI / 8, new Vector3(0, 1, 0));
-                    break;
-                }
-                case Keys.M:
-                {
-                    _scene.ModelGroups[0].Scale(0.99f, 0.99f, 0.99f);
-                    break;
-                }
-                case Keys.N:
-                {
-                    _scene.ModelGroups[0].Scale(1.01f, 1.01f, 1.01f);
-                    break;
-                }
-                case Keys.H:
-                {
-                    _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
-                    break;
-                }
-                case Keys.I:
-                {
-                    _scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f));
-                    break;
-                }
-                case Keys.V:
-                {
-                    _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
-                    break;
-                }
-                case Keys.G:
-                {
-                    _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
-                    _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
-                    _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
-                    break;
-                }
+                _isDebugMode = !_isDebugMode;
+            }
+
+            if (args.Key == Keys.M)
+            {
+                _scene.Models.Values.ElementAt(0).Scale(0.99f, 0.99f, 0.99f);
+            }
+            
+            if (args.Key == Keys.N)
+            {
+                _scene.Models.Values.ElementAt(0).Scale(1.01f, 1.01f, 1.01f);
+            }
+            
+            if (args.Key == Keys.H)
+            {
+                _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
+            }
+            
+            if (args.Key == Keys.I)
+            {
+                _scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f));
+            }
+            
+            if (args.Key == Keys.V)
+            {
+                _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
+            }
+            
+            if (args.Key == Keys.G)
+            {
+                _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
+                _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
+                _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
             }
         }
 
@@ -245,7 +242,7 @@ namespace MiodenusAnimationConverter
 
             base.OnRenderFrame(e);
 
-            //_animationController.PrepareSceneToNextFrame();
+            _animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
 
             GL.ClearColor(_backgroundColor);
@@ -254,7 +251,6 @@ namespace MiodenusAnimationConverter
             _angle = (float) (_deltaTime * _rotationRate);
             _scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
             _scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
-            //_lightPoint1.Rotate(_angle, new Vector3(0, 0, 1));
 
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
@@ -263,9 +259,9 @@ namespace MiodenusAnimationConverter
             _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
             _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
 
-            for (var i = 0; i < _scene.ModelGroups.Count; i++)
+            for (var i = 0; i < _scene.Models.Count; i++)
             {
-                _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex],
+                _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex],
                         _scene.CamerasController.CurrentDebugCamera, _drawMode);
             }
 
@@ -275,9 +271,9 @@ namespace MiodenusAnimationConverter
             {
                 CheckGLErrors();
                 
-                for (var i = 0; i < _scene.ModelGroups.Count; i++)
+                for (var i = 0; i < _scene.Models.Count; i++)
                 {
-                    _scene.ModelGroups[i].Draw(_shaderPrograms[_currentProgramIndex + 1],
+                    _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex + 1],
                             _scene.CamerasController.CurrentDebugCamera);
                 }
 
@@ -316,7 +312,7 @@ namespace MiodenusAnimationConverter
         private void TakeScreenshot(int screenshotNumber)
         {
             new Screenshot(this).Save($"{Config.ScreenshotDirectory}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
-                    ImageFormat.Png);
+                    ImageFormat.Jpeg);
         }
         
         public IEnumerable<IVideoFrame> GetBitmaps()

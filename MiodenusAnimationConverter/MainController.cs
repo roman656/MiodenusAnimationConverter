@@ -72,19 +72,18 @@ namespace MiodenusAnimationConverter
             return animation;
         }
         
-        private static List<Model> LoadModels(in List<ModelInfo> modelsInfo)
+        private static Dictionary<string, Model> LoadModels(in List<ModelInfo> modelsInfo)
         {
             Logger.Trace("Loading models started.");
             
-            var models = new List<Model>();
+            var models = new Dictionary<string, Model>();
             IModelLoader loader = new LoaderStl();
 
             foreach (var modelInfo in modelsInfo)
             {
                 try
                 {
-                    var model = loader.Load(modelInfo);
-                    models.Add(model);
+                    models[modelInfo.Name] = loader.Load(modelInfo);
                 }
                 catch (Exception exception)
                 {
@@ -113,7 +112,7 @@ namespace MiodenusAnimationConverter
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
                 StartVisible = workMode == WorkMode.FrameView,
-                NumberOfSamples = 4,
+                NumberOfSamples = animation.Info.EnableMultisampling ? 4 : 0,
                 Location = CalculateCenteredWindowLocation(animation.Info.FrameWidth, animation.Info.FrameHeight)
             };
 

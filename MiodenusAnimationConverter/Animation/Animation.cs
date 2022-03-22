@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace MiodenusAnimationConverter.Animation
 {
@@ -10,7 +11,7 @@ namespace MiodenusAnimationConverter.Animation
         public readonly List<ModelInfo> ModelsInfo;
         public readonly List<Action> Actions;
 
-        public Animation(MAFStructure.Animation animation)
+        public Animation(in MafStructure.Animation animation)
         {
             Info = new AnimationInfo(animation.AnimationInfo);
             ModelsInfo = new List<ModelInfo>();
@@ -40,7 +41,7 @@ namespace MiodenusAnimationConverter.Animation
                 {
                     ModelsInfo.Add(new ModelInfo(modelInfo, bindings[modelInfo.Name]));
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
                     ModelsInfo.Add(new ModelInfo(modelInfo, null));
                 }
@@ -50,19 +51,11 @@ namespace MiodenusAnimationConverter.Animation
         public override string ToString()
         {
             var result = $"Animation:\n{Info}\nModels info:\n";
-            
-            foreach (var modelInfo in ModelsInfo)
-            {
-                result += modelInfo;
-            }
 
-            result += "\nActions:\n";
-            
-            foreach (var action in Actions)
-            {
-                result += action;
-            }
-            
+            result = ModelsInfo.Aggregate(result, (current, modelInfo) => current + modelInfo);
+            result += "Actions:\n";
+            result = Actions.Aggregate(result, (current, action) => current + action);
+
             return string.Format(CultureInfo.InvariantCulture, result);
         }
     }
