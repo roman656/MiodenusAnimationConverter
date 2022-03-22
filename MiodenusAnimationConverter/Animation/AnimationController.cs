@@ -41,8 +41,11 @@ namespace MiodenusAnimationConverter.Animation
             {
                 model.ResetScale();
             }
-
-            model.Scale(transformation.Scale.X, transformation.Scale.Y, transformation.Scale.Z);
+            
+            if (transformation.Scale != Vector3.One)
+            {
+                model.Scale(transformation.Scale.X, transformation.Scale.Y, transformation.Scale.Z);
+            }
 
             if (transformation.ResetLocalRotation)
             {
@@ -90,11 +93,6 @@ namespace MiodenusAnimationConverter.Animation
                 result.LocalRotate.Angle /= stepsAmount;
             }
 
-            if (result.Scale != Vector3.One)
-            {
-                result.Scale /= stepsAmount;
-            }
-            
             return result;
         }
 
