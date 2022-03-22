@@ -30,7 +30,7 @@ namespace MiodenusAnimationConverter.Media
                             options => options
                                     .WithVideoCodec("h264")
                                     .ForceFormat(Type))
-                    .ProcessSynchronously();
+                    .ProcessAsynchronously();
         }
 /*
         public static IEnumerable<IVideoFrame> GetBitmaps( IEnumerable<IVideoFrame> frames)

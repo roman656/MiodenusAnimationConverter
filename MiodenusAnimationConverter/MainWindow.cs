@@ -45,6 +45,8 @@ namespace MiodenusAnimationConverter
         private bool _isDebugMode;
         private bool _isDrawCamerasModeActive;
         private AnimationController _animationController;
+        private bool _wasFirstIterationFinished = false;
+        private readonly bool _useGLDebug = false;
 
         public MainWindow(Animation.Animation animation, Scene.Scene scene, GameWindowSettings gameWindowSettings,
                 NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
@@ -52,7 +54,8 @@ namespace MiodenusAnimationConverter
             CheckPath(Config.ScreenshotDirectory);
             CheckPath(Config.VideoDirectory);
             _scene = scene;
-            _video = new VideoRecorder(this,$"{Config.VideoDirectory}/animation", "mp4", animation.Info.Fps);
+            _video = new VideoRecorder(this,$"{Config.VideoDirectory}/{animation.Info.VideoName}",
+                    animation.Info.VideoFormat, animation.Info.Fps);
             _animationController = new AnimationController(animation, _scene);
             _backgroundColor = animation.Info.BackgroundColor;
         }
@@ -101,6 +104,10 @@ namespace MiodenusAnimationConverter
         protected override void OnLoad()
         {
             _scene.Initialize();
+            
+            _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
+            _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
+            _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
 
             _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 5.0f, 3.0f), Color4.White);
 
@@ -235,10 +242,10 @@ namespace MiodenusAnimationConverter
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            /*if (_animationController.CurrentFrameIndex > 181)
+            if (_animationController.CurrentFrameIndex > 180)
             {
                 Close();
-            }*/
+            }
 
             base.OnRenderFrame(e);
 
@@ -249,13 +256,16 @@ namespace MiodenusAnimationConverter
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             _angle = (float) (_deltaTime * _rotationRate);
-            _scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
-            _scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
+            //_scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
+            //_scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
 
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
 
-            CheckGLErrors();
-            
+            if (_useGLDebug)
+            {
+                CheckGLErrors();
+            }
+
             _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
             _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
 
@@ -265,11 +275,17 @@ namespace MiodenusAnimationConverter
                         _scene.CamerasController.CurrentDebugCamera, _drawMode);
             }
 
-            CheckGLErrors();
+            if (_useGLDebug)
+            {
+                CheckGLErrors();
+            }
 
             if (_isDebugMode)
             {
-                CheckGLErrors();
+                if (_useGLDebug)
+                {
+                    CheckGLErrors();
+                }
                 
                 for (var i = 0; i < _scene.Models.Count; i++)
                 {
@@ -277,18 +293,25 @@ namespace MiodenusAnimationConverter
                             _scene.CamerasController.CurrentDebugCamera);
                 }
 
-                CheckGLErrors();
+                if (_useGLDebug)
+                {
+                    CheckGLErrors();
+                }
             }
 
             if (_isDrawCamerasModeActive)
             {
                 _scene.CamerasController.DrawCameras(_scene.CamerasController.CurrentDebugCamera);
-                CheckGLErrors();
+                
+                if (_useGLDebug)
+                {
+                    CheckGLErrors();
+                }
             }
 
             Context.SwapBuffers();
             
-            //frames.Add(_video.CreateVideoFrame());
+            frames.Add(_video.CreateVideoFrame());
             //TakeScreenshot(_screenshotId++);
         }
 
@@ -314,7 +337,7 @@ namespace MiodenusAnimationConverter
             new Screenshot(this).Save($"{Config.ScreenshotDirectory}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
                     ImageFormat.Jpeg);
         }
-        
+
         public IEnumerable<IVideoFrame> GetBitmaps()
         {
             for (var i = 0; i < frames.Count; i++)
@@ -325,14 +348,12 @@ namespace MiodenusAnimationConverter
 
         protected override void OnClosed()
         {
-/*
             var videoFramesSource = new RawVideoPipeSource(GetBitmaps())
             {
                 FrameRate = 60
             };
             
             _video.CreateVideo(videoFramesSource);
-*/
             _scene.Delete();
 
             for (var i = 0; i < _shaderPrograms.Count; i++)
