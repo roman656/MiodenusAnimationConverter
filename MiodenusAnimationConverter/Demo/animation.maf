@@ -11,8 +11,8 @@
     "timeLength": 20000,
     "fps": 60,
     "enableMultisampling": true,
-    "frameWidth": 800,
-    "frameHeight": 800,
+    "frameWidth": 600,
+    "frameHeight": 600,
     "backgroundColor": [0.3, 0.3, 0.4],
     "include":
     [
@@ -24,14 +24,14 @@
     {
       "name": "bolt_25x8",
       "type": "stl",
-      "filename": "DebugAssets/Jagdtiger.stl",
+      "filename": "Demo/Models/bolt_25x8.stl",
       "color": [0.45, 0.52, 0.58],
       "useCalculatedNormals": false
     },
     {
       "name": "nut_6x9",
       "type": "stl",
-      "filename": "DebugAssets/IS-6.stl",
+      "filename": "Demo/Models/nut_6x9.stl",
       "color": [0.45, 0.52, 0.58],
       "useCalculatedNormals": false
     }
@@ -70,7 +70,7 @@
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
             },
-            "globalMove": [1.0, 0.0, 0.2]
+            "globalMove": [0.0, 0.4, 0.0]
           }
         }
       ]
@@ -83,7 +83,7 @@
           "time": 2000
         },
         {
-          "time": 11000,
+          "time": 5000,
           "isModelVisible": true,
           "color": [0.45, 0.52, 0.58],
           "transformation":
@@ -93,24 +93,24 @@
             "resetLocalRotation": false,
             "localRotate":
             {
-              "angle": 359.0,
+              "angle": -359.0,
               "unit": "deg",
               "vector": [0.0, 1.0, 0.0]
             },
             "resetPosition": false,
-            "globalMove": [0.0, 0.0, 0.0],
+            "globalMove": [0.0, -0.1625, 0.0],
             "localMove": [0.0, 0.0, 0.0],
             "rotate":
             {
-              "angle": 359.0,
+              "angle": 0.0,
               "unit": "deg",
-              "rotationVectorStartPoint": [3.0, 0.0, 0.0],
-              "rotationVectorEndPoint": [3.0, 1.0, 0.0]
+              "rotationVectorStartPoint": [1.0, 0.0, 0.0],
+              "rotationVectorEndPoint": [1.0, 0.0, 0.0]
             }
           }
         },
         {
-          "time": 20000,
+          "time": 8000,
           "isModelVisible": true,
           "color": [0.45, 0.52, 0.58],
           "transformation":
@@ -119,20 +119,13 @@
             "resetLocalRotation": false,
             "localRotate":
             {
-              "angle": 359.0,
+              "angle": -359.0,
               "unit": "deg",
               "vector": [0.0, 1.0, 0.0]
             },
             "resetPosition": false,
-            "globalMove": [0.0, 0.0, 0.0],
-            "localMove": [0.0, 0.0, 0.0],
-            "rotate":
-            {
-              "angle": 359.0,
-              "unit": "deg",
-              "rotationVectorStartPoint": [3.0, 0.0, 0.0],
-              "rotationVectorEndPoint": [3.0, 1.0, 0.0]
-            }
+            "globalMove": [0.0, -0.1625, 0.0],
+            "localMove": [0.0, 0.0, 0.0]
           }
         }
       ]
@@ -156,13 +149,6 @@
     },
     {
       "modelName": "nut_6x9",
-      "actionName": "Nut rotation",
-      "startTime": 0,
-      "timeLength": 3500,
-      "useInterpolation": true
-    },
-    {
-      "modelName": "bolt_25x8",
       "actionName": "Nut rotation",
       "startTime": 0,
       "timeLength": 3500,

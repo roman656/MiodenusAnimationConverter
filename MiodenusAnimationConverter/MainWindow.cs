@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using FFMpegCore;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Animation;
@@ -244,7 +245,7 @@ namespace MiodenusAnimationConverter
         {
             if (_animationController.CurrentFrameIndex > 180)
             {
-                Close();
+                //Close();
             }
 
             base.OnRenderFrame(e);
@@ -338,9 +339,9 @@ namespace MiodenusAnimationConverter
                     ImageFormat.Jpeg);
         }
 
-        public IEnumerable<IVideoFrame> GetBitmaps()
+        private IEnumerable<BitmapVideoFrameWrapper> GetFrames(int amount)
         {
-            for (var i = 0; i < frames.Count; i++)
+            for (var i = 0; i < amount; i++)
             {
                 yield return frames[i];
             }
@@ -348,11 +349,11 @@ namespace MiodenusAnimationConverter
 
         protected override void OnClosed()
         {
-            var videoFramesSource = new RawVideoPipeSource(GetBitmaps())
+            var videoFramesSource = new RawVideoPipeSource(GetFrames(frames.Count))
             {
                 FrameRate = 60
             };
-            
+
             _video.CreateVideo(videoFramesSource);
             _scene.Delete();
 

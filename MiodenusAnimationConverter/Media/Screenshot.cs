@@ -37,7 +37,7 @@ namespace MiodenusAnimationConverter.Media
             
             GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
             GL.ReadBuffer(ReadBufferMode.Front);
-            GL.ReadPixels(0, 0, Width, Height, PixelFormat.Bgr, PixelType.Byte, PixelsData);
+            GL.ReadPixels(0, 0, Width, Height, PixelFormat.Bgr, PixelType.UnsignedByte, PixelsData);
         }
 
         public void Save(in string filename, ImageFormat format)

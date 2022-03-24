@@ -1,5 +1,4 @@
 using FFMpegCore;
-using FFMpegCore.Enums;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 
@@ -21,16 +20,11 @@ namespace MiodenusAnimationConverter.Media
         }
 
         public void CreateVideo(RawVideoPipeSource videoFramesSource)
-        { 
-            FFMpegArguments
-                    .FromPipeInput(videoFramesSource)
-                    .OutputToFile(
-                            $"{Filename}.{Type}",
-                            true,
-                            options => options
-                                    .WithVideoCodec("h264")
-                                    .ForceFormat(Type))
-                    .ProcessAsynchronously();
+        {
+            FFMpegArguments.FromPipeInput(videoFramesSource)
+                           .OutputToFile($"{Filename}.{Type}", true, options => 
+                                   options.ForceFormat(Type))
+                           .ProcessSynchronously();
         }
 /*
         public static IEnumerable<IVideoFrame> GetBitmaps( IEnumerable<IVideoFrame> frames)
