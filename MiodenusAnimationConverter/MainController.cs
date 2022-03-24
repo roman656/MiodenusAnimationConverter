@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Loaders.AnimationLoaders;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
@@ -13,13 +14,6 @@ namespace MiodenusAnimationConverter
 {
     public class MainController
     {
-        private enum WorkMode
-        {
-            Default,
-            FrameView,
-            GetFrameImage
-        }
-        
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public MainController(in CommandLineOptions options)
@@ -32,6 +26,8 @@ namespace MiodenusAnimationConverter
                 var models = LoadModels(animation.ModelsInfo);
                 var scene = new Scene.Scene(animation.Info, models);
 
+                CheckPath(Config.ScreenshotDirectory);
+                CheckPath(Config.VideoDirectory);
                 CreateMainWindow(animation, scene, DetermineWorkMode(options)).Run();
             }
             catch (Exception exception)
@@ -44,20 +40,28 @@ namespace MiodenusAnimationConverter
             LogManager.Shutdown();
         }
         
-        private static WorkMode DetermineWorkMode(in CommandLineOptions options)
+        private static void CheckPath(in string path)
         {
-            var result = WorkMode.Default;
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
+        
+        private static WorkModeEnum DetermineWorkMode(in CommandLineOptions options)
+        {
+            var result = WorkModeEnum.Default;
 
             if (options.WasFrameNumberToViewOptionGot)
             {
-                result = WorkMode.FrameView;
+                result = WorkModeEnum.FrameView;
             }
             else if (options.WasFrameNumberToGetImageOptionGot)
             {
-                result = WorkMode.GetFrameImage;
+                result = WorkModeEnum.GetFrameImage;
             }
-            
-            Logger.Trace("Working mode: {0}", result);
+
+            Logger.Trace($"Working mode: {result}");
             return result;
         }
 
@@ -96,13 +100,13 @@ namespace MiodenusAnimationConverter
         }
 
         private static MainWindow CreateMainWindow(in Animation.Animation animation, in Scene.Scene scene, 
-                WorkMode workMode)
+                WorkModeEnum workMode)
         {
             GameWindowSettings mainWindowSettings = new()
             {
                 IsMultiThreaded = true,
-                RenderFrequency = animation.Info.Fps,
-                UpdateFrequency = animation.Info.Fps
+                RenderFrequency = workMode == WorkModeEnum.FrameView ? animation.Info.Fps : 0,
+                UpdateFrequency = workMode == WorkModeEnum.FrameView ? animation.Info.Fps : 0
             };
             
             NativeWindowSettings nativeWindowSettings = new()
@@ -111,12 +115,12 @@ namespace MiodenusAnimationConverter
                 Title = Config.MainWindowTitle,
                 WindowBorder = WindowBorder.Fixed,
                 API = ContextAPI.OpenGL,
-                StartVisible = workMode == WorkMode.FrameView,
+                StartVisible = workMode == WorkModeEnum.FrameView,
                 NumberOfSamples = animation.Info.EnableMultisampling ? 4 : 0,
                 Location = CalculateCenteredWindowLocation(animation.Info.FrameWidth, animation.Info.FrameHeight)
             };
 
-            return new MainWindow(animation, scene, mainWindowSettings, nativeWindowSettings);
+            return new MainWindow(animation, scene, workMode, mainWindowSettings, nativeWindowSettings);
         }
 
         private static Vector2i? CalculateCenteredWindowLocation(int frameWidth, int frameHeight)

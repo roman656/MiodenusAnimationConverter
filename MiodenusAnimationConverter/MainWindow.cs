@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using FFMpegCore;
 using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Media;
-using MiodenusAnimationConverter.Scene;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.GeometryShaders;
@@ -27,45 +24,36 @@ namespace MiodenusAnimationConverter
     public class MainWindow : GameWindow
     {
         private const PrimitiveType DefaultDrawMode = PrimitiveType.Triangles;
+        private const bool IsCheckingGLErrorsEnabled = false;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private List<ShaderProgram> _shaderPrograms = new ();
+        private readonly List<ShaderProgram> _shaderPrograms = new ();
         private int _currentProgramIndex = 0;
-        private readonly Color4 _backgroundColor;
-        private int _screenshotId;
-        private float _angle;
-        private double _deltaTime;
-        private List<BitmapVideoFrameWrapper> frames = new ();
-        private bool _isCursorGrabbed = true;
-        private Scene.Scene _scene;
-        private VideoRecorder _video;
-        private readonly PrimitiveType _drawMode = DefaultDrawMode;
+        private readonly AnimationController _animationController;
+        private readonly VideoRecorder _videoRecorder;
+        private readonly AnimationInfo _animationInfo;
+        private readonly Scene.Scene _scene;
+        private readonly WorkModeEnum _workMode;
         private bool _isCursorModeActive;
-        private float _rotationRate = 0.1f;
-        private LightPoint _lightPoint1;
-        private LightPoint _lightPoint2;
-        private bool _isDebugMode;
+        private bool _isDrawNormalsModeActive;
         private bool _isDrawCamerasModeActive;
-        private AnimationController _animationController;
-        private bool _wasFirstIterationFinished = false;
-        private readonly bool _useGLDebug = false;
+        
+        private int _screenshotId;
+        private double _deltaTime;
+        private readonly List<BitmapVideoFrameWrapper> _frames = new ();
+        private PrimitiveType _drawMode = DefaultDrawMode;
 
-        public MainWindow(Animation.Animation animation, Scene.Scene scene, GameWindowSettings gameWindowSettings,
-                NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
+        public MainWindow(in Animation.Animation animation, in Scene.Scene scene, WorkModeEnum workMode,
+                GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
+                : base(gameWindowSettings, nativeWindowSettings)
         {
-            CheckPath(Config.ScreenshotDirectory);
-            CheckPath(Config.VideoDirectory);
             _scene = scene;
-            _video = new VideoRecorder(this,$"{Config.VideoDirectory}/{animation.Info.VideoName}",
-                    animation.Info.VideoFormat, animation.Info.Fps);
-            _animationController = new AnimationController(animation, _scene);
-            _backgroundColor = animation.Info.BackgroundColor;
-        }
+            _workMode = workMode;
+            _animationInfo = animation.Info;
+            _animationController = new AnimationController(animation, scene);
 
-        private static void CheckPath(in string path)
-        {
-            if (!Directory.Exists(path))
+            if (workMode == WorkModeEnum.Default)
             {
-                Directory.CreateDirectory(path);
+                _videoRecorder = new VideoRecorder(this, animation.Info);
             }
         }
 
@@ -79,26 +67,30 @@ namespace MiodenusAnimationConverter
                 new (LightingShader.Code, LightingShader.Type)
             };
             
-            var debugShaders = new List<Shader>
-            {
-                new (TransformShader.Code, TransformShader.Type),
-                new (NormalsShader.Code, NormalsShader.Type),
-                new (ColorShader.Code, ColorShader.Type)
-            };
-
             _shaderPrograms.Add(new ShaderProgram(mainShaders));
-            _shaderPrograms.Add(new ShaderProgram(debugShaders));
-
+            
             foreach (var shader in mainShaders)
             {
                 shader.Delete();
             }
 
-            foreach (var shader in debugShaders)
+            if (_workMode == WorkModeEnum.FrameView)
             {
-                shader.Delete();
+                var debugShaders = new List<Shader>
+                {
+                    new(TransformShader.Code, TransformShader.Type),
+                    new(NormalsShader.Code, NormalsShader.Type),
+                    new(ColorShader.Code, ColorShader.Type)
+                };
+
+                _shaderPrograms.Add(new ShaderProgram(debugShaders));
+
+                foreach (var shader in debugShaders)
+                {
+                    shader.Delete();
+                }
             }
-            
+
             Logger.Trace("Shader pograms initialization finished.");
         }
 
@@ -110,9 +102,11 @@ namespace MiodenusAnimationConverter
             _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
             _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
 
-            _lightPoint1 = _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 5.0f, 3.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 6.0f, 6.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(-6.0f, 6.0f, -6.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(6.0f, 6.0f, -6.0f), Color4.White);
 
-            CursorGrabbed = _isCursorGrabbed;
+            CursorGrabbed = _workMode == WorkModeEnum.FrameView;
             
             InitializeShaderPrograms();
 
@@ -125,7 +119,7 @@ namespace MiodenusAnimationConverter
         {
             base.OnUpdateFrame(args);
             
-            if (!IsFocused)
+            if (_workMode != WorkModeEnum.FrameView || !IsFocused)
             {
                 return;
             }
@@ -140,73 +134,26 @@ namespace MiodenusAnimationConverter
                 _isCursorModeActive = false;
                 CursorGrabbed = true;
                 _scene.CamerasController.CurrentDebugCamera.ProcessKeyboard(KeyboardState, _deltaTime);
-                ProcessKeyboard(KeyboardState, _deltaTime);
-            }
-        }
-
-        private void ProcessKeyboard(KeyboardState keyboardState, double deltaTime)
-        {
-            const float movementSpeed = 0.5f;
-            var velocity = (float)(movementSpeed * deltaTime);
-            
-            if (keyboardState.IsKeyDown(Keys.Up))
-            {
-                _scene.Models.Values.ElementAt(0).Pivot.LocalMove(deltaY: -velocity);
-                _scene.CamerasController.CurrentDebugCamera.Move(_scene.Models.Values.ElementAt(0).Pivot, deltaY: -velocity);
-            }
-            
-            if (keyboardState.IsKeyDown(Keys.Down))
-            {
-                _scene.Models.Values.ElementAt(0).Pivot.LocalMove(deltaY: velocity);
-                _scene.CamerasController.CurrentDebugCamera.Move(_scene.Models.Values.ElementAt(0).Pivot, deltaY: velocity);
-            }
-            
-            if (keyboardState.IsKeyDown(Keys.Left) && keyboardState.IsKeyDown(Keys.Down))
-            {
-                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-velocity * 80.0f), Vector3.UnitY);
-            }
-            else if (keyboardState.IsKeyDown(Keys.Left))
-            {
-                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(velocity * 80.0f), Vector3.UnitY);
-            }
-            
-            if (keyboardState.IsKeyDown(Keys.Right) && keyboardState.IsKeyDown(Keys.Down))
-            {
-                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(velocity * 80.0f), Vector3.UnitY);
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right))
-            {
-                _scene.Models.Values.ElementAt(0).Pivot.LocalRotate(MathHelper.DegreesToRadians(-velocity * 80.0f), Vector3.UnitY);
             }
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs args)
         {
             base.OnKeyDown(args);
-
-            if (args.Key == Keys.B)
-            {
-                _isDebugMode = !_isDebugMode;
-            }
-
-            if (args.Key == Keys.M)
-            {
-                _scene.Models.Values.ElementAt(0).Scale(0.99f, 0.99f, 0.99f);
-            }
             
+            if (_workMode != WorkModeEnum.FrameView || !IsFocused)
+            {
+                return;
+            }
+
             if (args.Key == Keys.N)
             {
-                _scene.Models.Values.ElementAt(0).Scale(1.01f, 1.01f, 1.01f);
+                _isDrawNormalsModeActive = !_isDrawNormalsModeActive;
             }
-            
-            if (args.Key == Keys.H)
+
+            if (args.Key == Keys.Z)
             {
-                _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 1.0f, 2.0f), Color4.Olive);
-            }
-            
-            if (args.Key == Keys.I)
-            {
-                _scene.CamerasController.CurrentDebugCamera.LookAt(new Vector3(0.0f));
+                _scene.CamerasController.CurrentDebugCamera.LookAt(Vector3.Zero);
             }
             
             if (args.Key == Keys.V)
@@ -225,7 +172,8 @@ namespace MiodenusAnimationConverter
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
-            if (!_isCursorModeActive)
+            
+            if (!_isCursorModeActive && _workMode == WorkModeEnum.FrameView && IsFocused)
             {
                 _scene.CamerasController.CurrentDebugCamera.ProcessMouseMovement(MouseState);
             }
@@ -235,7 +183,7 @@ namespace MiodenusAnimationConverter
         {
             base.OnMouseWheel(args);
 
-            if (!_isCursorModeActive)
+            if (!_isCursorModeActive && _workMode == WorkModeEnum.FrameView && IsFocused)
             {
                 _scene.CamerasController.CurrentDebugCamera.ProcessMouseScroll(args, KeyboardState);
             }
@@ -249,112 +197,110 @@ namespace MiodenusAnimationConverter
             }
 
             base.OnRenderFrame(e);
-
             _animationController.PrepareSceneToNextFrame();
             _deltaTime = e.Time;
 
-            GL.ClearColor(_backgroundColor);
+            GL.ClearColor(_animationInfo.BackgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            _angle = (float) (_deltaTime * _rotationRate);
-            //_scene.CamerasController.CurrentCamera.GlobalRotate(_angle, new Vector3(0.0f, 1.0f, 0.0f));
-            //_scene.CamerasController.CurrentCamera.LookAt(new Vector3(0.0f, 0.5f, 0.0f));
-
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
+            CheckGLErrors();
 
-            if (_useGLDebug)
+            if (_workMode == WorkModeEnum.FrameView)
             {
-                CheckGLErrors();
+                _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
+                _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
             }
 
-            _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
-            _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
-
-            for (var i = 0; i < _scene.Models.Count; i++)
+            if (_workMode == WorkModeEnum.FrameView)
             {
-                _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex],
-                        _scene.CamerasController.CurrentDebugCamera, _drawMode);
-            }
-
-            if (_useGLDebug)
-            {
-                CheckGLErrors();
-            }
-
-            if (_isDebugMode)
-            {
-                if (_useGLDebug)
+                for (var i = 0; i < _scene.Models.Count; i++)
                 {
-                    CheckGLErrors();
+                    _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex],
+                        _scene.CamerasController.CurrentDebugCamera, _drawMode);
                 }
-                
+            }
+            else
+            {
+                for (var i = 0; i < _scene.Models.Count; i++)
+                {
+                    _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex],
+                        _scene.CamerasController.CurrentCamera, _drawMode);
+                }
+            }
+
+            CheckGLErrors();
+
+            if (_workMode == WorkModeEnum.FrameView && _isDrawNormalsModeActive)
+            {
                 for (var i = 0; i < _scene.Models.Count; i++)
                 {
                     _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex + 1],
                             _scene.CamerasController.CurrentDebugCamera);
                 }
-
-                if (_useGLDebug)
-                {
-                    CheckGLErrors();
-                }
+                
+                CheckGLErrors();
             }
 
-            if (_isDrawCamerasModeActive)
+            if (_workMode == WorkModeEnum.FrameView && _isDrawCamerasModeActive)
             {
                 _scene.CamerasController.DrawCameras(_scene.CamerasController.CurrentDebugCamera);
-                
-                if (_useGLDebug)
-                {
-                    CheckGLErrors();
-                }
+                CheckGLErrors();
             }
 
             Context.SwapBuffers();
-            
-            frames.Add(_video.CreateVideoFrame());
-            //TakeScreenshot(_screenshotId++);
-        }
 
-        private void CheckGLErrors(int sleepTime = 1000, [CallerLineNumber] int lineNumber = -1, [CallerMemberName] string caller = null)
-        {
-            var hasError = false;
-            ErrorCode errorCode;
-            
-            while ((errorCode = GL.GetError()) != ErrorCode.NoError)
+            if (_workMode == WorkModeEnum.Default)
             {
-                hasError = true;
-                Logger.Error($"{caller}: detected OpenGL error on line {lineNumber}. Type: {errorCode}.");
+                _frames.Add(_videoRecorder.CreateVideoFrame());
             }
-
-            if (hasError)
+            else if (_workMode == WorkModeEnum.GetFrameImage)
             {
-                System.Threading.Thread.Sleep(sleepTime);
+                TakeScreenshot(_screenshotId);
+                Close();
             }
         }
 
-        private void TakeScreenshot(int screenshotNumber)
+        private void CheckGLErrors(int sleepTime = 1000, [CallerLineNumber] int lineNumber = -1,
+                [CallerMemberName] string caller = null)
         {
-            new Screenshot(this).Save($"{Config.ScreenshotDirectory}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
-                    ImageFormat.Jpeg);
+            if (IsCheckingGLErrorsEnabled)
+            {
+                var hasError = false;
+                ErrorCode errorCode;
+
+                while ((errorCode = GL.GetError()) != ErrorCode.NoError)
+                {
+                    hasError = true;
+                    Logger.Error($"{caller}: detected OpenGL error on line {lineNumber}. Type: {errorCode}.");
+                }
+
+                if (hasError)
+                {
+                    System.Threading.Thread.Sleep(sleepTime);
+                }
+            }
         }
 
-        private IEnumerable<BitmapVideoFrameWrapper> GetFrames(int amount)
+        private void TakeScreenshot(int screenshotNumber) => new Screenshot(this).Save(
+                $"{Config.ScreenshotDirectory}/{screenshotNumber}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
+                ImageFormat.Png);
+
+        private IEnumerable<BitmapVideoFrameWrapper> GetFrames()
         {
-            for (var i = 0; i < amount; i++)
+            for (var i = 0; i < _frames.Count; i++)
             {
-                yield return frames[i];
+                yield return _frames[i];
             }
         }
 
         protected override void OnClosed()
         {
-            var videoFramesSource = new RawVideoPipeSource(GetFrames(frames.Count))
+            if (_workMode == WorkModeEnum.Default)
             {
-                FrameRate = 60
-            };
+                _videoRecorder.CreateVideo(new RawVideoPipeSource(GetFrames()) {FrameRate = _animationInfo.Fps});
+            }
 
-            _video.CreateVideo(videoFramesSource);
             _scene.Delete();
 
             for (var i = 0; i < _shaderPrograms.Count; i++)

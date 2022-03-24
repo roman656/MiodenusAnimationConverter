@@ -6,7 +6,7 @@
     "name": "Demo assembling",
     "videoFormat": "mp4",
     "videoCodec": "h264",
-    "videoBitrate": 0,
+    "videoBitrate": 4000,
     "videoName": "ResultVideo",
     "timeLength": 20000,
     "fps": 60,

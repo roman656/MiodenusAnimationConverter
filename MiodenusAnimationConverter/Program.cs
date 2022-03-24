@@ -8,7 +8,7 @@ namespace MiodenusAnimationConverter
 {
     public static class Program
     {
-        public static ExitCodeEnum ExitCode = ExitCodeEnum.Success;
+        public static ExitCodeEnum ExitCode { get; set; } = ExitCodeEnum.Success;
         
         public static int Main(string[] args)
         {

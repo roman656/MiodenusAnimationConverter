@@ -40,7 +40,7 @@ namespace MiodenusAnimationConverter.Media
             GL.ReadPixels(0, 0, Width, Height, PixelFormat.Bgr, PixelType.UnsignedByte, PixelsData);
         }
 
-        public void Save(in string filename, ImageFormat format)
+        public void Save(in string filename, in ImageFormat format)
         {
             Bitmap.Save($"{filename}.{format.ToString().ToLower()}", format);
         }

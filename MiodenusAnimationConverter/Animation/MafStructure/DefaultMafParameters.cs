@@ -11,7 +11,7 @@ namespace MiodenusAnimationConverter.Animation.MafStructure
             public const string Name = "DefaultName";
             public const string VideoFormat = "mp4";
             public const string VideoCodec = "h264";
-            public const int VideoBitrate = 0;
+            public const int VideoBitrate = 4000;
             public const string VideoName = "ResultVideo";
             public const int TimeLength = 0;
             public const int Fps = 60;
