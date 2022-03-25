@@ -223,9 +223,7 @@ namespace MiodenusAnimationConverter
             }
             else if (_workMode == WorkModeEnum.Default)
             {
-                var totalFramesAmount = 280;    // временно.
-                
-                if (_animationController.CurrentFrameIndex >= totalFramesAmount)
+                if (_animationController.IsAnimationFinished)
                 {
                     Close();
                 }

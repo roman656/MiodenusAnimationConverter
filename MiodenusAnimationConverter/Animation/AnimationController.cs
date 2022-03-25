@@ -14,11 +14,15 @@ namespace MiodenusAnimationConverter.Animation
         private readonly Animation _animation;
         private readonly float _framesPerMillisecond;
         private int _currentFrameIndex;
+        public readonly int TotalFramesAmount;
+
+        public bool IsAnimationFinished => _currentFrameIndex >= TotalFramesAmount;
 
         public AnimationController(in Animation animation, in Scene.Scene scene)
         {
             _animation = animation;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
+            TotalFramesAmount = (int)(animation.Info.TimeLength * _framesPerMillisecond);
             
             foreach (var modelInfo in _animation.ModelsInfo)
             {

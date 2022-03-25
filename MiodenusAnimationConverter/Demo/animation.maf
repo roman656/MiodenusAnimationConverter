@@ -8,7 +8,7 @@
     "videoCodec": "mpeg4",
     "videoBitrate": 4000,
     "videoName": "ResultVideo",
-    "timeLength": 20000,
+    "timeLength": 3000,
     "fps": 60,
     "enableMultisampling": true,
     "frameWidth": 600,
