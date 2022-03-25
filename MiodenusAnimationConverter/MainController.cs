@@ -28,7 +28,8 @@ namespace MiodenusAnimationConverter
 
                 CheckPath(Config.ScreenshotDirectory);
                 CheckPath(Config.VideoDirectory);
-                CreateMainWindow(animation, scene, DetermineWorkMode(options)).Run();
+                CreateMainWindow(animation, scene, DetermineWorkMode(options), options.FrameNumberToView,
+                        options.FrameNumberToGetImage).Run();
             }
             catch (Exception exception)
             {
@@ -100,13 +101,13 @@ namespace MiodenusAnimationConverter
         }
 
         private static MainWindow CreateMainWindow(in Animation.Animation animation, in Scene.Scene scene, 
-                WorkModeEnum workMode)
+                WorkModeEnum workMode, int frameNumberToView, int frameNumberToGetImage)
         {
             GameWindowSettings mainWindowSettings = new()
             {
                 IsMultiThreaded = true,
-                RenderFrequency = /*workMode == WorkModeEnum.FrameView ? animation.Info.Fps :*/ 0,
-                UpdateFrequency = /*workMode == WorkModeEnum.FrameView ? animation.Info.Fps :*/ 0
+                RenderFrequency = workMode == WorkModeEnum.FrameView ? animation.Info.Fps : 0,
+                UpdateFrequency = workMode == WorkModeEnum.FrameView ? animation.Info.Fps : 0
             };
             
             NativeWindowSettings nativeWindowSettings = new()
@@ -120,7 +121,8 @@ namespace MiodenusAnimationConverter
                 Location = CalculateCenteredWindowLocation(animation.Info.FrameWidth, animation.Info.FrameHeight)
             };
 
-            return new MainWindow(animation, scene, workMode, mainWindowSettings, nativeWindowSettings);
+            return new MainWindow(animation, scene, workMode, frameNumberToView, frameNumberToGetImage,
+                    mainWindowSettings, nativeWindowSettings);
         }
 
         private static Vector2i? CalculateCenteredWindowLocation(int frameWidth, int frameHeight)

@@ -33,21 +33,26 @@ namespace MiodenusAnimationConverter
         private readonly AnimationInfo _animationInfo;
         private readonly Scene.Scene _scene;
         private readonly WorkModeEnum _workMode;
+        private readonly int _frameNumberToView;
+        private readonly int _frameNumberToGetImage;
+        private readonly List<BitmapVideoFrameWrapper> _frames = new ();
+        private PrimitiveType _drawMode = DefaultDrawMode;
         private bool _isCursorModeActive;
         private bool _isDrawNormalsModeActive;
         private bool _isDrawCamerasModeActive;
-        private readonly List<BitmapVideoFrameWrapper> _frames = new ();
-        private PrimitiveType _drawMode = DefaultDrawMode;
         private double _deltaTime;
-        private int _screenshotId;
+        private bool _isPaused = true;
+        private bool _isFirstIterationFinished;
 
         public MainWindow(in Animation.Animation animation, in Scene.Scene scene, WorkModeEnum workMode,
-                GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
-                : base(gameWindowSettings, nativeWindowSettings)
+                int frameNumberToView, int frameNumberToGetImage, GameWindowSettings gameWindowSettings,
+                NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
             _scene = scene;
             _workMode = workMode;
             _animationInfo = animation.Info;
+            _frameNumberToView = frameNumberToView;
+            _frameNumberToGetImage = frameNumberToGetImage;
             _animationController = new AnimationController(animation, scene);
 
             if (workMode == WorkModeEnum.Default)
@@ -145,6 +150,11 @@ namespace MiodenusAnimationConverter
             {
                 Close();
             }
+            
+            if (args.Key == Keys.P)
+            {
+                _isPaused = !_isPaused;
+            }
 
             if (args.Key == Keys.N)
             {
@@ -197,31 +207,61 @@ namespace MiodenusAnimationConverter
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            if (_animationController.CurrentFrameIndex > 180)
-            {
-                //Close();
-            }
-
             base.OnRenderFrame(e);
-            _animationController.PrepareSceneToNextFrame();
+
+            if (_workMode == WorkModeEnum.GetFrameImage)
+            {
+                /*
+                 * TODO: проверка, что не запросили кадр за пределами видео.
+                 * А точнее срез - если просят 1000 когда есть 500 - выдать 500 (или 501),
+                 * ведь дальше изменений всеравно не будет.
+                 */
+                while (_animationController.CurrentFrameIndex < _frameNumberToGetImage)
+                {
+                    _animationController.PrepareSceneToNextFrame();
+                }
+            }
+            else if (_workMode == WorkModeEnum.Default)
+            {
+                var totalFramesAmount = 280;    // временно.
+                
+                if (_animationController.CurrentFrameIndex >= totalFramesAmount)
+                {
+                    Close();
+                }
+                
+                _animationController.PrepareSceneToNextFrame();
+            }
+            else
+            {
+                if (_frameNumberToView <= 0 && (!_isPaused || !_isFirstIterationFinished))
+                {
+                    _animationController.PrepareSceneToNextFrame();
+                }
+                else
+                {
+                    while (_animationController.CurrentFrameIndex < _frameNumberToView)
+                    {
+                        _animationController.PrepareSceneToNextFrame();
+                    }
+                    
+                    if (!_isPaused)
+                    {
+                        _animationController.PrepareSceneToNextFrame();
+                    }
+                }
+            }
+            
             _deltaTime = e.Time;
 
             GL.ClearColor(_animationInfo.BackgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            if (IsCheckingGLErrorsEnabled)
-            {
-                CheckGLErrors();
-            }
-
             if (_workMode == WorkModeEnum.FrameView)
             {
                 _scene.Grid.Draw(_scene.CamerasController.CurrentDebugCamera);
                 _scene.MajorGrid.Draw(_scene.CamerasController.CurrentDebugCamera);
-            }
 
-            if (_workMode == WorkModeEnum.FrameView)
-            {
                 for (var i = 0; i < _scene.Models.Count; i++)
                 {
                     _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex],
@@ -267,6 +307,7 @@ namespace MiodenusAnimationConverter
             }
 
             Context.SwapBuffers();
+            _isFirstIterationFinished = true;
 
             if (_workMode == WorkModeEnum.Default)
             {
@@ -274,7 +315,7 @@ namespace MiodenusAnimationConverter
             }
             else if (_workMode == WorkModeEnum.GetFrameImage)
             {
-                TakeScreenshot(_screenshotId);
+                TakeScreenshot(_frameNumberToGetImage);
                 Close();
             }
         }

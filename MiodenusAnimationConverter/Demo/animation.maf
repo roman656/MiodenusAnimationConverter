@@ -5,7 +5,7 @@
     "version": "1.0",
     "name": "Demo assembling",
     "videoFormat": "mp4",
-    "videoCodec": "h264",
+    "videoCodec": "mpeg4",
     "videoBitrate": 4000,
     "videoName": "ResultVideo",
     "timeLength": 20000,
@@ -34,6 +34,13 @@
       "filename": "Demo/Models/nut_6x9.stl",
       "color": [0.45, 0.52, 0.58],
       "useCalculatedNormals": false
+    },
+    {
+      "name": "det",
+      "type": "stl",
+      "filename": "DebugAssets/Det1.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false
     }
   ],
   "actions":
@@ -51,7 +58,8 @@
               "angle": -90.0,
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
-            }
+            },
+            "globalMove": [0.0, -0.22, 0.0]
           }
         }
       ]
@@ -70,7 +78,25 @@
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
             },
-            "globalMove": [0.0, 0.4, 0.0]
+            "globalMove": [0.0, 0.2, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 3",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.0075, 0.0075, 0.0075],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            }
           }
         }
       ]
@@ -83,7 +109,7 @@
           "time": 2000
         },
         {
-          "time": 5000,
+          "time": 3000,
           "isModelVisible": true,
           "color": [0.45, 0.52, 0.58],
           "transformation":
@@ -93,12 +119,12 @@
             "resetLocalRotation": false,
             "localRotate":
             {
-              "angle": -359.0,
+              "angle": -180.0,
               "unit": "deg",
               "vector": [0.0, 1.0, 0.0]
             },
             "resetPosition": false,
-            "globalMove": [0.0, -0.1625, 0.0],
+            "globalMove": [0.0, -0.048, 0.0],
             "localMove": [0.0, 0.0, 0.0],
             "rotate":
             {
@@ -107,25 +133,6 @@
               "rotationVectorStartPoint": [1.0, 0.0, 0.0],
               "rotationVectorEndPoint": [1.0, 0.0, 0.0]
             }
-          }
-        },
-        {
-          "time": 8000,
-          "isModelVisible": true,
-          "color": [0.45, 0.52, 0.58],
-          "transformation":
-          {
-            "resetScale": false,
-            "resetLocalRotation": false,
-            "localRotate":
-            {
-              "angle": -359.0,
-              "unit": "deg",
-              "vector": [0.0, 1.0, 0.0]
-            },
-            "resetPosition": false,
-            "globalMove": [0.0, -0.1625, 0.0],
-            "localMove": [0.0, 0.0, 0.0]
           }
         }
       ]
@@ -153,6 +160,13 @@
       "startTime": 0,
       "timeLength": 3500,
       "useInterpolation": true
+    },
+    {
+      "modelName": "det",
+      "actionName": "Init 3",
+      "startTime": 0,
+      "timeLength": 3500,
+      "useInterpolation": false
     }
   ]
 }
