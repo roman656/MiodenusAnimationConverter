@@ -4,8 +4,8 @@ using System.IO;
 using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Loaders.AnimationLoaders;
 using MiodenusAnimationConverter.Loaders.ModelLoaders;
-using MiodenusAnimationConverter.Scene.Models;
 using NLog;
+using MiodenusAnimationConverter.Scene.Models;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -105,8 +105,8 @@ namespace MiodenusAnimationConverter
             GameWindowSettings mainWindowSettings = new()
             {
                 IsMultiThreaded = true,
-                RenderFrequency = workMode == WorkModeEnum.FrameView ? animation.Info.Fps : 0,
-                UpdateFrequency = workMode == WorkModeEnum.FrameView ? animation.Info.Fps : 0
+                RenderFrequency = /*workMode == WorkModeEnum.FrameView ? animation.Info.Fps :*/ 0,
+                UpdateFrequency = /*workMode == WorkModeEnum.FrameView ? animation.Info.Fps :*/ 0
             };
             
             NativeWindowSettings nativeWindowSettings = new()

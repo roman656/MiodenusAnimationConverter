@@ -14,6 +14,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public const Keys MoveDownKey = Keys.LeftShift;
         public const Keys LeftTiltKey = Keys.Q;
         public const Keys RightTiltKey = Keys.E;
+        public const Keys LookAtZeroKey = Keys.Z;
+        public const Keys ResetPositionKey = Keys.I;
         public static readonly Keys[] ResetKeys = { Keys.C, Keys.R };
     }
 }

@@ -33,6 +33,7 @@ namespace MiodenusAnimationConverter.Scene
         private bool _isTimeToUpdateVbo;
         private int _vertexesAmount;
         public readonly Pivot Pivot;
+        public bool IsVisible = true;
 
         public Grid(int xSizeInCells = 0, int ySizeInCells = 0, int zSizeInCells = 0, float cellSize = 1.0f,
                 float lineWidth = 1.0f) : this(Vector3.Zero, DefaultColor, xSizeInCells, ySizeInCells,
@@ -461,23 +462,26 @@ namespace MiodenusAnimationConverter.Scene
 
         public void Draw(in Camera camera)
         {
-            if (_isXzPlaneVisible || _isXyPlaneVisible || _isYzPlaneVisible)
+            if (IsVisible)
             {
-                UpdateVbo();
+                if (_isXzPlaneVisible || _isXyPlaneVisible || _isYzPlaneVisible)
+                {
+                    UpdateVbo();
 
-                _shaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
-                _shaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
-                _shaderProgram.SetVector3("pivot.position", Pivot.Position);
-                _shaderProgram.SetVector4("pivot.rotation", new Vector4(Pivot.Rotation.Xyz, Pivot.Rotation.W));
+                    _shaderProgram.SetMatrix4("view", camera.ViewMatrix, false);
+                    _shaderProgram.SetMatrix4("projection", camera.ProjectionMatrix, false);
+                    _shaderProgram.SetVector3("pivot.position", Pivot.Position);
+                    _shaderProgram.SetVector4("pivot.rotation", new Vector4(Pivot.Rotation.Xyz, Pivot.Rotation.W));
 
-                var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
-                
-                GL.LineWidth(_lineWidth);
-                _vao.Draw(_vertexesAmount, PrimitiveType.Lines);
-                GL.LineWidth(prevLineWidth);
+                    var prevLineWidth = GL.GetFloat(GetPName.LineWidth);
+
+                    GL.LineWidth(_lineWidth);
+                    _vao.Draw(_vertexesAmount, PrimitiveType.Lines);
+                    GL.LineWidth(prevLineWidth);
+                }
+
+                Pivot.Draw(camera);
             }
-            
-            Pivot.Draw(camera);
         }
         
         public void DeleteVao()

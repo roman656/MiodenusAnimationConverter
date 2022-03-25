@@ -10,6 +10,7 @@ namespace MiodenusAnimationConverter.Scene
     public class Scene
     {
         private const int GridSize = 6;
+        public static readonly Vector3 DefaultCameraPosition = new (0.0f, 1.5f, 3.0f);
         public readonly Grid Grid = new (xSizeInCells: GridSize * 10, zSizeInCells: GridSize * 10, cellSize: 0.1f);
         public readonly Grid MajorGrid = new (xSizeInCells: GridSize, zSizeInCells: GridSize, lineWidth: 2.0f);
         public readonly LightPointsController LightPointsController = new ();
@@ -18,8 +19,8 @@ namespace MiodenusAnimationConverter.Scene
 
         public Scene(in AnimationInfo animationInfo, in Dictionary<string, Model> models)
         {
-            var cameras = new List<Camera> { new (new Vector3(0.0f, 1.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
-            var debugCameras = new List<DebugCamera> { new (new Vector3(0.0f, 1.5f, 3.0f), animationInfo.FrameWidth, animationInfo.FrameHeight) };
+            var cameras = new List<Camera> { new (DefaultCameraPosition, animationInfo.FrameWidth, animationInfo.FrameHeight) };
+            var debugCameras = new List<DebugCamera> { new (DefaultCameraPosition, animationInfo.FrameWidth, animationInfo.FrameHeight) };
             cameras[0].LookAt(Vector3.Zero);
             debugCameras[0].LookAt(Vector3.Zero);
             
@@ -28,6 +29,13 @@ namespace MiodenusAnimationConverter.Scene
 
             Grid.Pivot.IsVisible = false;
             MajorGrid.Pivot.YAxisSize = GridSize * MajorGrid.CellSize / 2.0f;
+            SwitchGridVisibility();
+        }
+        
+        public void SwitchGridVisibility()
+        {
+            Grid.IsVisible = !Grid.IsVisible;
+            MajorGrid.IsVisible = !MajorGrid.IsVisible;
         }
 
         public void Initialize()

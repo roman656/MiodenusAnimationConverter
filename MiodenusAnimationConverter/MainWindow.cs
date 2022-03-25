@@ -36,11 +36,10 @@ namespace MiodenusAnimationConverter
         private bool _isCursorModeActive;
         private bool _isDrawNormalsModeActive;
         private bool _isDrawCamerasModeActive;
-        
-        private int _screenshotId;
-        private double _deltaTime;
         private readonly List<BitmapVideoFrameWrapper> _frames = new ();
         private PrimitiveType _drawMode = DefaultDrawMode;
+        private double _deltaTime;
+        private int _screenshotId;
 
         public MainWindow(in Animation.Animation animation, in Scene.Scene scene, WorkModeEnum workMode,
                 GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -97,18 +96,14 @@ namespace MiodenusAnimationConverter
         protected override void OnLoad()
         {
             _scene.Initialize();
-            
-            _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
-            _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
-            _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
+            InitializeShaderPrograms();
+
+            CursorGrabbed = _workMode == WorkModeEnum.FrameView;
 
             _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 6.0f, 6.0f), Color4.White);
             _scene.LightPointsController.AddLightPoint(new Vector3(-6.0f, 6.0f, -6.0f), Color4.White);
             _scene.LightPointsController.AddLightPoint(new Vector3(6.0f, 6.0f, -6.0f), Color4.White);
-
-            CursorGrabbed = _workMode == WorkModeEnum.FrameView;
-            
-            InitializeShaderPrograms();
+            _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);    // На данном этапе параметры освещения динамически обновлять не будем.
 
             GL.Enable(EnableCap.DepthTest);
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
@@ -146,26 +141,37 @@ namespace MiodenusAnimationConverter
                 return;
             }
 
+            if (args.Key == Keys.Escape)
+            {
+                Close();
+            }
+
             if (args.Key == Keys.N)
             {
                 _isDrawNormalsModeActive = !_isDrawNormalsModeActive;
             }
 
-            if (args.Key == Keys.Z)
-            {
-                _scene.CamerasController.CurrentDebugCamera.LookAt(Vector3.Zero);
-            }
-            
             if (args.Key == Keys.V)
             {
                 _isDrawCamerasModeActive = !_isDrawCamerasModeActive;
             }
+
+            if (args.Key == Keys.F1)
+            {
+                _drawMode = PrimitiveType.Triangles;
+            }
+            else if (args.Key == Keys.F2)
+            {
+                _drawMode = PrimitiveType.Lines;
+            }
+            else if (args.Key == Keys.F3)
+            {
+                _drawMode = PrimitiveType.Points;
+            }
             
             if (args.Key == Keys.G)
             {
-                _scene.Grid.IsXzPlaneVisible = !_scene.Grid.IsXzPlaneVisible;
-                _scene.MajorGrid.IsXzPlaneVisible = !_scene.MajorGrid.IsXzPlaneVisible;
-                _scene.MajorGrid.Pivot.IsVisible = !_scene.MajorGrid.Pivot.IsVisible;
+                _scene.SwitchGridVisibility();
             }
         }
 
@@ -203,8 +209,10 @@ namespace MiodenusAnimationConverter
             GL.ClearColor(_animationInfo.BackgroundColor);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);
-            CheckGLErrors();
+            if (IsCheckingGLErrorsEnabled)
+            {
+                CheckGLErrors();
+            }
 
             if (_workMode == WorkModeEnum.FrameView)
             {
@@ -229,7 +237,10 @@ namespace MiodenusAnimationConverter
                 }
             }
 
-            CheckGLErrors();
+            if (IsCheckingGLErrorsEnabled)
+            {
+                CheckGLErrors();
+            }
 
             if (_workMode == WorkModeEnum.FrameView && _isDrawNormalsModeActive)
             {
@@ -238,14 +249,21 @@ namespace MiodenusAnimationConverter
                     _scene.Models.Values.ElementAt(i).Draw(_shaderPrograms[_currentProgramIndex + 1],
                             _scene.CamerasController.CurrentDebugCamera);
                 }
-                
-                CheckGLErrors();
+
+                if (IsCheckingGLErrorsEnabled)
+                {
+                    CheckGLErrors();
+                }
             }
 
             if (_workMode == WorkModeEnum.FrameView && _isDrawCamerasModeActive)
             {
                 _scene.CamerasController.DrawCameras(_scene.CamerasController.CurrentDebugCamera);
-                CheckGLErrors();
+                
+                if (IsCheckingGLErrorsEnabled)
+                {
+                    CheckGLErrors();
+                }
             }
 
             Context.SwapBuffers();
@@ -264,21 +282,18 @@ namespace MiodenusAnimationConverter
         private void CheckGLErrors(int sleepTime = 1000, [CallerLineNumber] int lineNumber = -1,
                 [CallerMemberName] string caller = null)
         {
-            if (IsCheckingGLErrorsEnabled)
+            var hasError = false;
+            ErrorCode errorCode;
+
+            while ((errorCode = GL.GetError()) != ErrorCode.NoError)
             {
-                var hasError = false;
-                ErrorCode errorCode;
+                hasError = true;
+                Logger.Error($"{caller}: detected OpenGL error on line {lineNumber}. Type: {errorCode}.");
+            }
 
-                while ((errorCode = GL.GetError()) != ErrorCode.NoError)
-                {
-                    hasError = true;
-                    Logger.Error($"{caller}: detected OpenGL error on line {lineNumber}. Type: {errorCode}.");
-                }
-
-                if (hasError)
-                {
-                    System.Threading.Thread.Sleep(sleepTime);
-                }
+            if (hasError)
+            {
+                System.Threading.Thread.Sleep(sleepTime);
             }
         }
 
@@ -298,7 +313,7 @@ namespace MiodenusAnimationConverter
         {
             if (_workMode == WorkModeEnum.Default)
             {
-                _videoRecorder.CreateVideo(new RawVideoPipeSource(GetFrames()) {FrameRate = _animationInfo.Fps});
+                _videoRecorder.CreateVideo(new RawVideoPipeSource(GetFrames()) { FrameRate = _animationInfo.Fps });
             }
 
             _scene.Delete();

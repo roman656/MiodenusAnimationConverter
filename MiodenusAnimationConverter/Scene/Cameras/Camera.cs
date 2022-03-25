@@ -168,9 +168,13 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public Vector3 Position
         {
             get => _pivot.Position;
-            set => _pivot.Position = value;
+            set
+            {
+                _pivot.Position = value;
+                UpdateViewMatrix();
+            }
         }
-        
+
         public void LookAt(in Vector3 target)
         {
             var rotationAxis = Vector3.Normalize(target - Position) + ViewDirection;

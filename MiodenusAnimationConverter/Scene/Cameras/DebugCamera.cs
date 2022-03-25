@@ -118,8 +118,9 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public void ProcessKeyboard(KeyboardState keyboardState, double deltaTime)
         {
             var velocity = (float)(_movementSpeed * deltaTime);
-
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.ForwardMoveKey))
+            
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.ForwardMoveKey)
+                && !keyboardState.IsKeyDown(DebugCameraKeyBindings.BackMoveKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -131,7 +132,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
             
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.LeftMoveKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.LeftMoveKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.RightMoveKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -143,7 +145,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
             
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.BackMoveKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.BackMoveKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.ForwardMoveKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -155,7 +158,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
             
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.RightMoveKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.RightMoveKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.LeftMoveKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -167,7 +171,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
             
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.MoveUpKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.MoveUpKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.MoveDownKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -179,7 +184,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
             
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.MoveDownKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.MoveDownKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.MoveUpKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -191,7 +197,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
             
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.LeftTiltKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.LeftTiltKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.RightTiltKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -203,7 +210,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 }
             }
 
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.RightTiltKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.RightTiltKey)
+                    && !keyboardState.IsKeyDown(DebugCameraKeyBindings.LeftTiltKey))
             {
                 if (UseLocalCoordinateSystemForMovement)
                 {
@@ -213,6 +221,16 @@ namespace MiodenusAnimationConverter.Scene.Cameras
                 {
                     RotateViewDirection(velocity, -Vector3.UnitZ);
                 }
+            }
+            
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.ResetPositionKey))
+            {
+                Position = Scene.DefaultCameraPosition;
+            }
+            
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.LookAtZeroKey))
+            {
+                LookAt(Vector3.Zero);
             }
             
             if (keyboardState.IsKeyDown(DebugCameraKeyBindings.SwitchCoordinateSystemForMovementKey))
