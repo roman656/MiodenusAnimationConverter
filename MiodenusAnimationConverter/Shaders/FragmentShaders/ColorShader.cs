@@ -8,11 +8,12 @@ namespace MiodenusAnimationConverter.Shaders.FragmentShaders
         public const string Code = @"
                 #version 330 core
 
-                out vec4 color;
+                in vec4 color;
+                out vec4 result_color;
                  
                 void main(void)
                 {
-                    color = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+                    result_color = color;
                 } 
                 ";
     }

@@ -18,6 +18,8 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                     vec4 color;
                 } vertexes[];
 
+                out vec4 color;
+
                 uniform mat4 view;
                 uniform mat4 projection;
                  
@@ -35,9 +37,11 @@ namespace MiodenusAnimationConverter.Shaders.GeometryShaders
                 void generate_normal_line(const in int vertex_index)
                 {
                     gl_Position = projection * view * vec4(vertexes[vertex_index].position, 1.0f);
+                    color = vec4(1.0f, 1.0f, 0.0f, 1.0f);
                     EmitVertex();
 
                     gl_Position = projection * view * vec4((vertexes[vertex_index].position + vertexes[vertex_index].normal * MAGNITUDE), 1.0f);
+                    color = vec4(1.0f, 0.627f, 0.0f, 1.0f);
                     EmitVertex();
 
                     EndPrimitive();
