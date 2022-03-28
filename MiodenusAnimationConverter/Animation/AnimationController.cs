@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MiodenusAnimationConverter.Scene.Models;
 using NLog;
 using OpenTK.Mathematics;
@@ -32,7 +33,6 @@ namespace MiodenusAnimationConverter.Animation
             _animation = animation;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
             _totalFramesAmount = CalculateTotalFramesAmount(_animation.Info);
-            Logger.Trace(animation);
 
             foreach (var modelInfo in _animation.ModelsInfo)
             {
@@ -132,18 +132,30 @@ namespace MiodenusAnimationConverter.Animation
 
                                 for (var i = 0; i < action.States.Count; i++)
                                 {
-                                    var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
                                     var nextState = action.States[i];
-                                    var nextStateFrameIndex = (int) (_framesPerMillisecond * nextState.Time);
-                                    var prevStateFrameIndex = (int) (_framesPerMillisecond * prevState.Time);
+                                    var nextStateFrameIndex = (int)(_framesPerMillisecond * (nextState.Time
+                                            + actionBinding.StartTime));
+                                    nextStateFrameIndex = nextStateFrameIndex > 0 ? nextStateFrameIndex - 1 : 0;
 
                                     if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
                                     {
                                         TransformModel(model, nextState.Transformation);
+                                        model.IsVisible = nextState.IsModelVisible;
+
+                                        if (nextState.WasColorChanged)
+                                        {
+                                            for (var j = 0; j < model.Meshes.Count; j++)
+                                            {
+                                                model.Meshes.Values.ElementAt(j).Color = nextState.Color;
+                                            }
+                                        }
                                     }
-                                    else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex
-                                                                            && !wasModelTransformed)
+                                    else if (actionBinding.UseInterpolation && !wasModelTransformed
+                                            && nextStateFrameIndex > _currentFrameIndex)
                                     {
+                                        var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
+                                        var prevStateFrameIndex = (int)(_framesPerMillisecond * (prevState.Time
+                                                + actionBinding.StartTime));
                                         var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
 
                                         if (stepsAmount > 0)
@@ -154,6 +166,8 @@ namespace MiodenusAnimationConverter.Animation
                                         wasModelTransformed = true;
                                     }
                                 }
+                                
+                                break;
                             }
                         }
                     }

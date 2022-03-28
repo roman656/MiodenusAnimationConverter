@@ -230,11 +230,8 @@ namespace MiodenusAnimationConverter
                 }
                 else
                 {
-                    while (_animationController.CurrentFrameIndex < _frameNumberToView)
-                    {
-                        _animationController.PrepareSceneToNextFrame();
-                    }
-                    
+                    _animationController.PrepareSceneToFrame(_frameNumberToView);
+
                     if (!_isPaused)
                     {
                         _animationController.PrepareSceneToNextFrame();
