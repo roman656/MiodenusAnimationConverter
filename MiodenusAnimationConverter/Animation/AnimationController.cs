@@ -13,16 +13,18 @@ namespace MiodenusAnimationConverter.Animation
         private readonly Dictionary<ModelInfo, Model> _modelsInfo = new ();
         private readonly Animation _animation;
         private readonly float _framesPerMillisecond;
+        private readonly int _totalFramesAmount;
         private int _currentFrameIndex;
-        public readonly int TotalFramesAmount;
 
-        public bool IsAnimationFinished => _currentFrameIndex >= TotalFramesAmount;
+        public bool IsAnimationFinished => _currentFrameIndex >= _totalFramesAmount;
+        public int CurrentFrameIndex => _currentFrameIndex;
+        public int TotalFramesAmount => _totalFramesAmount;
 
         public AnimationController(in Animation animation, in Scene.Scene scene)
         {
             _animation = animation;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
-            TotalFramesAmount = (int)(animation.Info.TimeLength * _framesPerMillisecond);
+            _totalFramesAmount = (int)(animation.Info.TimeLength * _framesPerMillisecond);
             
             foreach (var modelInfo in _animation.ModelsInfo)
             {
@@ -36,8 +38,6 @@ namespace MiodenusAnimationConverter.Animation
                 }
             }
         }
-        
-        public int CurrentFrameIndex => _currentFrameIndex;
 
         private static void TransformModel(in Model model, in Transformation transformation)
         {
@@ -100,51 +100,65 @@ namespace MiodenusAnimationConverter.Animation
             return result;
         }
 
+        public void PrepareSceneToFrame(int frameIndex)
+        {
+            while (_currentFrameIndex < frameIndex && !IsAnimationFinished)
+            {
+                PrepareSceneToNextFrame();
+            }
+        }
+
         public void PrepareSceneToNextFrame()
         {
-            foreach (var (info, model) in _modelsInfo)
+            if (!IsAnimationFinished)
             {
-                if (info.ActionBindings == null) { continue; }
-                
-                foreach (var actionBinding in info.ActionBindings)
+                foreach (var (info, model) in _modelsInfo)
                 {
-                    foreach (var action in _animation.Actions)
+                    if (info.ActionBindings == null)
                     {
-                        if (action.Name == actionBinding.ActionName)
+                        continue;
+                    }
+
+                    foreach (var actionBinding in info.ActionBindings)
+                    {
+                        foreach (var action in _animation.Actions)
                         {
-                            var wasModelTransformed = false;
-
-                            for (var i = 0; i < action.States.Count; i++)
+                            if (action.Name == actionBinding.ActionName)
                             {
-                                /* TODO: отсортировать состояния по времени. */
-                                var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
-                                var nextState = action.States[i];
-                                var nextStateFrameIndex = (int)(_framesPerMillisecond * nextState.Time);
-                                var prevStateFrameIndex = (int)(_framesPerMillisecond * prevState.Time);
+                                var wasModelTransformed = false;
 
-                                if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
+                                for (var i = 0; i < action.States.Count; i++)
                                 {
-                                    TransformModel(model, nextState.Transformation);
-                                }
-                                else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex 
-                                        && !wasModelTransformed)
-                                {   
-                                    var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
+                                    /* TODO: отсортировать состояния по времени. */
+                                    var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
+                                    var nextState = action.States[i];
+                                    var nextStateFrameIndex = (int) (_framesPerMillisecond * nextState.Time);
+                                    var prevStateFrameIndex = (int) (_framesPerMillisecond * prevState.Time);
 
-                                    if (stepsAmount > 0)
+                                    if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
                                     {
-                                        TransformModel(model, GetStepTransformation(nextState, stepsAmount));
+                                        TransformModel(model, nextState.Transformation);
                                     }
+                                    else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex
+                                                                            && !wasModelTransformed)
+                                    {
+                                        var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
 
-                                    wasModelTransformed = true;
+                                        if (stepsAmount > 0)
+                                        {
+                                            TransformModel(model, GetStepTransformation(nextState, stepsAmount));
+                                        }
+
+                                        wasModelTransformed = true;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                _currentFrameIndex++;
             }
-            
-            _currentFrameIndex++;
         }
     }
 }

@@ -211,15 +211,7 @@ namespace MiodenusAnimationConverter
 
             if (_workMode == WorkModeEnum.GetFrameImage)
             {
-                /*
-                 * TODO: проверка, что не запросили кадр за пределами видео.
-                 * А точнее срез - если просят 1000 когда есть 500 - выдать 500 (или 501),
-                 * ведь дальше изменений всеравно не будет.
-                 */
-                while (_animationController.CurrentFrameIndex < _frameNumberToGetImage)
-                {
-                    _animationController.PrepareSceneToNextFrame();
-                }
+                _animationController.PrepareSceneToFrame(_frameNumberToGetImage);
             }
             else if (_workMode == WorkModeEnum.Default)
             {
