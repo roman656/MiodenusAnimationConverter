@@ -38,7 +38,7 @@ namespace MiodenusAnimationConverter.Animation
             VideoCodec = string.IsNullOrEmpty(animationInfo.VideoCodec.Trim())
                     ? DefaultAnimationParameters.AnimationInfo.VideoCodec
                     : animationInfo.VideoCodec.Trim().ToLower();
-            VideoBitrate = animationInfo.VideoBitrate < 0
+            VideoBitrate = animationInfo.VideoBitrate <= 0
                     ? DefaultAnimationParameters.AnimationInfo.VideoBitrate
                     : animationInfo.VideoBitrate;
             VideoName = string.IsNullOrEmpty(animationInfo.VideoName.Trim())

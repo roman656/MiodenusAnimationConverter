@@ -20,61 +20,10 @@ namespace MiodenusAnimationConverter.Animation
         public int CurrentFrameIndex => _currentFrameIndex;
         public int TotalFramesAmount => _totalFramesAmount;
 
-        private static int CalculateTotalFramesAmount(in Animation animation)
+        private static int CalculateTotalFramesAmount(in AnimationInfo info)
         {
-            var timeLength = 0;
+            var result = (int)(info.Fps / MillisecondsInSecond * info.TimeLength);
             
-            Logger.Trace(animation);
-
-            if (animation.Info.TimeLength == DefaultAnimationParameters.AnimationInfo.TimeLength)
-            {
-                foreach (var modelInfo in animation.ModelsInfo)
-                {
-                    foreach (var binding in modelInfo.ActionBindings)
-                    {
-                        var bindingTimeLength = 0;
-                        
-                        if (binding.TimeLength == DefaultAnimationParameters.ActionBinding.TimeLength)
-                        {
-                            var actionTimeLength = 0;
-                            
-                            foreach (var action in animation.Actions)
-                            {
-                                if (action.Name == binding.ActionName)
-                                {
-                                    foreach (var state in action.States)
-                                    {
-                                        if (state.Time > actionTimeLength)
-                                        {
-                                            actionTimeLength = state.Time;
-                                        }
-                                    }
-                                    
-                                    break;
-                                }
-                            }
-                            
-                            bindingTimeLength = binding.StartTime + actionTimeLength;
-                        }
-                        else
-                        {
-                            bindingTimeLength = binding.StartTime + binding.TimeLength;
-                        }
-
-                        if (bindingTimeLength > timeLength)
-                        {
-                            timeLength = bindingTimeLength;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                timeLength = animation.Info.TimeLength;
-            }
-
-            var result = (int)(animation.Info.Fps / MillisecondsInSecond * timeLength);
-
             return result > 0 ? result : 1;
         }
 
@@ -82,15 +31,16 @@ namespace MiodenusAnimationConverter.Animation
         {
             _animation = animation;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
-            _totalFramesAmount = CalculateTotalFramesAmount(_animation);
+            _totalFramesAmount = CalculateTotalFramesAmount(_animation.Info);
+            Logger.Trace(animation);
 
             foreach (var modelInfo in _animation.ModelsInfo)
             {
-                try
+                if (scene.Models.ContainsKey(modelInfo.Name))
                 {
                     _modelsInfo[modelInfo] = scene.Models[modelInfo.Name];
                 }
-                catch (Exception exception)
+                else
                 {
                     Logger.Warn($"There is no model with name: {modelInfo.Name}");
                 }
@@ -172,11 +122,6 @@ namespace MiodenusAnimationConverter.Animation
             {
                 foreach (var (info, model) in _modelsInfo)
                 {
-                    if (info.ActionBindings == null)
-                    {
-                        continue;
-                    }
-
                     foreach (var actionBinding in info.ActionBindings)
                     {
                         foreach (var action in _animation.Actions)
@@ -187,7 +132,6 @@ namespace MiodenusAnimationConverter.Animation
 
                                 for (var i = 0; i < action.States.Count; i++)
                                 {
-                                    /* TODO: отсортировать состояния по времени. */
                                     var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
                                     var nextState = action.States[i];
                                     var nextStateFrameIndex = (int) (_framesPerMillisecond * nextState.Time);

@@ -9,6 +9,7 @@ namespace MiodenusAnimationConverter.Animation
         private static int _index;
         public string Name { get; set; }
         public List<ActionState> States { get; set; }
+        public int TimeLength { get; set; }
 
         public Action(in MafStructure.Action action)
         {
@@ -23,11 +24,13 @@ namespace MiodenusAnimationConverter.Animation
             }
             
             States = States.OrderBy(state => state.Time).ToList();
+            TimeLength = States[^1].Time;
         }
         
         public override string ToString()
         {
-            var result = string.Format(CultureInfo.InvariantCulture, $"Action:\n\tName: {Name}\n\tStates:\n");
+            var result = string.Format(CultureInfo.InvariantCulture,
+                    $"Action:\n\tName: {Name}\n\tTime length: {TimeLength}\n\tStates:\n");
 
             result = States.Aggregate(result, (current, state) => current + $"\n\t{state}");
 

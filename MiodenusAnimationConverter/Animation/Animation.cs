@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -37,13 +36,38 @@ namespace MiodenusAnimationConverter.Animation
             
             foreach (var modelInfo in animation.ModelsInfo)
             {
-                try
+                ModelsInfo.Add(new ModelInfo(modelInfo, bindings.ContainsKey(modelInfo.Name)
+                        ? bindings[modelInfo.Name]
+                        : new List<ActionBinding>()));
+            }
+
+            CalculateTimeLength();
+        }
+        
+        private void CalculateTimeLength()
+        {
+            var calculateTimeLength = Info.TimeLength == DefaultAnimationParameters.AnimationInfo.TimeLength;
+            
+            foreach (var modelInfo in ModelsInfo)
+            {
+                foreach (var binding in modelInfo.ActionBindings)
                 {
-                    ModelsInfo.Add(new ModelInfo(modelInfo, bindings[modelInfo.Name]));
-                }
-                catch (Exception exception)
-                {
-                    ModelsInfo.Add(new ModelInfo(modelInfo, null));
+                    if (binding.TimeLength == DefaultAnimationParameters.ActionBinding.TimeLength)
+                    {
+                        foreach (var action in Actions)
+                        { 
+                            if (action.Name == binding.ActionName)
+                            {
+                                binding.TimeLength = action.TimeLength;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (calculateTimeLength && binding.StartTime + binding.TimeLength > Info.TimeLength)
+                    {
+                        Info.TimeLength = binding.StartTime + binding.TimeLength;
+                    }
                 }
             }
         }

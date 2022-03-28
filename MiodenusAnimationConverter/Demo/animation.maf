@@ -158,14 +158,14 @@
       "modelName": "nut_6x9",
       "actionName": "Nut rotation",
       "startTime": 0,
-      "timeLength": 3500,
+      "timeLength": 0,
       "useInterpolation": true
     },
     {
       "modelName": "det",
       "actionName": "Init 3",
       "startTime": 0,
-      "timeLength": 3500,
+      "timeLength": 0,
       "useInterpolation": false
     }
   ]

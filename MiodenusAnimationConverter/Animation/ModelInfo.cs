@@ -62,10 +62,7 @@ namespace MiodenusAnimationConverter.Animation
                     + $"Use calculated normals: {UseCalculatedNormals}\n\tColor: ({Color.R}; {Color.G}; {Color.B};"
                     + $" {Color.A})\n\tAction bindings:\n");
             
-            if (ActionBindings != null)
-            {
-                result = ActionBindings.Aggregate(result, (current, binding) => current + $"\n\t{binding}");
-            }
+            result = ActionBindings.Aggregate(result, (current, binding) => current + $"\n\t{binding}");
 
             return result + "\n";
         }
