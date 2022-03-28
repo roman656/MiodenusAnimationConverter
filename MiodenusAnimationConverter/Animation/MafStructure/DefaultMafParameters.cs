@@ -10,14 +10,14 @@ namespace MiodenusAnimationConverter.Animation.MafStructure
             public const string Version = "1.0";
             public const string Name = "DefaultName";
             public const string VideoFormat = "mp4";
-            public const string VideoCodec = "h264";
+            public const string VideoCodec = "mpeg4";
             public const int VideoBitrate = 4000;
             public const string VideoName = "ResultVideo";
             public const int TimeLength = 0;
             public const int Fps = 60;
             public const bool EnableMultisampling = true;
-            public const int FrameWidth = 800;
-            public const int FrameHeight = 800;
+            public const int FrameWidth = 600;
+            public const int FrameHeight = 600;
             public static readonly float[] BackgroundColor = { 0.3f, 0.3f, 0.4f };
             public static readonly string[] Include = Array.Empty<string>();
         }
