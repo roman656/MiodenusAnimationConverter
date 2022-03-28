@@ -21,6 +21,8 @@ namespace MiodenusAnimationConverter.Animation
             {
                 States.Add(new ActionState(actionState));
             }
+            
+            States = States.OrderBy(state => state.Time).ToList();
         }
         
         public override string ToString()

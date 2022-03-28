@@ -20,12 +20,70 @@ namespace MiodenusAnimationConverter.Animation
         public int CurrentFrameIndex => _currentFrameIndex;
         public int TotalFramesAmount => _totalFramesAmount;
 
+        private static int CalculateTotalFramesAmount(in Animation animation)
+        {
+            var timeLength = 0;
+            
+            Logger.Trace(animation);
+
+            if (animation.Info.TimeLength == DefaultAnimationParameters.AnimationInfo.TimeLength)
+            {
+                foreach (var modelInfo in animation.ModelsInfo)
+                {
+                    foreach (var binding in modelInfo.ActionBindings)
+                    {
+                        var bindingTimeLength = 0;
+                        
+                        if (binding.TimeLength == DefaultAnimationParameters.ActionBinding.TimeLength)
+                        {
+                            var actionTimeLength = 0;
+                            
+                            foreach (var action in animation.Actions)
+                            {
+                                if (action.Name == binding.ActionName)
+                                {
+                                    foreach (var state in action.States)
+                                    {
+                                        if (state.Time > actionTimeLength)
+                                        {
+                                            actionTimeLength = state.Time;
+                                        }
+                                    }
+                                    
+                                    break;
+                                }
+                            }
+                            
+                            bindingTimeLength = binding.StartTime + actionTimeLength;
+                        }
+                        else
+                        {
+                            bindingTimeLength = binding.StartTime + binding.TimeLength;
+                        }
+
+                        if (bindingTimeLength > timeLength)
+                        {
+                            timeLength = bindingTimeLength;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                timeLength = animation.Info.TimeLength;
+            }
+
+            var result = (int)(animation.Info.Fps / MillisecondsInSecond * timeLength);
+
+            return result > 0 ? result : 1;
+        }
+
         public AnimationController(in Animation animation, in Scene.Scene scene)
         {
             _animation = animation;
             _framesPerMillisecond = _animation.Info.Fps / MillisecondsInSecond;
-            _totalFramesAmount = (int)(animation.Info.TimeLength * _framesPerMillisecond);
-            
+            _totalFramesAmount = CalculateTotalFramesAmount(_animation);
+
             foreach (var modelInfo in _animation.ModelsInfo)
             {
                 try
