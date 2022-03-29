@@ -44,6 +44,8 @@ namespace MiodenusAnimationConverter.Animation
             CalculateTimeLength();
         }
         
+        public Action GetActionByName(string name) => Actions.FirstOrDefault(action => action.Name == name);
+
         private void CalculateTimeLength()
         {
             var calculateTimeLength = Info.TimeLength == DefaultAnimationParameters.AnimationInfo.TimeLength;

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MiodenusAnimationConverter.Scene.Models;
@@ -124,49 +123,71 @@ namespace MiodenusAnimationConverter.Animation
                 {
                     foreach (var actionBinding in info.ActionBindings)
                     {
-                        foreach (var action in _animation.Actions)
+                        var action = _animation.GetActionByName(actionBinding.ActionName);
+
+                        if (action == null)
                         {
-                            if (action.Name == actionBinding.ActionName)
+                            if (_currentFrameIndex == 0)
                             {
-                                var wasModelTransformed = false;
+                                Logger.Warn($"There is no action with name: {actionBinding.ActionName}");
+                            }
+                            
+                            continue;
+                        }
+                        
+                        var actionBindingFinalFrameIndex = (int)(_framesPerMillisecond * (actionBinding.TimeLength
+                                + actionBinding.StartTime));
 
-                                for (var i = 0; i < action.States.Count; i++)
+                        if (actionBindingFinalFrameIndex >= _currentFrameIndex)
+                        {
+                            //continue;
+                        }
+
+                        for (var i = 0; i < action.States.Count; i++)
+                        {
+                            var nextState = action.States[i];
+                            var nextStateFrameIndex = (int)(_framesPerMillisecond * (nextState.Time
+                                    + actionBinding.StartTime));
+                            nextStateFrameIndex = nextStateFrameIndex > 0 ? nextStateFrameIndex - 1 : 0;
+                            
+                            if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
+                            {
+                                TransformModel(model, nextState.Transformation);
+                                model.IsVisible = nextState.IsModelVisible;
+
+                                if (nextState.WasColorChanged)
                                 {
-                                    var nextState = action.States[i];
-                                    var nextStateFrameIndex = (int)(_framesPerMillisecond * (nextState.Time
-                                            + actionBinding.StartTime));
-                                    nextStateFrameIndex = nextStateFrameIndex > 0 ? nextStateFrameIndex - 1 : 0;
-
-                                    if (!actionBinding.UseInterpolation && nextStateFrameIndex == _currentFrameIndex)
+                                    for (var j = 0; j < model.Meshes.Count; j++)
                                     {
-                                        TransformModel(model, nextState.Transformation);
-                                        model.IsVisible = nextState.IsModelVisible;
-
-                                        if (nextState.WasColorChanged)
-                                        {
-                                            for (var j = 0; j < model.Meshes.Count; j++)
-                                            {
-                                                model.Meshes.Values.ElementAt(j).Color = nextState.Color;
-                                            }
-                                        }
-                                    }
-                                    else if (actionBinding.UseInterpolation && !wasModelTransformed
-                                            && nextStateFrameIndex > _currentFrameIndex)
-                                    {
-                                        var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
-                                        var prevStateFrameIndex = (int)(_framesPerMillisecond * (prevState.Time
-                                                + actionBinding.StartTime));
-                                        var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
-
-                                        if (stepsAmount > 0)
-                                        {
-                                            TransformModel(model, GetStepTransformation(nextState, stepsAmount));
-                                        }
-
-                                        wasModelTransformed = true;
+                                        model.Meshes.Values.ElementAt(j).Color = nextState.Color;
                                     }
                                 }
-                                
+                            }
+                            else if (actionBinding.UseInterpolation && nextStateFrameIndex > _currentFrameIndex)
+                            {
+                                var prevState = (i != 0) ? action.States[i - 1] : action.States[i];
+                                var prevStateFrameIndex = (int)(_framesPerMillisecond * (prevState.Time
+                                        + actionBinding.StartTime));
+                                prevStateFrameIndex = prevStateFrameIndex > 0 ? prevStateFrameIndex - 1 : 0;
+                                var stepsAmount = nextStateFrameIndex - prevStateFrameIndex;
+
+                                if (stepsAmount > 0)
+                                {
+                                    TransformModel(model, GetStepTransformation(nextState, stepsAmount));
+                                    
+                                    if (nextState.WasColorChanged)
+                                    {
+                                        for (var j = 0; j < model.Meshes.Count; j++)
+                                        {
+                                            model.Meshes.Values.ElementAt(j).Color = new Color4(
+                                                    model.Meshes.Values.ElementAt(j).Triangles[0].Vertexes[0].Color.R + nextState.Color.R / stepsAmount,
+                                                    model.Meshes.Values.ElementAt(j).Triangles[0].Vertexes[0].Color.G + nextState.Color.G / stepsAmount,
+                                                    model.Meshes.Values.ElementAt(j).Triangles[0].Vertexes[0].Color.B + nextState.Color.B / stepsAmount,
+                                                    nextState.Color.A);
+                                        }
+                                    }
+                                }
+
                                 break;
                             }
                         }
