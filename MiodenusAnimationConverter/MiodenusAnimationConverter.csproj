@@ -31,9 +31,6 @@
       <None Update="DebugAssets\IS-6.stl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="DebugAssets\Rhm_Borsig_12_8.stl">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="DebugAssets\Bottle.stl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
@@ -55,7 +52,16 @@
       <None Update="Demo\Models\bolt_25x8.stl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="DebugAssets\Det1.stl">
+      <None Update="Demo\Models\00_000_06_13_13_02.stl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Demo\Models\00_000_06_13_13_01.stl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Demo\Includes\header.maf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Demo\Includes\MoveUpAction.maf">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

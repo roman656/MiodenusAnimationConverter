@@ -25,7 +25,7 @@ namespace MiodenusAnimationConverter
                 var animation = LoadAnimation(options.AnimationFilePath);
                 var models = LoadModels(animation.ModelsInfo);
                 var scene = new Scene.Scene(animation.Info, models);
-
+                
                 CheckPath(Config.ScreenshotDirectory);
                 CheckPath(Config.VideoDirectory);
                 CreateMainWindow(animation, scene, DetermineWorkMode(options), options.FrameNumberToView,
@@ -33,7 +33,7 @@ namespace MiodenusAnimationConverter
             }
             catch (Exception exception)
             {
-                Logger.Fatal(exception);
+                Logger.Error(exception.Message);
                 Program.ExitCode = ExitCodeEnum.AnimationLoadingError;
             }
 

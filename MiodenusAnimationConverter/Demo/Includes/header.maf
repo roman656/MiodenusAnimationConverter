@@ -1,21 +1,9 @@
 {
-  "actions":
-  [
-    {
-      "name": "Move up",
-      "states":
-      [
-        {
-          "time": 0
-        },
-        {
-          "time": 5000,
-          "transformation":
-          {
-            "location": [0.0, 0.0, 50.0]
-          }
-        }
-      ]
-    }
-  ]
+  "animationInfo":
+  {
+    "include":
+    [
+      "Demo/Includes/MoveUpAction.maf"
+    ]
+  }
 }
