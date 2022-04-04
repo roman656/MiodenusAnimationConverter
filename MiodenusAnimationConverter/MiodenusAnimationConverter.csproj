@@ -64,6 +64,12 @@
       <None Update="Demo\Includes\MoveUpAction.maf">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Demo\Models\00_000_06_13_13_05.stl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Demo\Models\00_000_06_13_13_03.stl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

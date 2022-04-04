@@ -22,16 +22,9 @@
   "modelsInfo":
   [
     {
-      "name": "bolt_25x8",
+      "name": "00_000_06_13_13_01",
       "type": "stl",
-      "filename": "Demo/Models/bolt_25x8.stl",
-      "color": [0.45, 0.52, 0.58],
-      "useCalculatedNormals": false
-    },
-    {
-      "name": "nut_6x9",
-      "type": "stl",
-      "filename": "Demo/Models/nut_6x9.stl",
+      "filename": "Demo/Models/00_000_06_13_13_01.stl",
       "color": [0.45, 0.52, 0.58],
       "useCalculatedNormals": false
     },
@@ -43,11 +36,14 @@
       "useCalculatedNormals": false
     },
     {
-      "name": "00_000_06_13_13_01",
-      "type": "stl",
-      "filename": "Demo/Models/00_000_06_13_13_01.stl",
-      "color": [0.45, 0.52, 0.58],
-      "useCalculatedNormals": false
+      "name": "00_000_06_13_13_03",
+      "filename": "Demo/Models/00_000_06_13_13_03.stl",
+      "color": [0.45, 0.52, 0.58]
+    },
+    {
+      "name": "00_000_06_13_13_05",
+      "filename": "Demo/Models/00_000_06_13_13_05.stl",
+      "color": [0.45, 0.52, 0.58]
     }
   ],
   "actions":
@@ -59,14 +55,14 @@
         {
           "transformation":
           {
-            "scale": [0.015, 0.015, 0.015],
+            "scale": [0.005, 0.005, 0.005],
             "localRotate":
             {
               "angle": -90.0,
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
             },
-            "globalMove": [0.0, -0.22, 0.0]
+            "globalMove": [0.0, 0.001, 0.0]
           }
         }
       ]
@@ -78,26 +74,7 @@
         {
           "transformation":
           {
-            "scale": [0.015, 0.015, 0.015],
-            "localRotate":
-            {
-              "angle": -90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "globalMove": [0.0, 0.2, 0.0]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Init 3",
-      "states":
-      [
-        {
-          "transformation":
-          {
-            "scale": [0.0075, 0.0075, 0.0075],
+            "scale": [0.005, 0.005, 0.005],
             "localRotate":
             {
               "angle": 90.0,
@@ -109,25 +86,45 @@
       ]
     },
     {
-      "name": "Init 4",
+      "name": "Init 3",
       "states":
       [
         {
           "transformation":
           {
-            "scale": [0.0075, 0.0075, 0.0075],
+            "scale": [0.005, 0.005, 0.005],
             "localRotate":
             {
               "angle": -90.0,
               "unit": "deg",
               "vector": [1.0, 0.0, 0.0]
-            }
+            },
+            "globalMove": [0.0, -0.2, 0.0]
           }
         }
       ]
     },
     {
-      "name": "Nut rotation",
+      "name": "Init 5",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": 0.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, -0.2, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Повернуть вал",
       "states":
       [
         {
@@ -149,7 +146,7 @@
               "vector": [0.0, 1.0, 0.0]
             },
             "resetPosition": false,
-            "globalMove": [0.0, -0.048, 0.0],
+            "globalMove": [0.0, 0.0, 0.0],
             "localMove": [0.0, 0.0, 0.0],
             "rotate":
             {
@@ -166,35 +163,38 @@
   "bindings":
   [
     {
-      "modelName": "nut_6x9",
-      "actionName": "Init 2",
-      "startTime": 0,
-      "timeLength": 0,
-      "useInterpolation": false
-    },
-    {
-      "modelName": "bolt_25x8",
+      "modelName": "00_000_06_13_13_01",
       "actionName": "Init 1",
       "startTime": 0,
       "timeLength": 0,
       "useInterpolation": false
     },
     {
-      "modelName": "nut_6x9",
-      "actionName": "Nut rotation",
+      "modelName": "00_000_06_13_13_02",
+      "actionName": "Init 2",
       "startTime": 0,
       "timeLength": 0,
-      "useInterpolation": true
+      "useInterpolation": false
     },
     {
-      "modelName": "00_000_06_13_13_02",
+      "modelName": "00_000_06_13_13_03",
       "actionName": "Init 3",
       "useInterpolation": false
     },
     {
-      "modelName": "00_000_06_13_13_01",
-      "actionName": "Init 4",
+      "modelName": "00_000_06_13_13_05",
+      "actionName": "Init 5",
       "useInterpolation": false
+    },
+    {
+      "modelName": "00_000_06_13_13_05",
+      "actionName": "Повернуть вал",
+      "startTime": 2000
+    },
+    {
+      "modelName": "00_000_06_13_13_03",
+      "actionName": "Повернуть вал",
+      "startTime": 2000
     },
     {
       "modelName": "00_000_06_13_13_01",
