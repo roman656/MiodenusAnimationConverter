@@ -41,6 +41,11 @@
       "color": [0.45, 0.52, 0.58]
     },
     {
+      "name": "00_000_06_13_13_04",
+      "filename": "Demo/Models/00_000_06_13_13_04.stl",
+      "color": [0.45, 0.52, 0.58]
+    },
+    {
       "name": "00_000_06_13_13_05",
       "filename": "Demo/Models/00_000_06_13_13_05.stl",
       "color": [0.45, 0.52, 0.58]
@@ -105,6 +110,25 @@
       ]
     },
     {
+      "name": "Init 4",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": 180.0,
+              "unit": "deg",
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, 0.0, 0.0]
+          }
+        }
+      ]
+    },
+    {
       "name": "Init 5",
       "states":
       [
@@ -128,7 +152,7 @@
       "states":
       [
         {
-          "time": 2000
+          "time": 1000
         },
         {
           "time": 3000,
@@ -182,6 +206,11 @@
       "useInterpolation": false
     },
     {
+      "modelName": "00_000_06_13_13_04",
+      "actionName": "Init 4",
+      "useInterpolation": false
+    },
+    {
       "modelName": "00_000_06_13_13_05",
       "actionName": "Init 5",
       "useInterpolation": false
@@ -189,17 +218,27 @@
     {
       "modelName": "00_000_06_13_13_05",
       "actionName": "Повернуть вал",
-      "startTime": 2000
+      "startTime": 0
     },
     {
       "modelName": "00_000_06_13_13_03",
       "actionName": "Повернуть вал",
-      "startTime": 2000
+      "startTime": 0
     },
     {
       "modelName": "00_000_06_13_13_01",
       "actionName": "Поднять на 3",
       "startTime": 1000
+    },
+    {
+      "modelName": "00_000_06_13_13_04",
+      "actionName": "Повернуть вал",
+      "startTime": 0
+    },
+    {
+      "modelName": "00_000_06_13_13_01",
+      "actionName": "Опустить на 3",
+      "startTime": 4000
     }
   ]
 }

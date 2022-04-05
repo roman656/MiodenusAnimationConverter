@@ -3,7 +3,8 @@
   {
     "include":
     [
-      "Demo/Includes/MoveUpAction.maf"
+      "Demo/Includes/MoveUpAction.maf",
+      "Demo/Includes/MoveDownAction.maf"
     ]
   }
 }

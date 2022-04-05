@@ -1,0 +1,16 @@
+{
+  "actions":
+  [
+    {
+      "name": "Опустить на 3",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, -3.0, 0.0] }
+        }
+      ]
+    }
+  ]
+}
