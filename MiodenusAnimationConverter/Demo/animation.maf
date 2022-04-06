@@ -146,42 +146,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "Повернуть вал",
-      "states":
-      [
-        {
-          "time": 1000
-        },
-        {
-          "time": 3000,
-          "isModelVisible": true,
-          "color": [1.0, 0.0, 0.0],
-          "transformation":
-          {
-            "resetScale": false,
-            "scale": [1.0, 1.0, 1.0],
-            "resetLocalRotation": false,
-            "localRotate":
-            {
-              "angle": -180.0,
-              "unit": "deg",
-              "vector": [0.0, 1.0, 0.0]
-            },
-            "resetPosition": false,
-            "globalMove": [0.0, 0.0, 0.0],
-            "localMove": [0.0, 0.0, 0.0],
-            "rotate":
-            {
-              "angle": 0.0,
-              "unit": "deg",
-              "rotationVectorStartPoint": [1.0, 0.0, 0.0],
-              "rotationVectorEndPoint": [1.0, 0.0, 0.0]
-            }
-          }
-        }
-      ]
     }
   ],
   "bindings":
@@ -218,12 +182,12 @@
     {
       "modelName": "00_000_06_13_13_05",
       "actionName": "Повернуть вал",
-      "startTime": 0
+      "startTime": 1500
     },
     {
       "modelName": "00_000_06_13_13_03",
       "actionName": "Повернуть вал",
-      "startTime": 0
+      "startTime": 1500
     },
     {
       "modelName": "00_000_06_13_13_01",
@@ -233,12 +197,12 @@
     {
       "modelName": "00_000_06_13_13_04",
       "actionName": "Повернуть вал",
-      "startTime": 0
+      "startTime": 1500
     },
     {
       "modelName": "00_000_06_13_13_01",
       "actionName": "Опустить на 3",
-      "startTime": 4000
+      "startTime": 8200
     }
   ]
 }
