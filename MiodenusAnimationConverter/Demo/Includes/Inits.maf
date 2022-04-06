@@ -1,0 +1,278 @@
+{
+  "actions":
+  [
+    {
+      "name": "Init 01",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, 3.001, 0.0]
+          }
+        }
+      ]
+	},
+    {
+      "name": "Init 02",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": 90.0,
+              "vector": [1.0, 0.0, 0.0]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 03",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, -0.1, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 04",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": 180.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, 0.1, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 05",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "globalMove": [0.0, -0.1, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 06",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": 8.72,
+              "vector": [0.0, 1.0, 0.0]
+            },
+            "globalMove": [-0.96, -0.1, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 07",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-2.0, 0.0, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 08",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-3.0, 0.0, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 09",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-4.0, 0.0, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 10",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "globalMove": [-2.0, 0.0, 1.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 11",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-3.0, 0.0, 1.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 12",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-4.0, 0.0, 1.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 13",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-2.0, 0.0, 2.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 14",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-3.0, 0.0, 2.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 16",
+      "states":
+      [
+        {
+          "color": [0.15, 0.15, 0.15],
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "globalMove": [-4.0, 0.0, 2.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 19",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -90.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-2.0, 0.0, 3.0]
+          }
+        }
+      ]
+    }
+  ]
+}

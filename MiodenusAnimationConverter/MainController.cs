@@ -92,7 +92,7 @@ namespace MiodenusAnimationConverter
                 }
                 catch (Exception exception)
                 {
-                    Logger.Warn(exception);
+                    Logger.Warn(exception.Message);
                 }
             }
 

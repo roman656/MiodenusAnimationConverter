@@ -3,9 +3,11 @@
   {
     "include":
     [
+	  "Demo/Includes/Inits.maf",
       "Demo/Includes/MoveUpAction.maf",
       "Demo/Includes/MoveDownAction.maf",
-	  "Demo/Includes/ShaftRotationAction.maf"
+	  "Demo/Includes/ShaftRotationAction.maf",
+      "Demo/Includes/Rotation6Action.maf"
     ]
   }
 }

@@ -6,18 +6,15 @@
     "name": "Demo assembling",
     "videoFormat": "mp4",
     "videoCodec": "mpeg4",
-    "videoBitrate": 4000,
+    "videoBitrate": 5000,
     "videoName": "ResultVideo",
     "timeLength": 0,
     "fps": 60,
     "enableMultisampling": true,
-    "frameWidth": 600,
-    "frameHeight": 600,
+    "frameWidth": 800,
+    "frameHeight": 800,
     "backgroundColor": [0.3, 0.3, 0.4],
-    "include":
-    [
-      "Demo/Includes/header.maf"
-    ]
+    "include": [ "Demo/Includes/header.maf" ]
   },
   "modelsInfo":
   [
@@ -35,150 +32,51 @@
       "color": [0.45, 0.52, 0.58],
       "useCalculatedNormals": false
     },
-    {
-      "name": "00_000_06_13_13_03",
-      "filename": "Demo/Models/00_000_06_13_13_03.stl",
-      "color": [0.45, 0.52, 0.58]
-    },
-    {
-      "name": "00_000_06_13_13_04",
-      "filename": "Demo/Models/00_000_06_13_13_04.stl",
-      "color": [0.45, 0.52, 0.58]
-    },
-    {
-      "name": "00_000_06_13_13_05",
-      "filename": "Demo/Models/00_000_06_13_13_05.stl",
-      "color": [0.45, 0.52, 0.58]
-    }
-  ],
-  "actions":
-  [
-    {
-      "name": "Init 1",
-      "states":
-      [
-        {
-          "transformation":
-          {
-            "scale": [0.005, 0.005, 0.005],
-            "localRotate":
-            {
-              "angle": -90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "globalMove": [0.0, 0.001, 0.0]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Init 2",
-      "states":
-      [
-        {
-          "transformation":
-          {
-            "scale": [0.005, 0.005, 0.005],
-            "localRotate":
-            {
-              "angle": 90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Init 3",
-      "states":
-      [
-        {
-          "transformation":
-          {
-            "scale": [0.005, 0.005, 0.005],
-            "localRotate":
-            {
-              "angle": -90.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "globalMove": [0.0, -0.2, 0.0]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Init 4",
-      "states":
-      [
-        {
-          "transformation":
-          {
-            "scale": [0.005, 0.005, 0.005],
-            "localRotate":
-            {
-              "angle": 180.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "globalMove": [0.0, 0.0, 0.0]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Init 5",
-      "states":
-      [
-        {
-          "transformation":
-          {
-            "scale": [0.005, 0.005, 0.005],
-            "localRotate":
-            {
-              "angle": 0.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "globalMove": [0.0, -0.2, 0.0]
-          }
-        }
-      ]
-    }
+    { "name": "00_000_06_13_13_03", "filename": "Demo/Models/00_000_06_13_13_03.stl" },
+    { "name": "00_000_06_13_13_04", "filename": "Demo/Models/00_000_06_13_13_04.stl" },
+    { "name": "00_000_06_13_13_05", "filename": "Demo/Models/00_000_06_13_13_05.stl" },
+    { "name": "00_000_06_13_13_06", "filename": "Demo/Models/00_000_06_13_13_06.stl" },
+    { "name": "00_000_06_13_13_07", "filename": "Demo/Models/00_000_06_13_13_07.stl" },
+    { "name": "00_000_06_13_13_08", "filename": "Demo/Models/00_000_06_13_13_08.stl" },
+    { "name": "00_000_06_13_13_09", "filename": "Demo/Models/00_000_06_13_13_09.stl" },
+    { "name": "00_000_06_13_13_10", "filename": "Demo/Models/00_000_06_13_13_10.stl" },
+    { "name": "00_000_06_13_13_11", "filename": "Demo/Models/00_000_06_13_13_11.stl" },
+    { "name": "00_000_06_13_13_12", "filename": "Demo/Models/00_000_06_13_13_12.stl" },
+    { "name": "00_000_06_13_13_13", "filename": "Demo/Models/00_000_06_13_13_13.stl" },
+    { "name": "00_000_06_13_13_14", "filename": "Demo/Models/00_000_06_13_13_14.stl" },
+    { "name": "00_000_06_13_13_16", "filename": "Demo/Models/00_000_06_13_13_16.stl" },
+    { "name": "00_000_06_13_13_19", "filename": "Demo/Models/00_000_06_13_13_19.stl" }
   ],
   "bindings":
   [
     {
       "modelName": "00_000_06_13_13_01",
-      "actionName": "Init 1",
+      "actionName": "Init 01",
       "startTime": 0,
       "timeLength": 0,
       "useInterpolation": false
     },
     {
       "modelName": "00_000_06_13_13_02",
-      "actionName": "Init 2",
+      "actionName": "Init 02",
       "startTime": 0,
       "timeLength": 0,
       "useInterpolation": false
     },
-    {
-      "modelName": "00_000_06_13_13_03",
-      "actionName": "Init 3",
-      "useInterpolation": false
-    },
-    {
-      "modelName": "00_000_06_13_13_04",
-      "actionName": "Init 4",
-      "useInterpolation": false
-    },
-    {
-      "modelName": "00_000_06_13_13_05",
-      "actionName": "Init 5",
-      "useInterpolation": false
-    },
+    { "modelName": "00_000_06_13_13_03", "actionName": "Init 03", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_04", "actionName": "Init 04", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_05", "actionName": "Init 05", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_06", "actionName": "Init 06", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_07", "actionName": "Init 07", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_08", "actionName": "Init 08", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_09", "actionName": "Init 09", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_10", "actionName": "Init 10", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_11", "actionName": "Init 11", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_12", "actionName": "Init 12", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_13", "actionName": "Init 13", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_14", "actionName": "Init 14", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_16", "actionName": "Init 16", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_19", "actionName": "Init 19", "useInterpolation": false },
     {
       "modelName": "00_000_06_13_13_05",
       "actionName": "Повернуть вал",
@@ -190,13 +88,13 @@
       "startTime": 1500
     },
     {
-      "modelName": "00_000_06_13_13_01",
-      "actionName": "Поднять на 3",
-      "startTime": 1000
-    },
-    {
       "modelName": "00_000_06_13_13_04",
       "actionName": "Повернуть вал",
+      "startTime": 1500
+    },
+    {
+      "modelName": "00_000_06_13_13_06",
+      "actionName": "Повернуть шестерню",
       "startTime": 1500
     },
     {

@@ -105,9 +105,12 @@ namespace MiodenusAnimationConverter
 
             CursorGrabbed = _workMode == WorkModeEnum.FrameView;
 
-            _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 6.0f, 6.0f), Color4.White);
-            _scene.LightPointsController.AddLightPoint(new Vector3(-6.0f, 6.0f, -6.0f), Color4.White);
-            _scene.LightPointsController.AddLightPoint(new Vector3(6.0f, 6.0f, -6.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 9.0f, 0.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, -9.0f, 0.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(9.0f, 9.0f, -9.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(9.0f, 9.0f, 9.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(-9.0f, 9.0f, -9.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(-9.0f, 9.0f, 9.0f), Color4.White);
             _scene.LightPointsController.SetLightPointsTo(_shaderPrograms[_currentProgramIndex]);    // На данном этапе параметры освещения динамически обновлять не будем.
 
             GL.Enable(EnableCap.DepthTest);
