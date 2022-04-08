@@ -4,10 +4,12 @@
     "include":
     [
 	  "Demo/Includes/Inits.maf",
-      "Demo/Includes/MoveUpAction.maf",
-      "Demo/Includes/MoveDownAction.maf",
-	  "Demo/Includes/ShaftRotationAction.maf",
-      "Demo/Includes/Rotation6Action.maf"
+      "Demo/Includes/Move01ToTheCenterAction.maf",
+      "Demo/Includes/Move02ToTheCenterAction.maf",
+      "Demo/Includes/Move05ToTheCenterAction.maf",
+	  "Demo/Includes/Add19To05Action.maf",
+      "Demo/Includes/Add07To05Action.maf",
+      "Demo/Includes/Add16To05Action.maf"
     ]
   }
 }

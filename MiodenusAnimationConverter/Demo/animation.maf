@@ -6,7 +6,7 @@
     "name": "Demo assembling",
     "videoFormat": "mp4",
     "videoCodec": "mpeg4",
-    "videoBitrate": 5000,
+    "videoBitrate": 4000,
     "videoName": "ResultVideo",
     "timeLength": 0,
     "fps": 60,
@@ -44,7 +44,7 @@
     { "name": "00_000_06_13_13_12", "filename": "Demo/Models/00_000_06_13_13_12.stl" },
     { "name": "00_000_06_13_13_13", "filename": "Demo/Models/00_000_06_13_13_13.stl" },
     { "name": "00_000_06_13_13_14", "filename": "Demo/Models/00_000_06_13_13_14.stl" },
-    { "name": "00_000_06_13_13_16", "filename": "Demo/Models/00_000_06_13_13_16.stl" },
+    { "name": "00_000_06_13_13_16", "filename": "Demo/Models/00_000_06_13_13_16.stl", "color": [0.15, 0.15, 0.15] },
     { "name": "00_000_06_13_13_19", "filename": "Demo/Models/00_000_06_13_13_19.stl" }
   ],
   "bindings":
@@ -77,30 +77,11 @@
     { "modelName": "00_000_06_13_13_14", "actionName": "Init 14", "useInterpolation": false },
     { "modelName": "00_000_06_13_13_16", "actionName": "Init 16", "useInterpolation": false },
     { "modelName": "00_000_06_13_13_19", "actionName": "Init 19", "useInterpolation": false },
-    {
-      "modelName": "00_000_06_13_13_05",
-      "actionName": "Повернуть вал",
-      "startTime": 1500
-    },
-    {
-      "modelName": "00_000_06_13_13_03",
-      "actionName": "Повернуть вал",
-      "startTime": 1500
-    },
-    {
-      "modelName": "00_000_06_13_13_04",
-      "actionName": "Повернуть вал",
-      "startTime": 1500
-    },
-    {
-      "modelName": "00_000_06_13_13_06",
-      "actionName": "Повернуть шестерню",
-      "startTime": 1500
-    },
-    {
-      "modelName": "00_000_06_13_13_01",
-      "actionName": "Опустить на 3",
-      "startTime": 8200
-    }
+    { "modelName": "00_000_06_13_13_01", "actionName": "Переместить 01 в центр", "startTime": 1000 },
+    { "modelName": "00_000_06_13_13_05", "actionName": "Переместить 05 в центр", "startTime": 1500 },
+    { "modelName": "00_000_06_13_13_19", "actionName": "Соединить 19 и 05", "startTime": 2500 },
+    { "modelName": "00_000_06_13_13_07", "actionName": "Соединить 07 и 05", "startTime": 3500 },
+    { "modelName": "00_000_06_13_13_16", "actionName": "Соединить 16 и 05", "startTime": 4500 },
+    { "modelName": "00_000_06_13_13_02", "actionName": "Переместить 02 в центр", "startTime": 7000 }
   ]
 }

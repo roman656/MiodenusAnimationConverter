@@ -1,0 +1,24 @@
+{
+  "actions":
+  [
+    {
+      "name": "Переместить 02 в центр",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "GlobalMove": [0.0, -1.5, 0.0] }
+        },
+        {
+          "time": 800,
+          "transformation": { "globalMove": [2.5, 0.0, 3.5] }
+        },
+        {
+          "time": 1200,
+          "transformation": { "globalMove": [0.0, 1.5, 0.0] }
+        }
+      ]
+    }
+  ]
+}

@@ -10,7 +10,7 @@ namespace MiodenusAnimationConverter.Scene
     public class Scene
     {
         private const int GridSize = 6;
-        public static readonly Vector3 DefaultCameraPosition = new (0.0f, 0.5f, 1.5f);
+        public static readonly Vector3 DefaultCameraPosition = new (3.0f, 4.0f, 5.0f);
         public readonly Grid Grid = new (xSizeInCells: GridSize * 10, zSizeInCells: GridSize * 10, cellSize: 0.1f);
         public readonly Grid MajorGrid = new (xSizeInCells: GridSize, zSizeInCells: GridSize, lineWidth: 2.0f);
         public readonly LightPointsController LightPointsController = new ();
