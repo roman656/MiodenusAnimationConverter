@@ -3,7 +3,10 @@
 *MiodenusAnimationConverter* - это консольное приложение, входящее в состав *Miodenus Project*, отвечающее за преобразование входных данных ([см. ниже](#входные-данные)) в итоговый видеофайл, содержащий анимацию сборки.
 
 ## Демо
-![Demo](https://user-images.githubusercontent.com/57591626/162587743-1500fce5-f069-4e37-bf47-8021115e6a65.gif)
+
+Ниже представлена демонстрационная сборка редуктора привода лебёдки, созданная в *MiodenusAnimationConverter*.
+
+<p align="center"><img src="https://user-images.githubusercontent.com/57591626/162587743-1500fce5-f069-4e37-bf47-8021115e6a65.gif" alt="Демо" /></p>
 
 ## Входные данные
 
