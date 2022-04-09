@@ -1,0 +1,28 @@
+{
+  "actions":
+  [
+    {
+      "name": "Переместить 04 в центр",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, -1.5, 0.0] }
+        },
+        {
+          "time": 1200,
+          "transformation":
+          {
+            "localRotate":
+            {
+              "angle": -45.0,
+              "vector": [0.0, 1.0, 0.0]
+            },
+            "globalMove": [0.0, 0.0, 3.0]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 08 и 02",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 800,
+          "transformation":
+          {
+            "localRotate":
+            {
+              "angle": -180.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, -2.0, 0.0]
+          }
+        },
+        {
+          "time": 1600,
+          "transformation": { "globalMove": [2.04, 0.0, 2.0] }
+        },
+        {
+          "time": 2200,
+          "transformation": { "globalMove": [0.0, 0.25, 0.0] }
+        }
+      ]
+    }
+  ]
+}

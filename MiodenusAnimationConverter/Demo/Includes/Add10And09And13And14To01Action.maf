@@ -1,0 +1,16 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 10 + 09 + 13 + 14 и 01",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, -1.803, 0.0] }
+        }
+      ]
+    }
+  ]
+}

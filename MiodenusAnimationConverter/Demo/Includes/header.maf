@@ -9,7 +9,23 @@
       "Demo/Includes/Move05ToTheCenterAction.maf",
 	  "Demo/Includes/Add19To05Action.maf",
       "Demo/Includes/Add07To05Action.maf",
-      "Demo/Includes/Add16To05Action.maf"
+      "Demo/Includes/Add16To05Action.maf",
+      "Demo/Includes/Add04To03Action.maf",
+      "Demo/Includes/Move04ToTheCenterAction.maf",
+      "Demo/Includes/Add04And03To05Action.maf",
+      "Demo/Includes/Add08To02Action.maf",
+      "Demo/Includes/MoveUp08And02Action.maf",
+      "Demo/Includes/Move10ToAssemblyAction.maf",
+      "Demo/Includes/Add09To10Action.maf",
+      "Demo/Includes/Add13To10Action.maf",
+      "Demo/Includes/Add14To10Action.maf",
+      "Demo/Includes/Add10And09And13And14To01Action.maf",
+      "Demo/Includes/Add06To10Action.maf",
+      "Demo/Includes/Add11To10Action.maf",
+      "Demo/Includes/Add12ToTwo11Action.maf",
+      "Demo/Includes/HideBottomLidAction.maf",
+      "Demo/Includes/Rotate04Action.maf",
+      "Demo/Includes/Rotate06Action.maf"
     ]
   }
 }

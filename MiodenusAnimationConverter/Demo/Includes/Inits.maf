@@ -96,7 +96,7 @@
             "scale": [0.005, 0.005, 0.005],
             "localRotate":
             {
-              "angle": 8.72,
+              "angle": 75.49419,
               "vector": [0.0, 1.0, 0.0]
             },
             "globalMove": [2.0, 0.0, -3.0]
@@ -166,13 +166,18 @@
           "transformation":
           {
             "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": -14.5,
+              "vector": [0.0, 1.0, 0.0]
+            },
             "globalMove": [-1.0, 0.0, -2.0]
           }
         }
       ]
     },
     {
-      "name": "Init 11",
+      "name": "Init 11-1",
       "states":
       [
         {
@@ -181,8 +186,36 @@
             "scale": [0.005, 0.005, 0.005],
             "localRotate":
             {
-              "angle": -90.0,
+              "angle": 90.0,
               "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [0.0, 0.0, -2.0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Init 11-2",
+      "states":
+      [
+        {
+          "transformation":
+          {
+            "scale": [0.005, 0.005, 0.005],
+            "localRotate":
+            {
+              "angle": 90.0,
+              "vector": [1.0, 0.0, 0.0]
+            }
+          }
+        },
+        {
+          "transformation":
+          {
+            "localRotate":
+            {
+              "angle": -180.0,
+              "vector": [0.0, 1.0, 0.0]
             },
             "globalMove": [0.0, 0.0, -2.0]
           }
@@ -199,7 +232,7 @@
             "scale": [0.005, 0.005, 0.005],
             "localRotate":
             {
-              "angle": -90.0,
+              "angle": 90.0,
               "vector": [1.0, 0.0, 0.0]
             },
             "globalMove": [1.0, 0.0, -2.0]

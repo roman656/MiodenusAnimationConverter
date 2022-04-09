@@ -1,0 +1,41 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 11 и 10",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, -1.5, 0.0] }
+        },
+        {
+          "time": 1200,
+          "transformation": { "globalMove": [-0.96, 0.0, 2.0] }
+        },
+        {
+          "time": 1600,
+          "transformation": { "globalMove": [0.0, 1.0, 0.0] }
+        },
+        {
+          "time": 2000,
+          "transformation": { "localMove": [0.0, 0.2, 0.0] }
+        },
+        {
+          "time": 2400,
+          "transformation": { "globalMove": [0.0, 0.247, 0.0] }
+        },
+        {
+          "time": 3000,
+          "transformation": { "localMove": [0.0, -0.18, 0.0] }
+        },
+        { "time": 4400 },
+        {
+          "time": 4600,
+          "transformation": { "localMove": [0.0, -0.02, 0.0] }
+        }
+      ]
+    }
+  ]
+}

@@ -30,4 +30,8 @@
 	  <None Update="Demo\**" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Demo\Video" />
+    </ItemGroup>
+
 </Project>

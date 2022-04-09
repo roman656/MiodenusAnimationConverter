@@ -1,0 +1,28 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 12 и два 11",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, -1.5, 0.0] }
+        },
+        {
+          "time": 1200,
+          "transformation": { "globalMove": [-1.96, 0.0, 2.0] }
+        },
+        {
+          "time": 1600,
+          "transformation": { "globalMove": [0.0, 1.0, 0.0] }
+        },
+        {
+          "time": 2600,
+          "transformation": { "globalMove": [0.0, 0.237, 0.0] }
+        }
+      ]
+    }
+  ]
+}

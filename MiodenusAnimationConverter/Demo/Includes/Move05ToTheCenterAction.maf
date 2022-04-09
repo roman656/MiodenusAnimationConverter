@@ -8,15 +8,23 @@
         { "time": 0 },
         {
           "time": 400,
-          "transformation": { "GlobalMove": [0.0, 1.5, 0.0] }
+          "transformation": { "globalMove": [0.0, 1.5, 0.0] }
         },
         {
           "time": 800,
-          "transformation": { "globalMove": [-1.0, 0.0, 3.0] }
+          "transformation":
+          {
+            "localRotate":
+            {
+              "angle": -45.0,
+              "vector": [0.0, 1.0, 0.0]
+            },
+            "globalMove": [-1.0, 0.0, 3.0]
+          }
         },
         {
           "time": 1200,
-          "transformation": { "globalMove": [0.0, -1.7, 0.0] }
+          "transformation": { "globalMove": [0.0, -1.75, 0.0] }
         }
       ]
     }

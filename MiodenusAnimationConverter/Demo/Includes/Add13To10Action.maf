@@ -1,0 +1,32 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 13 и 10",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, 1.0, 0.0] }
+        },
+        {
+          "time": 1200,
+          "transformation":
+          {
+            "localRotate":
+            {
+              "angle": -180.0,
+              "vector": [1.0, 0.0, 0.0]
+            },
+            "globalMove": [-2.96, 0.0, 2.0]
+          }
+        },
+        {
+          "time": 1600,
+          "transformation": { "globalMove": [0.0, 1.165, 0.0] }
+        }
+      ]
+    }
+  ]
+}

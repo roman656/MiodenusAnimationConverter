@@ -107,6 +107,7 @@ namespace MiodenusAnimationConverter
 
             _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, 9.0f, 0.0f), Color4.White);
             _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, -9.0f, 0.0f), Color4.White);
+            _scene.LightPointsController.AddLightPoint(new Vector3(0.0f, -15.0f, 0.0f), Color4.White);
             _scene.LightPointsController.AddLightPoint(new Vector3(9.0f, 9.0f, -9.0f), Color4.White);
             _scene.LightPointsController.AddLightPoint(new Vector3(9.0f, 9.0f, 9.0f), Color4.White);
             _scene.LightPointsController.AddLightPoint(new Vector3(-9.0f, 9.0f, -9.0f), Color4.White);

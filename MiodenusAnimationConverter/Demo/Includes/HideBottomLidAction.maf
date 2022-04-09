@@ -1,0 +1,9 @@
+{
+  "actions":
+  [
+    {
+      "name": "Скрыть нижнюю крышку",
+      "states": [ { "isModelVisible": false} ]
+	}
+  ]
+}

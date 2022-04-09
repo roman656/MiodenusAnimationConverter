@@ -1,0 +1,24 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 09 и 10",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, 1.0, 0.0] }
+        },
+        {
+          "time": 1200,
+          "transformation": { "globalMove": [1.04, 0.0, 2.0] }
+        },
+        {
+          "time": 1600,
+          "transformation": { "globalMove": [0.0, 1.065, 0.0] }
+        }
+      ]
+    }
+  ]
+}

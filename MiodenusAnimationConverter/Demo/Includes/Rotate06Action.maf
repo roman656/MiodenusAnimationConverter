@@ -1,0 +1,18 @@
+{
+  "actions":
+  [
+    {
+      "name": "Вращать 06",
+      "states":
+      [
+        {
+          "transformation": { "localRotate": { "angle": 267.09677, "vector": [0.0, 1.0, 0.0] } }
+        },
+		{
+          "time": 3000,
+          "transformation": { "localRotate": { "angle": 267.09677, "vector": [0.0, 1.0, 0.0] } }
+        }
+	  ]
+	}
+  ]
+}

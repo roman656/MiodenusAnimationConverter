@@ -1,0 +1,32 @@
+{
+  "actions":
+  [
+    {
+      "name": "Соединить 04 и 03",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 400,
+          "transformation": { "globalMove": [0.0, -2.5, 0.0] }
+        },
+        {
+          "time": 1200,
+          "transformation":
+          {
+            "localRotate":
+            {
+              "angle": -45.0,
+              "vector": [0.0, 1.0, 0.0]
+            },
+            "globalMove": [1.0, 0.0, 3.0]
+          }
+        },
+        {
+          "time": 2000,
+          "transformation": { "globalMove": [0.0, 0.725, 0.0] }
+        }
+      ]
+    }
+  ]
+}

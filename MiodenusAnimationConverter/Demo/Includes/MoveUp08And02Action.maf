@@ -1,0 +1,16 @@
+{
+  "actions":
+  [
+    {
+      "name": "Поднять 08 и 02",
+      "states":
+      [
+        { "time": 0 },
+        {
+          "time": 600,
+          "transformation": { "globalMove": [0.0, 1.5, 0.0] }
+        }
+      ]
+    }
+  ]
+}
