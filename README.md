@@ -136,6 +136,53 @@
 }
 ```
 
+Содержимое блока *Actions* было разбито на отдельные файлы. Ниже представлен пример содержимого одного из этих файлов.
+
+```json
+{
+  "actions":
+  [
+    {
+      "name": "Вращать 04",
+      "states":
+      [
+        {
+          "time": 0,
+          "isModelVisible": true,
+          "color": [0.45, 0.52, 0.58],
+          "transformation":
+          {
+            "resetScale": false,
+            "scale": [1.0, 1.0, 1.0],
+            "resetLocalRotation": false,
+            "localRotate":
+            {
+              "angle": -180.0,
+              "unit": "deg",
+              "vector": [0.0, 1.0, 0.0]
+            },
+            "resetPosition": false,
+            "globalMove": [0.0, 0.0, 0.0],
+            "localMove": [0.0, 0.0, 0.0],
+            "rotate":
+            {
+              "angle": 0.0,
+              "unit": "deg",
+              "rotationVectorStartPoint": [1.0, 0.0, 0.0],
+              "rotationVectorEndPoint": [1.0, 0.0, 0.0]
+            }
+          }
+        },
+		    {
+          "time": 3000,
+          "transformation": { "localRotate": { "angle": -180.0, "vector": [0.0, 1.0, 0.0] } }
+        }
+	    ]
+	  }
+  ]
+}
+```
+
 ## Выходные данные
 
 В результате работы приложения будет получен видеофайл, содержащий анимацию сборки. В случае передачи особых аргументов результат работы приложения может быть другим ([см. ниже](#таблица-аргументов)).
