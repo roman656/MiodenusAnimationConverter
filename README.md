@@ -159,3 +159,25 @@
 Команда, представленная ниже, создаст итоговый видеофайл сборки, используя анимационный файл *animation.maf*. Приложение не будет выводить какие-либо сообщения в консоль.
 
 `$ ./MiodenusAnimationConverter --animation "path/to/animation.maf" --quiet`
+
+## Установка
+
+Можно воспользоваться уже [скомпилированными исходниками](https://cloud.mail.ru/public/WjBw/uoZge8X91) (Windows 10 / Kubuntu 21.10).
+
+### Особенности установки на Windows
+
+В директорию проекта (где находятся файлы с расширением .dll) необходимо поместить файл *ffmpeg.exe*.
+
+### Особенности установки на Linux
+
+Приложение было протестировано под ОС [Kubuntu 21.10](https://kubuntu.org/).
+
+Рекомендуется использовать проприетарные драйвера для видеокарты.
+
+Установка [.NET 5](https://docs.microsoft.com/ru-ru/dotnet/core/install/linux-ubuntu) в Kubuntu.
+
+Установка зависимостей:
+
+`sudo apt install -y libgdiplus`
+
+`sudo apt install ffmpeg`
