@@ -173,12 +173,12 @@
             }
           }
         },
-		    {
+	{
           "time": 3000,
           "transformation": { "localRotate": { "angle": -180.0, "vector": [0.0, 1.0, 0.0] } }
         }
-	    ]
-	  }
+      ]
+    }
   ]
 }
 ```
