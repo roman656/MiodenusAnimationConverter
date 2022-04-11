@@ -22,116 +22,116 @@
   {
     "type": "maf",
     "version": "1.0",
-    "name": "AnimationDemo",
-    "videoType": "mp4",
+    "name": "Demo assembling",
+    "videoFormat": "mp4",
+    "videoCodec": "mpeg4",
+    "videoBitrate": 4000,
     "videoName": "ResultVideo",
-    "timeLength": 3600,
+    "timeLength": 0,
     "fps": 60,
-    "frameWidth": 600,
-    "frameHeight": 600
+    "enableMultisampling": true,
+    "frameWidth": 800,
+    "frameHeight": 800,
+    "backgroundColor": [0.3, 0.3, 0.4],
+    "include": [ "Demo/Includes/header.maf" ]
   },
   "modelsInfo":
   [
     {
-      "name": "bolt_25x8",
+      "name": "00_000_06_13_13_01",
       "type": "stl",
-      "filename": "path/to/bolt_25x8.stl",
-      "color": [0.0, 1.0, 0.0],
-      "baseTransformation":
-      {
-        "location": [0.0, 0.0, 0.0],
-        "rotation":
-        {
-          "angle": 5.0,
-          "unit": "rad",
-          "vector": [0.0, 1.0, 0.0]
-        },
-        "scale": [0.5, 0.5, 0.5]
-      }
+      "filename": "Demo/Models/00_000_06_13_13_01.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false
     },
     {
-      "name": "nut_6x9",
+      "name": "00_000_06_13_13_02",
       "type": "stl",
-      "filename": "path/to/nut_6x9.stl",
-      "color": [1.0, 0.0, 0.0],
-      "baseTransformation":
-      {
-        "location": [0.0, 0.0, 20.0],
-        "rotation":
-        {
-          "angle": 90.0,
-          "unit": "deg",
-          "vector": [1.0, 0.0, 0.0]
-        },
-        "scale": [0.5, 0.5, 0.5]
-      }
-    }
-  ],
-  "actions":
-  [
-    {
-      "name": "nut rotation",
-      "states":
-      [
-        {
-          "time": 0,
-          "isModelVisible": true,
-          "color": [0.0, 1.0, 0.0],
-          "transformation":
-          {
-            "location": [0.0, 0.0, 0.0],
-            "rotation":
-            {
-              "angle": 10.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            },
-            "scale": [1.0, 1.0, 1.0]
-          }
-        },
-        {
-          "time": 1500,
-          "transformation":
-          {
-            "location": [0.0, 0.0, -20.0],
-            "rotation":
-            {
-              "angle": 180.0,
-              "unit": "deg",
-              "vector": [1.0, 0.0, 0.0]
-            }
-          }
-        },
-        {
-          "time": 3000,
-          "transformation":
-          {
-            "rotation":
-            {
-              "angle": -7.0,
-              "vector": [0.0, 1.0, 0.0]
-            }
-          }
-        }
-      ]
-    }
+      "filename": "Demo/Models/00_000_06_13_13_02.stl",
+      "color": [0.45, 0.52, 0.58],
+      "useCalculatedNormals": false
+    },
+    { "name": "00_000_06_13_13_03", "filename": "Demo/Models/00_000_06_13_13_03.stl" },
+    { "name": "00_000_06_13_13_04", "filename": "Demo/Models/00_000_06_13_13_04.stl" },
+    { "name": "00_000_06_13_13_05", "filename": "Demo/Models/00_000_06_13_13_05.stl" },
+    { "name": "00_000_06_13_13_06", "filename": "Demo/Models/00_000_06_13_13_06.stl" },
+    { "name": "00_000_06_13_13_07", "filename": "Demo/Models/00_000_06_13_13_07.stl" },
+    { "name": "00_000_06_13_13_08", "filename": "Demo/Models/00_000_06_13_13_08.stl" },
+    { "name": "00_000_06_13_13_09", "filename": "Demo/Models/00_000_06_13_13_09.stl" },
+    { "name": "00_000_06_13_13_10", "filename": "Demo/Models/00_000_06_13_13_10.stl" },
+    { "name": "00_000_06_13_13_11_1", "filename": "Demo/Models/00_000_06_13_13_11.stl" },
+    { "name": "00_000_06_13_13_11_2", "filename": "Demo/Models/00_000_06_13_13_11.stl" },
+    { "name": "00_000_06_13_13_12", "filename": "Demo/Models/00_000_06_13_13_12.stl" },
+    { "name": "00_000_06_13_13_13", "filename": "Demo/Models/00_000_06_13_13_13.stl" },
+    { "name": "00_000_06_13_13_14", "filename": "Demo/Models/00_000_06_13_13_14.stl" },
+    { "name": "00_000_06_13_13_16", "filename": "Demo/Models/00_000_06_13_13_16.stl", "color": [0.15, 0.15, 0.15] },
+    { "name": "00_000_06_13_13_19", "filename": "Demo/Models/00_000_06_13_13_19.stl" }
   ],
   "bindings":
   [
     {
-      "modelName": "nut_6x9",
-      "actionName": "nut rotation",
-      "startTime": 10,
-      "timeLength": 3500,
-      "useInterpolation": true
+      "modelName": "00_000_06_13_13_01",
+      "actionName": "Init 01",
+      "startTime": 0,
+      "timeLength": 0,
+      "useInterpolation": false
     },
     {
-      "modelName": "bolt_25x8",
-      "actionName": "nut rotation",
-      "startTime": 2000,
-      "timeLength": 100,
+      "modelName": "00_000_06_13_13_02",
+      "actionName": "Init 02",
+      "startTime": 0,
+      "timeLength": 0,
       "useInterpolation": false
-    }
+    },
+    { "modelName": "00_000_06_13_13_03", "actionName": "Init 03", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_04", "actionName": "Init 04", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_05", "actionName": "Init 05", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_06", "actionName": "Init 06", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_07", "actionName": "Init 07", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_08", "actionName": "Init 08", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_09", "actionName": "Init 09", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_10", "actionName": "Init 10", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_11_1", "actionName": "Init 11-1", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_11_2", "actionName": "Init 11-2", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_12", "actionName": "Init 12", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_13", "actionName": "Init 13", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_14", "actionName": "Init 14", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_16", "actionName": "Init 16", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_19", "actionName": "Init 19", "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_01", "actionName": "Переместить 01 в центр", "startTime": 1000 },
+    { "modelName": "00_000_06_13_13_05", "actionName": "Переместить 05 в центр", "startTime": 1500 },
+    { "modelName": "00_000_06_13_13_19", "actionName": "Соединить 19 и 05", "startTime": 2500 },
+    { "modelName": "00_000_06_13_13_07", "actionName": "Соединить 07 и 05", "startTime": 3500 },
+    { "modelName": "00_000_06_13_13_16", "actionName": "Соединить 16 и 05", "startTime": 4500 },
+    { "modelName": "00_000_06_13_13_04", "actionName": "Переместить 04 в центр", "startTime": 5500 },
+    { "modelName": "00_000_06_13_13_03", "actionName": "Соединить 04 и 03", "startTime": 6500 },
+    { "modelName": "00_000_06_13_13_03", "actionName": "Соединить 04 + 03 и 05", "startTime": 9000 },
+    { "modelName": "00_000_06_13_13_04", "actionName": "Соединить 04 + 03 и 05", "startTime": 9000 },
+    { "modelName": "00_000_06_13_13_10", "actionName": "Переместить 10 к сборке", "startTime": 10000 },
+    { "modelName": "00_000_06_13_13_09", "actionName": "Соединить 09 и 10", "startTime": 10500 },
+    { "modelName": "00_000_06_13_13_13", "actionName": "Соединить 13 и 10", "startTime": 11000 },
+    { "modelName": "00_000_06_13_13_14", "actionName": "Соединить 14 и 10", "startTime": 12000 },
+    { "modelName": "00_000_06_13_13_10", "actionName": "Соединить 10 + 09 + 13 + 14 и 01", "startTime": 14500 },
+    { "modelName": "00_000_06_13_13_09", "actionName": "Соединить 10 + 09 + 13 + 14 и 01", "startTime": 14500 },
+    { "modelName": "00_000_06_13_13_13", "actionName": "Соединить 10 + 09 + 13 + 14 и 01", "startTime": 14500 },
+    { "modelName": "00_000_06_13_13_14", "actionName": "Соединить 10 + 09 + 13 + 14 и 01", "startTime": 14500 },
+    { "modelName": "00_000_06_13_13_06", "actionName": "Соединить 06 и 10", "startTime": 15500 },
+    { "modelName": "00_000_06_13_13_11_1", "actionName": "Соединить 11 и 10", "startTime": 16500 },
+    { "modelName": "00_000_06_13_13_11_2", "actionName": "Соединить 11 и 10", "startTime": 16500 },
+    { "modelName": "00_000_06_13_13_12", "actionName": "Соединить 12 и два 11", "startTime": 18500 },
+    { "modelName": "00_000_06_13_13_02", "actionName": "Переместить 02 в центр", "startTime": 22000 },
+    { "modelName": "00_000_06_13_13_08", "actionName": "Соединить 08 и 02", "startTime": 23000 },
+    { "modelName": "00_000_06_13_13_02", "actionName": "Поднять 08 и 02", "startTime": 26000 },
+    { "modelName": "00_000_06_13_13_08", "actionName": "Поднять 08 и 02", "startTime": 26000 },
+    { "modelName": "00_000_06_13_13_02", "actionName": "Скрыть нижнюю крышку", "startTime": 27500, "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_08", "actionName": "Скрыть нижнюю крышку", "startTime": 27500, "useInterpolation": false },
+    { "modelName": "00_000_06_13_13_04", "actionName": "Вращать 04", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_05", "actionName": "Вращать 04", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_03", "actionName": "Вращать 04", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_06", "actionName": "Вращать 06", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_10", "actionName": "Вращать 06", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_11_1", "actionName": "Вращать 06", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_11_2", "actionName": "Вращать 06", "startTime": 29000 }
   ]
 }
 ```
