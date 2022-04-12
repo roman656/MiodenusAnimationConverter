@@ -241,6 +241,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             if (DebugCameraKeyBindings.ResetKeys.All(keyboardState.IsKeyDown))
             {
                 Reset();
+                MovementSpeed = 2.0f;
             }
         }
         
