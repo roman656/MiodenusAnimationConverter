@@ -25,7 +25,8 @@
       "Demo/Includes/Add12ToTwo11Action.maf",
       "Demo/Includes/HideBottomLidAction.maf",
       "Demo/Includes/Rotate04Action.maf",
-      "Demo/Includes/Rotate06Action.maf"
+      "Demo/Includes/Rotate06Action.maf",
+      "Demo/Includes/ColorizeAction.maf"
     ]
   }
 }

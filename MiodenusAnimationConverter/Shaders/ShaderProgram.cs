@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using MiodenusAnimationConverter.Exceptions;
 using OpenTK.Graphics.OpenGL;

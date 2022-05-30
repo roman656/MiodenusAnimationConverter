@@ -13,7 +13,7 @@
     "enableMultisampling": true,
     "frameWidth": 800,
     "frameHeight": 800,
-    "backgroundColor": [0.3, 0.3, 0.4],
+    "backgroundColor": [0.83, 0.87, 0.93],
     "include": [ "Demo/Includes/header.maf" ]
   },
   "modelsInfo":
@@ -107,9 +107,11 @@
     { "modelName": "00_000_06_13_13_02", "actionName": "Скрыть нижнюю крышку", "startTime": 27500, "useInterpolation": false },
     { "modelName": "00_000_06_13_13_08", "actionName": "Скрыть нижнюю крышку", "startTime": 27500, "useInterpolation": false },
     { "modelName": "00_000_06_13_13_04", "actionName": "Вращать 04", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_04", "actionName": "Нагрев", "startTime": 29000 },
     { "modelName": "00_000_06_13_13_05", "actionName": "Вращать 04", "startTime": 29000 },
     { "modelName": "00_000_06_13_13_03", "actionName": "Вращать 04", "startTime": 29000 },
     { "modelName": "00_000_06_13_13_06", "actionName": "Вращать 06", "startTime": 29000 },
+    { "modelName": "00_000_06_13_13_06", "actionName": "Нагрев", "startTime": 29000 },
     { "modelName": "00_000_06_13_13_10", "actionName": "Вращать 06", "startTime": 29000 },
     { "modelName": "00_000_06_13_13_11_1", "actionName": "Вращать 06", "startTime": 29000 },
     { "modelName": "00_000_06_13_13_11_2", "actionName": "Вращать 06", "startTime": 29000 }
