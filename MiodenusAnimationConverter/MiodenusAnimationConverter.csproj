@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Description>This console application converts input data into a final video file containing an animation of the assembly.</Description>
         <RepositoryUrl>https://github.com/roman656/MiodenusAnimationConverter</RepositoryUrl>
         <PackageVersion>1.0.0</PackageVersion>
