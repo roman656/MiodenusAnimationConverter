@@ -10,6 +10,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
     {
         private const float FovMinValue = 1.0f;
         private const float FovMaxValue = 180.0f;
+        private const float ProjectionVolumeMinValue = 0.001f;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly Pivot _pivot;
         private int _viewportWidth;
@@ -18,11 +19,13 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private float _fov = MathHelper.PiOver3;    // Угол поля зрения в направлении оси OY (в радианах).
         private float _distanceToTheNearClipPlane = 0.01f;
         private float _distanceToTheFarClipPlane = 100.0f;
+        private float _projectionVolume = 6.0f;
         private Matrix4 _view;
         private Matrix4 _projection;
+        private ProjectionTypeEnum _projectionType = ProjectionTypeEnum.Perspective;
         private VertexArrayObject _vao;
         public bool IsVisibleInDebug = true;
-        
+
         private int _fovVboIndex;
         private int _distanceToTheNearClipPlaneVboIndex;
         private int _distanceToTheFarClipPlaneVboIndex;
@@ -153,10 +156,43 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             }
         }
 
+        public ProjectionTypeEnum ProjectionType
+        {
+            get => _projectionType;
+            set
+            {
+                _projectionType = value;
+                UpdateProjectionMatrix();
+            }
+        }
+        
+        public float ProjectionVolume
+        {
+            get => _projectionVolume;
+            set
+            {
+                if (value >= ProjectionVolumeMinValue)
+                {
+                    _projectionVolume = value;
+                    UpdateProjectionMatrix();
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for ProjectionVolume parameter. Expected: value"
+                            + $" greater than {ProjectionVolumeMinValue}. Got: {value}." 
+                            + " Projection volume was not changed.");
+                }
+            }
+        }
+
         private void UpdateViewMatrix() => _view = Matrix4.LookAt(_pivot.Position,
                 _pivot.Position + _pivot.ZAxisPositiveDirection * -1, _pivot.YAxisPositiveDirection);
-        private void UpdateProjectionMatrix() => _projection = Matrix4.CreatePerspectiveFieldOfView(_fov,
-                _viewportAspectRatio, _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+        private void UpdateProjectionMatrix() => _projection = _projectionType == ProjectionTypeEnum.Perspective
+                ? Matrix4.CreatePerspectiveFieldOfView(_fov, _viewportAspectRatio, _distanceToTheNearClipPlane,
+                        _distanceToTheFarClipPlane)
+                : Matrix4.CreateOrthographic(_projectionVolume, _projectionVolume,
+                        _distanceToTheNearClipPlane, _distanceToTheFarClipPlane);
+
         private void UpdateViewportAspectRatio() => _viewportAspectRatio = _viewportWidth / (float)_viewportHeight;
         
         public Matrix4 ViewMatrix => _view;

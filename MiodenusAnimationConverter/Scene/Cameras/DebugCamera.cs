@@ -14,7 +14,8 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private bool _isFirstMouseMove = true;
         private Vector2 _previousMousePosition;
         private float _maxRotationSpeed = 0.1f;
-        private float _scrollSensitivity = 2.0f;
+        private float _scrollFovSensitivity = 2.0f;
+        private float _scrollVolumeSensitivity = 0.2f;
         private float _mouseSensitivity = 0.004f;
         public bool UseLocalCoordinateSystemForMovement = true;
 
@@ -46,19 +47,36 @@ namespace MiodenusAnimationConverter.Scene.Cameras
             }
         }
         
-        public float ScrollSensitivity
+        public float ScrollFovSensitivity
         {
-            get => _scrollSensitivity;
+            get => _scrollFovSensitivity;
             set
             {
                 if (value > 0.0f)
                 {
-                    _scrollSensitivity = value;
+                    _scrollFovSensitivity = value;
                 }
                 else
                 {
-                    Logger.Warn("Wrong value for ScrollSensitivity parameter. Expected: value greater than"
-                                + $" 0. Got: {value}. Scroll sensitivity was not changed.");
+                    Logger.Warn("Wrong value for ScrollFovSensitivity parameter. Expected: value greater than"
+                                + $" 0. Got: {value}. Scroll FOV sensitivity was not changed.");
+                }
+            }
+        }
+        
+        public float ScrollVolumeSensitivity
+        {
+            get => _scrollVolumeSensitivity;
+            set
+            {
+                if (value > 0.0f)
+                {
+                    _scrollVolumeSensitivity = value;
+                }
+                else
+                {
+                    Logger.Warn("Wrong value for ScrollVolumeSensitivity parameter. Expected: value greater than"
+                                + $" 0. Got: {value}. Scroll volume sensitivity was not changed.");
                 }
             }
         }
@@ -266,9 +284,16 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         
         public void ProcessMouseScroll(MouseWheelEventArgs args, KeyboardState keyboardState)
         {
-            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.FovChangeKey))
+            if (keyboardState.IsKeyDown(DebugCameraKeyBindings.FovOrVolumeChangeKey))
             {
-                Fov -= args.OffsetY * _scrollSensitivity;
+                if (ProjectionType == ProjectionTypeEnum.Perspective)
+                {
+                    Fov -= args.OffsetY * _scrollFovSensitivity;
+                }
+                else
+                {
+                    ProjectionVolume -= args.OffsetY * _scrollVolumeSensitivity;
+                }
             }
             else
             {

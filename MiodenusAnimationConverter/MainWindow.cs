@@ -7,6 +7,7 @@ using FFMpegCore.Extend;
 using FFMpegCore.Pipes;
 using MiodenusAnimationConverter.Animation;
 using MiodenusAnimationConverter.Media;
+using MiodenusAnimationConverter.Scene.Cameras;
 using MiodenusAnimationConverter.Shaders;
 using MiodenusAnimationConverter.Shaders.FragmentShaders;
 using MiodenusAnimationConverter.Shaders.GeometryShaders;
@@ -186,6 +187,13 @@ namespace MiodenusAnimationConverter
             if (args.Key == Keys.G)
             {
                 _scene.SwitchGridVisibility();
+            }
+            
+            if (args.Key == DebugCameraKeyBindings.SwitchProjectionTypeKey)
+            {
+                _scene.CamerasController.CurrentDebugCamera.ProjectionType =
+                        _scene.CamerasController.CurrentDebugCamera.ProjectionType == ProjectionTypeEnum.Perspective
+                        ? ProjectionTypeEnum.Orthographic : ProjectionTypeEnum.Perspective;
             }
         }
 

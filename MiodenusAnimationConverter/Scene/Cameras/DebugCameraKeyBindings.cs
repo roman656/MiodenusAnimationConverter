@@ -4,7 +4,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
 {
     public static class DebugCameraKeyBindings
     {
-        public const Keys FovChangeKey = Keys.LeftAlt;
+        public const Keys FovOrVolumeChangeKey = Keys.LeftAlt;
         public const Keys SwitchCoordinateSystemForMovementKey = Keys.L;
         public const Keys ForwardMoveKey = Keys.W;
         public const Keys LeftMoveKey = Keys.A;
@@ -16,6 +16,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         public const Keys RightTiltKey = Keys.E;
         public const Keys LookAtZeroKey = Keys.Z;
         public const Keys ResetPositionKey = Keys.I;
+        public const Keys SwitchProjectionTypeKey = Keys.T;
         public static readonly Keys[] ResetKeys = { Keys.C, Keys.R };
     }
 }
