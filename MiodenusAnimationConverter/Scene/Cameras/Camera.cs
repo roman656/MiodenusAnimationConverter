@@ -19,7 +19,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         private float _fov = MathHelper.PiOver3;    // Угол поля зрения в направлении оси OY (в радианах).
         private float _distanceToTheNearClipPlane = 0.01f;
         private float _distanceToTheFarClipPlane = 100.0f;
-        private float _projectionVolume = 6.0f;
+        private float _projectionVolume = 10.0f;
         private Matrix4 _view;
         private Matrix4 _projection;
         private ProjectionTypeEnum _projectionType = ProjectionTypeEnum.Perspective;
@@ -50,6 +50,7 @@ namespace MiodenusAnimationConverter.Scene.Cameras
         {
             _pivot.ResetLocalRotation();
             _fov = MathHelper.PiOver3;
+            _projectionVolume = 10.0f;
             _distanceToTheNearClipPlane = 0.01f;
             _distanceToTheFarClipPlane = 100.0f;
             UpdateViewMatrix();

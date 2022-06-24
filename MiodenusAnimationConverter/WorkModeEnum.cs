@@ -1,9 +1,8 @@
-namespace MiodenusAnimationConverter
+namespace MiodenusAnimationConverter;
+
+public enum WorkModeEnum : byte
 {
-    public enum WorkModeEnum : byte
-    {
-        Default,
-        FrameView,
-        GetFrameImage
-    }
+    Default,
+    FrameView,
+    GetFrameImage
 }

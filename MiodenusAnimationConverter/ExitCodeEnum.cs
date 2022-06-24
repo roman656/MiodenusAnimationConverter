@@ -1,9 +1,8 @@
-namespace MiodenusAnimationConverter
+namespace MiodenusAnimationConverter;
+
+public enum ExitCodeEnum : byte
 {
-    public enum ExitCodeEnum : byte
-    {
-        Success,
-        WrongCommandLineOptionValue,
-        AnimationLoadingError
-    }
+    Success,
+    WrongCommandLineOptionValue,
+    AnimationLoadingError
 }
