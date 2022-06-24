@@ -1,7 +1,6 @@
-namespace MiodenusAnimationConverter.Loaders.AnimationLoaders
+namespace MiodenusAnimationConverter.Loaders.AnimationLoaders;
+
+public interface IAnimationLoader
 {
-    public interface IAnimationLoader
-    {
-        public Animation.Animation Load(in string filename);
-    }
+    public Animation.Animation Load(in string filename);
 }

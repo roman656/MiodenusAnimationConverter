@@ -1,10 +1,9 @@
-using MiodenusAnimationConverter.Animation;
-using MiodenusAnimationConverter.Scene.Models;
+namespace MiodenusAnimationConverter.Loaders.ModelLoaders;
 
-namespace MiodenusAnimationConverter.Loaders.ModelLoaders
+using Animation;
+using Scene.Models;
+
+public interface IModelLoader
 {
-    public interface IModelLoader
-    {
-        public Model Load(in ModelInfo modelInfo);
-    }
+    public Model Load(in ModelInfo modelInfo);
 }
